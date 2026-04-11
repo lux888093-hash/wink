@@ -1,0 +1,147 @@
+.redeem-page {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.redeem-stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.redeem-stage-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.4);
+}
+
+.redeem-stage-mask {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 0%, var(--surface) 90%);
+}
+
+.redeem-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 42rpx;
+}
+
+.redeem-stage-bottle {
+  width: 380rpx;
+  height: 500rpx;
+  filter: drop-shadow(0 20rpx 42rpx rgba(0,0,0,0.52));
+  margin-bottom: 26rpx;
+  animation: fadeIn 1.2s ease-out;
+}
+
+.redeem-stage-copy {
+  text-align: center;
+  margin-bottom: 46rpx;
+  animation: fadeIn 1.5s ease-out;
+}
+
+.redeem-brand {
+  display: block;
+  font-family: Baskerville, Georgia, "Times New Roman", serif;
+  font-size: 82rpx;
+  line-height: 1.02;
+  color: var(--ink);
+  margin-bottom: 12rpx;
+  font-weight: 300;
+}
+
+.redeem-caption {
+  display: block;
+  font-size: 16rpx;
+  color: var(--gold);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+
+.redeem-card {
+  width: 100%;
+  max-width: 630rpx;
+  background: rgba(17, 14, 13, 0.54);
+  backdrop-filter: blur(40rpx);
+  border: 1rpx solid rgba(216, 180, 128, 0.1);
+  padding: 42rpx 30rpx;
+  text-align: center;
+  border-radius: 22rpx;
+  animation: fadeIn 1.8s ease-out;
+}
+
+.redeem-card .display-title {
+  font-size: 40rpx;
+  margin: 18rpx 0;
+}
+
+.loader-row {
+  display: flex;
+  justify-content: center;
+  gap: 16rpx;
+  margin: 26rpx 0;
+}
+
+.loader-dot {
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 999rpx;
+  background: var(--gold);
+}
+
+.loader-dot--one { animation: pulse 1.2s infinite 0s; }
+.loader-dot--two { animation: pulse 1.2s infinite 0.2s; }
+.loader-dot--three { animation: pulse 1.2s infinite 0.4s; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.4); }
+}
+
+.success-seal {
+  width: 120rpx;
+  height: 120rpx;
+  margin: 28rpx auto;
+  border-radius: 999rpx;
+  border: 2rpx solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.success-seal-text {
+  color: var(--gold);
+  font-size: 24rpx;
+  letter-spacing: 0.2em;
+  font-weight: 600;
+}
+
+.redeem-footnote {
+  display: block;
+  margin-top: 28rpx;
+  font-size: 16rpx;
+  color: var(--ink-faint);
+  opacity: 0.6;
+}

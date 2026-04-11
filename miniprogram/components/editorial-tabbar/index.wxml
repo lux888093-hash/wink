@@ -1,0 +1,34 @@
+<view class="tabbar-shell">
+  <button
+    class="tabbar-item {{active === 'cellar' ? 'is-active' : ''}}"
+    data-key="cellar"
+    data-url="/pages/cellar/index"
+    bindtap="switchView"
+  >
+    <view class="tabbar-mark"></view>
+    <text class="tabbar-label">Estate</text>
+    <text class="tabbar-meta">VISIT</text>
+  </button>
+
+  <button
+    class="tabbar-item {{active === 'detail' ? 'is-active' : ''}}"
+    data-key="detail"
+    data-url="/pages/detail/index"
+    bindtap="switchView"
+  >
+    <view class="tabbar-mark"></view>
+    <text class="tabbar-label">Wine</text>
+    <text class="tabbar-meta">BOTTLE</text>
+  </button>
+
+  <button
+    class="tabbar-item {{active === 'melody' ? 'is-active' : ''}}"
+    data-key="melody"
+    data-url="/pages/melody/index"
+    bindtap="switchView"
+  >
+    <view class="tabbar-mark"></view>
+    <text class="tabbar-label">Music</text>
+    <text class="tabbar-meta">LISTEN</text>
+  </button>
+</view>

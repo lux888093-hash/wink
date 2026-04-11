@@ -1,0 +1,18 @@
+{
+  "pages": [
+    "pages/redeem/index",
+    "pages/cellar/index",
+    "pages/detail/index",
+    "pages/melody/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "Hongjiu Estate",
+    "navigationBarBackgroundColor": "#0a0a0a",
+    "navigationBarTextStyle": "white",
+    "backgroundTextStyle": "light",
+    "backgroundColor": "#131313"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

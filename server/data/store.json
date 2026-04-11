@@ -1,0 +1,183 @@
+{
+  "wines": [
+    {
+      "id": "soundless-a-quiet-world-2022",
+      "brand": "Hongjiu Estate",
+      "title": "Soundless A Quiet World",
+      "vintage": "2022 Estate Edition",
+      "eyebrow": "Estate Signature",
+      "region": "Moonlit Vineyard",
+      "country": "China",
+      "grapes": "Moon Harvest Signature",
+      "abv": "Night Reserve",
+      "style": "Estate Red",
+      "serving": "16-18°C · Open 20 min before serving",
+      "quote": "Moonlight, oak and one lit window slow the wine to the right pace.",
+      "overview": "This wine does not arrive loudly. It opens like a second sentence after dusk: dark fruit first, then a softer line of oak, dried flowers and a finish that stays composed rather than forceful.",
+      "storyTitle": "From Estate To Bottle",
+      "story": "Its narrative begins with the same visual world each time: vine rows under a crescent moon, a house glowing at the end of the path and hands moving through fruit after dark. The estate, the bottle and the music are meant to feel like one sequence.",
+      "moodLine": "Lower the lights and let the room quieten with the pour.",
+      "estateName": "Hongjiu Estate",
+      "estateTagline": "Moonlight, vine rows and a window left glowing",
+      "estateIntro": "The estate is not memorable because it is loud. It is memorable because, after dark, everything falls into order: the crescent moon, the lamp, the path and the vines all read as a single composed scene.",
+      "estatePhilosophy": "The goal is not to present a bottle alone, but a complete sensory frame: first the estate, then the wine, then the music that lets the pour settle into memory.",
+      "estateHeroImage": "/assets/images/winery-vineyard-moon.jpg",
+      "estatePortraitImage": "/assets/images/winery-cottage-night.jpg",
+      "harvestImage": "/assets/images/harvest-under-moon.jpg",
+      "bottleImage": "/assets/images/wine-bottle-estate.jpg",
+      "posterImage": "/assets/images/wine-bottle-poster.jpg",
+      "giftImage": "/assets/images/wine-gift-set.jpg",
+      "estateStats": [
+        {
+          "label": "Atmosphere",
+          "value": "Moonlight / Quiet / Warmth"
+        },
+        {
+          "label": "Signature Image",
+          "value": "A crescent moon above vine rows"
+        },
+        {
+          "label": "Experience",
+          "value": "Estate + Bottle + Music"
+        }
+      ],
+      "tasting": [
+        {
+          "key": "Aroma",
+          "icon": "NOSE",
+          "text": "Dark fruit leads, followed by dried petals, light oak and a faint coolness that feels almost nocturnal."
+        },
+        {
+          "key": "Palate",
+          "icon": "FLOW",
+          "text": "Rounded on entry and measured in its movement, it prefers length and composure over sheer impact.",
+          "meter": 82
+        },
+        {
+          "key": "Finish",
+          "icon": "FINISH",
+          "text": "Clean and slightly mineral, with a quiet trace of wood that suits slow drinking and low-volume music.",
+          "meter": 76
+        }
+      ],
+      "scores": [
+        {
+          "source": "Atmosphere",
+          "score": "Still"
+        },
+        {
+          "source": "Texture",
+          "score": "Velvet"
+        },
+        {
+          "source": "Memory",
+          "score": "Night"
+        }
+      ],
+      "technical": [
+        {
+          "label": "Style",
+          "value": "Quiet, rounded, lightly oaked and dusk-toned"
+        },
+        {
+          "label": "Best For",
+          "value": "Solo pours, late conversation and gifting"
+        },
+        {
+          "label": "Pairing",
+          "value": "Aged cheese, lightly charred meat, dark chocolate"
+        },
+        {
+          "label": "Music",
+          "value": "Ambient piano, low strings, restrained jazz"
+        }
+      ],
+      "collection": [
+        {
+          "id": "moon-arch",
+          "vintage": "MOON ARCH",
+          "title": "Moon Arch",
+          "note": "The vine corridor is the image that immediately explains why the estate works as an immersive experience.",
+          "image": "/assets/images/winery-vineyard-moon.jpg"
+        },
+        {
+          "id": "lamp-house",
+          "vintage": "LAMP HOUSE",
+          "title": "The Lit House",
+          "note": "A single warm window brings back the estate’s warmth and its sense of story.",
+          "image": "/assets/images/winery-cottage-night.jpg"
+        },
+        {
+          "id": "night-harvest",
+          "vintage": "NIGHT HARVEST",
+          "title": "Night Harvest",
+          "note": "When people, fruit and moonlight appear together, the brand identity feels complete.",
+          "image": "/assets/images/harvest-under-moon.jpg"
+        }
+      ],
+      "tracks": [
+        {
+          "id": "moonlit-path",
+          "mood": "Moon Courtyard",
+          "title": "Moonlit Path",
+          "description": "A slow opening cue for looking through the estate before the pour.",
+          "src": "/assets/audio/vintage-noir.wav",
+          "durationLabel": "00:24",
+          "art": "noir",
+          "cover": "/assets/images/winery-vineyard-moon.jpg"
+        },
+        {
+          "id": "harvest-whisper",
+          "mood": "Night Harvest",
+          "title": "Harvest Whisper",
+          "description": "Closer to the breathing rhythm of vine rows and harvest after dark.",
+          "src": "/assets/audio/earthly-echoes.wav",
+          "durationLabel": "00:26",
+          "art": "earth",
+          "cover": "/assets/images/harvest-under-moon.jpg"
+        },
+        {
+          "id": "candle-cellar",
+          "mood": "Cellar Candle",
+          "title": "Candle Cellar",
+          "description": "Softer and warmer, suited to opening the case and pouring without rush.",
+          "src": "/assets/audio/relaxing-jazz.wav",
+          "durationLabel": "00:22",
+          "art": "jazz",
+          "cover": "/assets/images/wine-gift-set.jpg"
+        },
+        {
+          "id": "quiet-world",
+          "mood": "Signature Pour",
+          "title": "Quiet World",
+          "description": "The track that lets label, light and pace resolve on a single page.",
+          "src": "/assets/audio/classical-piano.wav",
+          "durationLabel": "00:20",
+          "art": "ivory",
+          "cover": "/assets/images/wine-bottle-poster.jpg"
+        }
+      ]
+    }
+  ],
+  "codes": [
+    {
+      "token": "demo_vintage_noir",
+      "label": "Local demo card",
+      "wineId": "soundless-a-quiet-world-2022",
+      "status": "used",
+      "createdAt": "2026-04-09T14:20:45.871Z",
+      "expiresAt": "2026-05-09T14:20:45.871Z",
+      "usedAt": "2026-04-09T14:20:45.881Z",
+      "sessionId": "ses_fF2DA0k"
+    }
+  ],
+  "sessions": [
+    {
+      "id": "ses_fF2DA0k",
+      "wineId": "soundless-a-quiet-world-2022",
+      "createdAt": "2026-04-09T14:20:45.881Z",
+      "expiresAt": "2026-04-16T14:20:45.881Z",
+      "sourceToken": "demo_vintage_noir"
+    }
+  ]
+}

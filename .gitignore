@@ -1,0 +1,8 @@
+/server/node_modules/
+/server/logs/
+/downloads/
+/server/.env
+/miniprogram/project.private.config.json
+
+.DS_Store
+Thumbs.db

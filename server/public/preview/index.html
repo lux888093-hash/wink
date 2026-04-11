@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Curator Preview</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <aside class="preview-sidebar">
+        <p class="sidebar-kicker">HONGJIU PREVIEW</p>
+        <h1 class="sidebar-title">The Curator</h1>
+        <p class="sidebar-copy">
+          浏览器预览版，用来快速看 UI 和交互节奏。数据与一次性码逻辑仍然走本地后端。
+        </p>
+
+        <div class="sidebar-actions">
+          <button id="demo-entry" class="primary-button">生成演示卡并进入</button>
+          <button id="reset-demo" class="ghost-button">重置演示数据</button>
+        </div>
+
+        <div class="sidebar-status" id="status-box">
+          <span class="status-label">状态</span>
+          <span id="status-text">等待生成本地演示卡</span>
+        </div>
+
+        <div class="sidebar-notes">
+          <p>1. 这是浏览器预览，不是微信运行时。</p>
+          <p>2. 真正小程序前端仍在 <code>miniprogram/</code>。</p>
+          <p>3. 一次性二维码逻辑在本地后端已接通。</p>
+        </div>
+      </aside>
+
+      <main class="phone-stage">
+        <div class="phone-frame">
+          <div class="phone-topbar">
+            <span>THE CURATOR</span>
+            <span id="session-pill">NO SESSION</span>
+          </div>
+
+          <section class="screen screen-entry is-visible" data-screen="entry">
+            <p class="eyebrow">ONE TIME CELLAR ENTRY</p>
+            <div class="entry-art">
+              <div class="entry-disc"></div>
+              <div class="entry-bottle entry-neck"></div>
+              <div class="entry-bottle entry-body"></div>
+              <div class="entry-bottle entry-label"></div>
+            </div>
+            <h2 class="display-title">Cellar Gate</h2>
+            <p class="muted-copy" id="entry-copy">
+              点击左侧按钮，生成一张一次性演示卡，再直接进入体验。
+            </p>
+            <button id="entry-button" class="primary-button full-width">使用本地演示码</button>
+          </section>
+
+          <section class="screen screen-detail" data-screen="detail">
+            <div class="hero-card">
+              <div class="hero-copy">
+                <p class="eyebrow" id="detail-eyebrow">GRAND CRU</p>
+                <h2 class="display-title" id="detail-title">Chateau Saint-Emilion</h2>
+                <p class="hero-vintage" id="detail-vintage">Vintage 2018</p>
+                <div class="chip-row" id="detail-chips"></div>
+                <p class="muted-copy" id="detail-overview"></p>
+              </div>
+
+              <div class="hero-art">
+                <div class="hero-halo"></div>
+                <div class="hero-bottle neck"></div>
+                <div class="hero-bottle body"></div>
+                <div class="hero-bottle label"></div>
+                <div class="quote-card" id="detail-quote"></div>
+              </div>
+            </div>
+
+            <section class="stack-section">
+              <h3 class="section-title">The Palate Profile</h3>
+              <div id="tasting-grid" class="stack-grid"></div>
+            </section>
+
+            <section class="stack-section">
+              <div class="story-card">
+                <h3 class="section-title" id="story-title"></h3>
+                <p class="muted-copy" id="story-copy"></p>
+                <div class="score-row" id="score-row"></div>
+              </div>
+            </section>
+
+            <section class="stack-section">
+              <h3 class="section-title">Technical Composition</h3>
+              <div class="tech-card" id="tech-grid"></div>
+            </section>
+          </section>
+
+          <section class="screen screen-melody" data-screen="melody">
+            <div class="melody-card">
+              <div id="melody-art" class="record-shell artwork-noir">
+                <div class="record-core"></div>
+              </div>
+              <p class="eyebrow" id="track-mood">AMBIENT PAIRING</p>
+              <h2 class="display-title" id="track-title">Vintage Noir</h2>
+              <p class="muted-copy" id="track-description"></p>
+
+              <div class="progress-wrap">
+                <div class="progress-rail">
+                  <div id="progress-fill" class="progress-fill"></div>
+                </div>
+                <div class="progress-labels">
+                  <span id="progress-current">00:00</span>
+                  <span id="progress-duration">00:00</span>
+                </div>
+              </div>
+
+              <div class="control-row">
+                <button id="prev-track" class="ghost-chip">PREV</button>
+                <button id="play-track" class="play-button">PLAY</button>
+                <button id="next-track" class="ghost-chip">NEXT</button>
+              </div>
+            </div>
+
+            <div id="track-list" class="track-list"></div>
+          </section>
+
+          <section class="screen screen-cellar" data-screen="cellar">
+            <p class="eyebrow">PERSONAL COLLECTION</p>
+            <h2 class="display-title">My Cellar</h2>
+
+            <div class="featured-card">
+              <div class="featured-art">
+                <div class="featured-neck"></div>
+                <div class="featured-body"></div>
+                <div class="featured-label"></div>
+              </div>
+              <p class="featured-chip">CURRENT SELECTION</p>
+              <h3 class="featured-title" id="cellar-feature-title"></h3>
+              <p class="muted-copy" id="cellar-feature-copy"></p>
+            </div>
+
+            <div id="cellar-list" class="cellar-list"></div>
+          </section>
+
+          <nav class="bottom-nav">
+            <button class="nav-item" data-tab="entry">Entry</button>
+            <button class="nav-item" data-tab="detail">Journal</button>
+            <button class="nav-item" data-tab="melody">Melody</button>
+            <button class="nav-item" data-tab="cellar">Cellar</button>
+          </nav>
+        </div>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
+

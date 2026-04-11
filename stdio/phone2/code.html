@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-on-surface": "#313030",
+                    "surface-variant": "#353534",
+                    "primary-fixed": "#ffdad4",
+                    "on-primary-fixed": "#410000",
+                    "surface-bright": "#393939",
+                    "secondary-container": "#604403",
+                    "on-error-container": "#ffdad6",
+                    "surface-tint": "#ffb4a8",
+                    "error": "#ffb4ab",
+                    "tertiary": "#c8c6c5",
+                    "on-tertiary-container": "#8c8b8b",
+                    "primary-fixed-dim": "#ffb4a8",
+                    "outline-variant": "#554240",
+                    "tertiary-fixed": "#e4e2e1",
+                    "on-tertiary": "#303030",
+                    "surface-container-low": "#1c1b1b",
+                    "on-primary-fixed-variant": "#920703",
+                    "secondary-fixed": "#ffdea5",
+                    "on-error": "#690005",
+                    "surface-container-high": "#2a2a2a",
+                    "on-secondary-fixed": "#261900",
+                    "surface-container-lowest": "#0e0e0e",
+                    "surface-container-highest": "#353534",
+                    "primary": "#ffb4a8",
+                    "outline": "#a38b88",
+                    "inverse-surface": "#e5e2e1",
+                    "error-container": "#93000a",
+                    "on-primary": "#690000",
+                    "on-secondary-container": "#dab36a",
+                    "primary-container": "#520000",
+                    "on-tertiary-fixed": "#1b1c1c",
+                    "surface-container": "#201f1f",
+                    "surface-dim": "#131313",
+                    "on-background": "#e5e2e1",
+                    "tertiary-container": "#242424",
+                    "on-primary-container": "#f45440",
+                    "on-surface": "#e5e2e1",
+                    "on-secondary": "#412d00",
+                    "background": "#131313",
+                    "surface": "#131313",
+                    "on-surface-variant": "#dbc0bd",
+                    "secondary": "#e9c176",
+                    "on-secondary-fixed-variant": "#5d4201",
+                    "on-tertiary-fixed-variant": "#474747",
+                    "tertiary-fixed-dim": "#c8c6c5",
+                    "secondary-fixed-dim": "#e9c176",
+                    "inverse-primary": "#b52619"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Newsreader"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .serif-italic { font-family: 'Newsreader'; font-style: italic; }
+        .text-glow { text-shadow: 0 0 15px rgba(233, 193, 118, 0.3); }
+        body { background-color: #131313; color: #e5e2e1; font-family: 'Manrope', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen selection:bg-primary-container selection:text-primary">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-stone-950/80 backdrop-blur-xl bg-stone-900/40 flex justify-between items-center px-6 py-4 w-full">
+<div class="flex items-center gap-4">
+<button class="text-stone-200 hover:text-amber-200 transition-colors duration-300 active:scale-95 duration-200">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+</div>
+<div class="font-serif text-xl tracking-widest uppercase text-stone-200">The Curator</div>
+<div class="flex items-center gap-4">
+<button class="text-stone-200 hover:text-amber-200 transition-colors duration-300 active:scale-95 duration-200">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+</div>
+</header>
+<main class="pt-20 pb-32">
+<!-- Hero Section -->
+<section class="relative px-6 md:px-12 lg:px-24 py-12 flex flex-col md:flex-row items-center gap-12 overflow-hidden">
+<!-- Background Texture -->
+<div class="absolute inset-0 -z-10 opacity-20 pointer-events-none bg-[radial-gradient(circle_at_50%_50%,#520000_0%,transparent_70%)]"></div>
+<!-- Bottle Visual -->
+<div class="relative w-full md:w-1/2 flex justify-center order-2 md:order-1">
+<div class="relative w-64 md:w-80 lg:w-96 aspect-[2/5]">
+<img alt="Château Saint-Emilion Bottle" class="w-full h-full object-contain drop-shadow-[0_35px_35px_rgba(0,0,0,0.8)]" data-alt="close-up of a premium wine bottle with elegant typography on dark textured background with dramatic warm side lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwTUZAnBA8pu5EsnjG7YJFQOK_-0d2gmVqEoC8PIQG_QbP1ENqsy0opSFKE-AUNc-h_-8ZhB8rrlqzZYEISLQQ5RL0xaO0QO-5UIyIjPqzsbvC6rOHsddOc_A0KGNVpCL8JnZZxK1eyGaqgJkEe6ZOVpQMzBmz8dDBgMSC9eDLhVgIHxUtAERJWRXrXQCxvI7HlTtSxcisUM1o2vEtVdp2h57JtkAbvlcNh6Pz-AGq79ig-x88-8WB-yU3ymqqK0U2hBUiVUyU8tIT"/>
+<!-- Overlapping Label Detail -->
+<div class="absolute -bottom-4 -right-8 p-6 bg-surface-container-high/80 backdrop-blur-md rounded-lg max-w-[200px] border border-outline-variant/10">
+<p class="font-headline italic text-secondary text-sm">"A masterpiece of the Right Bank, defined by its velvet tannins and deep crimson heart."</p>
+</div>
+</div>
+</div>
+<!-- Product Info -->
+<div class="w-full md:w-1/2 order-1 md:order-2 space-y-8">
+<div>
+<span class="font-label text-secondary tracking-[0.2em] uppercase text-xs">Grand Cru Classé</span>
+<h1 class="font-headline text-5xl md:text-7xl lg:text-8xl font-light text-on-surface leading-none mt-2">Château Saint-Emilion</h1>
+<p class="font-headline italic text-2xl text-on-surface-variant mt-4">Vintage 2018</p>
+</div>
+<div class="flex flex-wrap gap-3">
+<span class="px-4 py-1.5 bg-secondary-container/30 text-on-secondary-container rounded-full text-xs font-label border border-on-secondary-container/10">Bordeaux, France</span>
+<span class="px-4 py-1.5 bg-secondary-container/30 text-on-secondary-container rounded-full text-xs font-label border border-on-secondary-container/10">Merlot &amp; Cabernet Franc</span>
+<span class="px-4 py-1.5 bg-secondary-container/30 text-on-secondary-container rounded-full text-xs font-label border border-on-secondary-container/10">14.5% ABV</span>
+</div>
+<div class="pt-6">
+<button class="group relative px-8 py-4 overflow-hidden rounded-md bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-label font-bold tracking-widest uppercase transition-all hover:scale-[1.02] active:opacity-70 flex items-center gap-3">
+<span class="material-symbols-outlined" data-icon="library_music" style="font-variation-settings: 'FILL' 1;">library_music</span>
+                        Start Tasting Session
+                    </button>
+</div>
+</div>
+</section>
+<!-- Tasting Notes Bento -->
+<section class="px-6 md:px-12 lg:px-24 py-16">
+<h2 class="font-headline text-3xl mb-12 flex items-center gap-4">
+                The Palate Profile 
+                <span class="h-[1px] flex-grow bg-outline-variant/20"></span>
+</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Aroma -->
+<div class="bg-surface-container-low p-8 rounded-xl space-y-4">
+<div class="text-secondary">
+<span class="material-symbols-outlined text-4xl" data-icon="air">air</span>
+</div>
+<h3 class="font-headline text-2xl italic">Aroma</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">Exuberant notes of dark cherries, dried plum, and a hint of truffle. Secondary layers reveal toasted oak and delicate violet.</p>
+<div class="flex flex-wrap gap-2 pt-2">
+<span class="text-[10px] uppercase tracking-tighter text-secondary border border-secondary/20 px-2 py-0.5 rounded">Oak</span>
+<span class="text-[10px] uppercase tracking-tighter text-secondary border border-secondary/20 px-2 py-0.5 rounded">Dark Fruit</span>
+</div>
+</div>
+<!-- Body & Texture -->
+<div class="bg-surface-container-low p-8 rounded-xl space-y-4 relative overflow-hidden group">
+<div class="text-secondary">
+<span class="material-symbols-outlined text-4xl" data-icon="water_drop">water_drop</span>
+</div>
+<h3 class="font-headline text-2xl italic">Body</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">Full-bodied with structured, velvety tannins. It offers a dense, concentrated mouthfeel that lingers with persistent elegance.</p>
+<!-- Visual representation of body -->
+<div class="w-full bg-surface-container-highest h-1.5 rounded-full mt-4">
+<div class="bg-primary h-full w-[85%] rounded-full shadow-[0_0_8px_rgba(255,180,168,0.5)]"></div>
+</div>
+</div>
+<!-- Acidity & Finish -->
+<div class="bg-surface-container-low p-8 rounded-xl space-y-4">
+<div class="text-secondary">
+<span class="material-symbols-outlined text-4xl" data-icon="vibration">vibration</span>
+</div>
+<h3 class="font-headline text-2xl italic">Acidity</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">Bright and well-integrated acidity that provides a long, refreshing finish with mineral nuances characteristic of limestone terroir.</p>
+<div class="pt-2 italic text-sm text-secondary font-headline">Finish: ~45 seconds</div>
+</div>
+</div>
+</section>
+<!-- Origin & Awards Asymmetric Section -->
+<section class="px-6 md:px-12 lg:px-24 py-16 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+<div class="space-y-10">
+<div class="space-y-4">
+<h2 class="font-headline text-4xl text-on-surface">The Heritage of Saint-Emilion</h2>
+<p class="text-on-surface-variant leading-loose font-light">
+                        Nestled on the limestone plateau of Bordeaux’s Right Bank, the vineyards of Château Saint-Emilion benefit from a unique microclimate. The roots of our Merlot vines reach deep into ancient soils, absorbing the character of a millennium of winemaking history.
+                    </p>
+</div>
+<div class="flex gap-8">
+<div class="text-center">
+<div class="w-20 h-20 rounded-full border border-secondary/30 flex items-center justify-center mb-3 group hover:border-secondary transition-colors duration-500">
+<span class="font-headline text-2xl text-secondary">98</span>
+</div>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Wine Advocate</span>
+</div>
+<div class="text-center">
+<div class="w-20 h-20 rounded-full border border-secondary/30 flex items-center justify-center mb-3 group hover:border-secondary transition-colors duration-500">
+<span class="font-headline text-2xl text-secondary">97</span>
+</div>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">James Suckling</span>
+</div>
+<div class="text-center">
+<div class="w-20 h-20 rounded-full border border-secondary/30 flex items-center justify-center mb-3 group hover:border-secondary transition-colors duration-500">
+<span class="font-headline text-2xl text-secondary">96</span>
+</div>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Decanter</span>
+</div>
+</div>
+</div>
+<div class="relative">
+<div class="aspect-square bg-surface-container-low rounded-xl overflow-hidden shadow-2xl">
+<img alt="Saint-Emilion Vineyard" class="w-full h-full object-cover opacity-80 hover:scale-105 transition-transform duration-700" data-alt="sweeping aerial view of a historic French vineyard with stone chateau at dawn, soft misty atmosphere and orange horizon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbtn6XjQFQP-PiAPLh4qb-aMXdkyycezJYGiAp3JmwFLj5p_0YMMdBu7Zjke0ONS3YwxjLz7KOAf-jckONnqMr8ITLyNMSFKvoLEt7NLg2sAfPTmwOO7Ez3WD6pc4Tdn7EYrOmIOTyKDjkvgexllOJ9xL3eYSwo745w0rC5LvqLuLmHInmMcTme86SlmyAjnYdeeesfO7qTH3ElBCK-YLBLKFhHudtPAlaFrMvfdPNVXLPpa0o2QADv_de2FrySUcrRxHwFnyL2MMk"/>
+</div>
+<!-- Location Label Overlay -->
+<div class="absolute top-6 left-6 p-4 bg-surface-dim/80 backdrop-blur-xl rounded-lg">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="location_on">location_on</span>
+<span class="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface">Terroir Profile</span>
+</div>
+<div class="font-headline text-lg italic text-secondary">Libournais, France</div>
+</div>
+</div>
+</section>
+<!-- Technical Specs Timeline -->
+<section class="px-6 md:px-12 lg:px-24 py-16 mb-12">
+<div class="max-w-4xl mx-auto space-y-12">
+<h3 class="font-headline text-center text-3xl">Technical Composition</h3>
+<div class="space-y-8">
+<div class="flex items-center gap-6">
+<div class="w-32 text-right font-label text-xs uppercase tracking-widest text-secondary">Grapes</div>
+<div class="h-px flex-grow bg-outline-variant/10"></div>
+<div class="w-64 text-left text-on-surface">82% Merlot, 18% Cabernet Franc</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="w-32 text-right font-label text-xs uppercase tracking-widest text-secondary">Aging</div>
+<div class="h-px flex-grow bg-outline-variant/10"></div>
+<div class="w-64 text-left text-on-surface">18 months in 70% new French oak</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="w-32 text-right font-label text-xs uppercase tracking-widest text-secondary">Serving</div>
+<div class="h-px flex-grow bg-outline-variant/10"></div>
+<div class="w-64 text-left text-on-surface">16-18°C, Decant for 1 hour</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center py-3 px-8 bg-stone-950/90 backdrop-blur-2xl shadow-[0px_-24px_48px_rgba(0,0,0,0.6)] z-50">
+<a class="flex flex-col items-center justify-center text-stone-500 hover:text-stone-200 transition-opacity active:opacity-70 group" href="#">
+<span class="material-symbols-outlined text-2xl" data-icon="wine_bar">wine_bar</span>
+<span class="font-sans text-[10px] tracking-[0.1em] uppercase font-light mt-1">Cellar</span>
+</a>
+<a class="flex flex-col items-center justify-center text-stone-500 hover:text-stone-200 transition-opacity active:opacity-70 group" href="#">
+<span class="material-symbols-outlined text-2xl" data-icon="library_music">library_music</span>
+<span class="font-sans text-[10px] tracking-[0.1em] uppercase font-light mt-1">Melody</span>
+</a>
+<a class="flex flex-col items-center justify-center text-amber-500 scale-110 transition-transform group" href="#">
+<span class="material-symbols-outlined text-2xl" data-icon="auto_stories" style="font-variation-settings: 'FILL' 1;">auto_stories</span>
+<span class="font-sans text-[10px] tracking-[0.1em] uppercase font-light mt-1">Journal</span>
+</a>
+</nav>
+</body></html>

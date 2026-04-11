@@ -1,0 +1,10 @@
+{
+  "desc": "hongjiu curator sitemap",
+  "rules": [
+    {
+      "action": "allow",
+      "page": "*"
+    }
+  ]
+}
+

@@ -1,0 +1,53 @@
+<view class="shell">
+  <view class="redeem-page">
+    <view class="redeem-stage">
+      <image
+        class="redeem-stage-image"
+        src="/assets/images/winery-vineyard-moon.jpg"
+        mode="aspectFill"
+      ></image>
+      <view class="redeem-stage-mask"></view>
+    </view>
+
+    <view class="redeem-content">
+      <image
+        class="redeem-stage-bottle"
+        src="/assets/images/wine-bottle-poster.jpg"
+        mode="aspectFit"
+      ></image>
+
+      <view class="redeem-stage-copy">
+        <text class="redeem-brand">Hongjiu Estate</text>
+        <text class="redeem-caption">The Moonlit Estate Experience</text>
+      </view>
+
+      <view class="redeem-card">
+        <text class="eyebrow">Entrance</text>
+        <text class="display-title">{{title}}</text>
+        <text class="text-muted italic text-sm" style="display: block; margin-bottom: 40rpx;">{{message}}</text>
+
+        <button
+          wx:if="{{state === 'idle' || state === 'error'}}"
+          class="cta"
+          bindtap="useLocalDemo"
+        >
+          Begin The Tasting
+        </button>
+
+        <view wx:if="{{state === 'loading'}}" class="loader-row">
+          <view class="loader-dot loader-dot--one"></view>
+          <view class="loader-dot loader-dot--two"></view>
+          <view class="loader-dot loader-dot--three"></view>
+        </view>
+
+        <view wx:if="{{state === 'success'}}" class="success-seal">
+          <text class="success-seal-text">OPEN</text>
+        </view>
+
+        <text class="redeem-footnote">
+          * Local Demo Only
+        </text>
+      </view>
+    </view>
+  </view>
+</view>

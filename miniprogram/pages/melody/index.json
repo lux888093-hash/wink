@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "Music",
+  "usingComponents": {
+    "editorial-tabbar": "/components/editorial-tabbar/index"
+  }
+}
