@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "Music",
+  "navigationBarTitleText": "配乐厅",
   "usingComponents": {
     "editorial-tabbar": "/components/editorial-tabbar/index"
   }

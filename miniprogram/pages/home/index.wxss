@@ -1,0 +1,233 @@
+.home-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.hero-panel {
+  min-height: 560rpx;
+  border-radius: 36rpx;
+}
+
+.hero-image,
+.hero-mask {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-mask {
+  background:
+    linear-gradient(180deg, rgba(10, 8, 7, 0.12) 0%, rgba(10, 8, 7, 0.88) 100%),
+    radial-gradient(circle at 78% 10%, rgba(245, 219, 176, 0.2), rgba(245, 219, 176, 0));
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 2;
+  padding: 42rpx 30rpx 170rpx;
+}
+
+.hero-title {
+  max-width: 520rpx;
+  margin: 10rpx 0 12rpx;
+}
+
+.hero-subtitle {
+  max-width: 480rpx;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 24rpx;
+}
+
+.hero-ribbon {
+  position: absolute;
+  left: 16rpx;
+  right: 16rpx;
+  bottom: 16rpx;
+  z-index: 2;
+  display: flex;
+  gap: 12rpx;
+}
+
+.hero-ribbon-item {
+  flex: 1;
+  min-height: 88rpx;
+  padding: 18rpx 18rpx 16rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(180deg, rgba(16, 13, 12, 0.54), rgba(16, 13, 12, 0.44));
+  border: 1rpx solid rgba(214, 177, 124, 0.08);
+}
+
+.hero-ribbon-label {
+  display: block;
+  margin-bottom: 6rpx;
+  color: rgba(246, 239, 232, 0.46);
+  font-size: 12rpx;
+  letter-spacing: 0.24em;
+}
+
+.hero-ribbon-value {
+  display: block;
+  color: var(--ink);
+  font-size: 18rpx;
+  line-height: 1.44;
+}
+
+.exclusive-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 16rpx;
+  padding: 24rpx;
+}
+
+.exclusive-copy {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.exclusive-kicker {
+  color: rgba(63, 42, 20, 0.7);
+}
+
+.exclusive-button {
+  min-width: 188rpx;
+}
+
+.editorial-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.archive-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.archive-image {
+  width: 100%;
+  height: 258rpx;
+}
+
+.archive-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+  padding: 22rpx 24rpx 26rpx;
+}
+
+.club-card {
+  padding: 24rpx 24rpx 26rpx;
+}
+
+.club-plan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 18rpx 0 20rpx;
+}
+
+.club-plan-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+  padding: 16rpx 0;
+  border-top: 1rpx solid rgba(214, 177, 124, 0.1);
+}
+
+.club-plan-item:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.club-plan-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.club-plan-name {
+  color: var(--ink);
+  font-size: 22rpx;
+}
+
+.club-plan-price {
+  color: var(--gold-strong);
+  font-family: Baskerville, Georgia, "Times New Roman", serif;
+  font-size: 28rpx;
+}
+
+.product-list,
+.wine-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.product-card {
+  display: flex;
+  gap: 16rpx;
+  padding: 14rpx;
+}
+
+.product-image {
+  width: 206rpx;
+  height: 236rpx;
+  border-radius: 24rpx;
+  flex-shrink: 0;
+}
+
+.product-copy {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+  justify-content: space-between;
+  min-height: 236rpx;
+}
+
+.product-title {
+  font-size: 28rpx;
+}
+
+.wine-card {
+  display: flex;
+  gap: 14rpx;
+  padding: 10rpx 0 18rpx;
+  border-bottom: 1rpx solid rgba(214, 177, 124, 0.1);
+}
+
+.wine-card-image {
+  width: 172rpx;
+  height: 152rpx;
+  border-radius: 22rpx;
+  flex-shrink: 0;
+}
+
+.wine-card-copy {
+  flex: 1;
+  padding-top: 4rpx;
+}
+
+.wine-card-badge {
+  display: block;
+  margin-bottom: 8rpx;
+  color: var(--gold);
+  font-size: 12rpx;
+  letter-spacing: 0.24em;
+}
+
+.wine-card-name {
+  display: block;
+  margin-bottom: 8rpx;
+  color: var(--ink);
+  font-family: Baskerville, Georgia, "Times New Roman", serif;
+  font-size: 27rpx;
+}

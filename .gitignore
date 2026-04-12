@@ -1,7 +1,9 @@
 /server/node_modules/
 /server/logs/
+/server/runtime-logs/
 /downloads/
 /server/.env
+/server/data/db-snapshot.json
 /miniprogram/project.private.config.json
 
 .DS_Store

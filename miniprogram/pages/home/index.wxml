@@ -1,0 +1,137 @@
+<view class="shell">
+  <view wx:if="{{pageReady}}" class="page-scroll home-page">
+    <view class="hero-panel section-panel">
+      <image class="hero-image" src="{{winery.heroImage}}" mode="aspectFill"></image>
+      <view class="hero-mask"></view>
+
+      <view class="hero-copy">
+        <text class="eyebrow">{{hero.eyebrow}}</text>
+        <text class="display-title hero-title">{{hero.title}}</text>
+        <text class="muted-copy hero-subtitle line-clamp-2">{{hero.subtitle}}</text>
+
+        <view class="hero-actions">
+          <button class="primary-button" bindtap="openStore">进入酒廊</button>
+          <button class="ghost-button" bindtap="openRedeem">扫码</button>
+        </view>
+      </view>
+
+      <view class="hero-ribbon">
+        <view class="hero-ribbon-item">
+          <text class="hero-ribbon-label">身份</text>
+          <text class="hero-ribbon-value">{{user.tierLabel}}</text>
+        </view>
+        <view class="hero-ribbon-item">
+          <text class="hero-ribbon-label">氛围</text>
+          <text class="hero-ribbon-value">{{hero.ambienceNote}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{exclusiveEntry}}" class="exclusive-row paper-panel">
+      <view class="exclusive-copy">
+        <text class="eyebrow exclusive-kicker">专属入口</text>
+        <text class="section-title">首扫记录已保留</text>
+        <text class="micro-copy line-clamp-2">这支酒的专属页仍在，可直接继续进入。</text>
+      </view>
+      <button class="soft-button exclusive-button" bindtap="enterExclusive">继续进入</button>
+    </view>
+
+    <view class="editorial-grid">
+      <view class="paper-panel archive-card">
+        <image class="archive-image" src="{{winery.portraitImage}}" mode="aspectFill"></image>
+        <view class="archive-copy">
+          <text class="eyebrow">庄园手册</text>
+          <text class="section-title">像礼盒内页一样克制。</text>
+          <text class="muted-copy line-clamp-3">{{winery.story}}</text>
+        </view>
+      </view>
+
+      <view class="section-panel club-card">
+        <text class="eyebrow">会员会所</text>
+        <text class="section-title">会员与配乐权益</text>
+        <text class="micro-copy line-clamp-2">开卡、解锁、下载都收进一条轻量动线。</text>
+
+        <view class="club-plan-list">
+          <view
+            class="club-plan-item"
+            wx:for="{{membershipPlans}}"
+            wx:key="id"
+          >
+            <view class="club-plan-head">
+              <text class="club-plan-name">{{item.name}}</text>
+              <text class="club-plan-price">¥{{item.price}}</text>
+            </view>
+            <text class="micro-copy line-clamp-1">{{item.benefitsLabel}}</text>
+          </view>
+        </view>
+
+        <button class="ghost-button full-width" bindtap="openMember">查看会员中心</button>
+      </view>
+    </view>
+
+    <view class="section-head">
+      <view>
+        <text class="eyebrow">主推礼盒</text>
+        <text class="section-title">精选礼盒</text>
+      </view>
+      <button class="ghost-link" bindtap="openStore">全部商品</button>
+    </view>
+
+    <view class="product-list">
+      <view
+        class="section-panel product-card"
+        wx:for="{{featuredProducts}}"
+        wx:key="id"
+        data-product-id="{{item.id}}"
+        bindtap="openProduct"
+      >
+        <image class="product-image" src="{{item.coverImage}}" mode="aspectFill"></image>
+        <view class="product-copy">
+          <view class="chip-row">
+            <text class="chip">{{item.badge}}</text>
+            <text class="chip">{{item.category}}</text>
+          </view>
+          <text class="section-title product-title">{{item.name}}</text>
+          <text class="micro-copy line-clamp-2">{{item.subtitle}}</text>
+          <view class="price-row">
+            <text class="price-current">¥{{item.lowestPrice}}</text>
+            <text class="price-original" wx:if="{{item.hasSkus}}">¥{{item.firstMarketPrice}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section-head">
+      <view>
+        <text class="eyebrow">酒款档案</text>
+        <text class="section-title">故事型酒款</text>
+      </view>
+    </view>
+
+    <view class="wine-list">
+      <view
+        class="wine-card"
+        wx:for="{{featuredWines}}"
+        wx:key="id"
+        data-wine-id="{{item.id}}"
+        bindtap="openWine"
+      >
+        <image class="wine-card-image" src="{{item.image}}" mode="aspectFill"></image>
+        <view class="wine-card-copy">
+          <text class="wine-card-badge">{{item.badge}}</text>
+          <text class="wine-card-name">{{item.name}}</text>
+          <text class="micro-copy line-clamp-2">{{item.quote}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="tabbar-gap"></view>
+    <boutique-tabbar active="home" cartCount="{{cartCount}}"></boutique-tabbar>
+  </view>
+
+  <view wx:elif="{{errorTitle}}" class="page-scroll empty-state">
+    <text class="empty-title">{{errorTitle}}</text>
+    <text class="empty-subtitle">{{errorMessage}}</text>
+    <button class="ghost-button" bindtap="loadPage">重新加载</button>
+  </view>
+</view>

@@ -1,0 +1,115 @@
+.cart-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.cart-head {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  padding: 8rpx 2rpx;
+}
+
+.cart-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.cart-item {
+  display: flex;
+  gap: 14rpx;
+  padding: 16rpx;
+  align-items: center;
+}
+
+.cart-image {
+  width: 164rpx;
+  height: 192rpx;
+  border-radius: 24rpx;
+  flex-shrink: 0;
+}
+
+.cart-copy {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10rpx;
+  min-height: 192rpx;
+}
+
+.cart-title {
+  color: var(--ink);
+  font-family: Baskerville, Georgia, "Times New Roman", serif;
+  font-size: 27rpx;
+}
+
+.cart-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+}
+
+.qty-stepper {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  min-height: 54rpx;
+  padding: 0 6rpx;
+  border-radius: 999rpx;
+  background: rgba(244, 235, 225, 0.06);
+}
+
+.qty-button {
+  width: 54rpx;
+  height: 54rpx;
+  border-radius: 999rpx;
+  background: rgba(244, 235, 225, 0.08);
+  color: var(--ink);
+}
+
+.qty-value {
+  color: var(--ink);
+  min-width: 28rpx;
+  text-align: center;
+}
+
+.remove-button {
+  color: var(--gold);
+  font-size: 16rpx;
+  letter-spacing: 0.14em;
+}
+
+.empty-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  padding: 22rpx 0;
+}
+
+.checkout-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22rpx;
+}
+
+.checkout-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.checkout-label {
+  display: block;
+  color: var(--ink-faint);
+  font-size: 16rpx;
+}
+
+.checkout-button {
+  min-width: 220rpx;
+}

@@ -1,53 +1,34 @@
 <view class="shell">
   <view class="redeem-page">
-    <view class="redeem-stage">
-      <image
-        class="redeem-stage-image"
-        src="/assets/images/winery-vineyard-moon.jpg"
-        mode="aspectFill"
-      ></image>
-      <view class="redeem-stage-mask"></view>
+    <image class="redeem-bg" src="/assets/images/winery-vineyard-moon.jpg" mode="aspectFill"></image>
+    <view class="redeem-mask"></view>
+
+    <view class="redeem-copy">
+      <text class="eyebrow">EXCLUSIVE ENTRY</text>
+      <text class="display-title redeem-title">专属入口</text>
+      <text class="muted-copy redeem-subtitle">礼盒首扫，从这里进入。</text>
     </view>
 
-    <view class="redeem-content">
-      <image
-        class="redeem-stage-bottle"
-        src="/assets/images/wine-bottle-poster.jpg"
-        mode="aspectFit"
-      ></image>
+    <view class="redeem-card">
+      <text class="eyebrow">扫码消费</text>
+      <text class="section-title redeem-card-title">{{title}}</text>
+      <text class="muted-copy line-clamp-3">{{message}}</text>
 
-      <view class="redeem-stage-copy">
-        <text class="redeem-brand">Hongjiu Estate</text>
-        <text class="redeem-caption">The Moonlit Estate Experience</text>
+      <button wx:if="{{state === 'idle' || state === 'error'}}" class="primary-button full-width" bindtap="useLocalDemo">
+        开始首扫
+      </button>
+
+      <view wx:if="{{state === 'loading'}}" class="loading-row">
+        <view class="loading-dot"></view>
+        <view class="loading-dot"></view>
+        <view class="loading-dot"></view>
       </view>
 
-      <view class="redeem-card">
-        <text class="eyebrow">Entrance</text>
-        <text class="display-title">{{title}}</text>
-        <text class="text-muted italic text-sm" style="display: block; margin-bottom: 40rpx;">{{message}}</text>
-
-        <button
-          wx:if="{{state === 'idle' || state === 'error'}}"
-          class="cta"
-          bindtap="useLocalDemo"
-        >
-          Begin The Tasting
-        </button>
-
-        <view wx:if="{{state === 'loading'}}" class="loader-row">
-          <view class="loader-dot loader-dot--one"></view>
-          <view class="loader-dot loader-dot--two"></view>
-          <view class="loader-dot loader-dot--three"></view>
-        </view>
-
-        <view wx:if="{{state === 'success'}}" class="success-seal">
-          <text class="success-seal-text">OPEN</text>
-        </view>
-
-        <text class="redeem-footnote">
-          * Local Demo Only
-        </text>
+      <view wx:if="{{state === 'success'}}" class="success-seal">
+        <text class="success-seal-text">OPEN</text>
       </view>
+
+      <button class="ghost-button full-width" bindtap="reloadPage">重新准备入口</button>
     </view>
   </view>
 </view>

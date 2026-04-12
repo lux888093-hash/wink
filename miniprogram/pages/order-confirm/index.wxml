@@ -1,0 +1,71 @@
+<view class="shell">
+  <view wx:if="{{ready}}" class="page-scroll order-page">
+    <view wx:if="{{!successOrder}}">
+      <view class="order-head">
+        <text class="eyebrow">CHECKOUT</text>
+        <text class="display-title">支付确认</text>
+      </view>
+
+      <view class="paper-panel order-paper">
+        <view class="order-paper-head">
+          <text class="eyebrow">DELIVERY</text>
+          <text class="order-delivery-tag">会所专送</text>
+        </view>
+        <text class="section-title">上海静安 · 预约送达</text>
+        <text class="micro-copy">地址簿与配送时段接入后，这里保持同样的轻量布局。</text>
+      </view>
+
+      <view class="section-panel order-list">
+        <view class="order-list-head">
+          <text class="eyebrow">ORDER</text>
+          <text class="micro-copy">{{cart.totalCount}} 件</text>
+        </view>
+        <view class="order-item" wx:for="{{cart.items}}" wx:key="id">
+          <text class="order-item-name">{{item.productName}} · {{item.specName}}</text>
+          <text class="order-item-price">¥{{item.lineAmount}}</text>
+        </view>
+        <view class="split-line"></view>
+        <view class="order-total">
+          <text class="order-total-label">应付合计</text>
+          <text class="price-current">¥{{cart.totalAmount}}</text>
+        </view>
+      </view>
+
+      <button class="primary-button full-width" bindtap="submitOrder" loading="{{submitting}}">
+        确认支付
+      </button>
+    </view>
+
+    <view wx:else class="section-panel success-panel">
+      <view class="success-seal">
+        <text class="success-seal-text">PAID</text>
+      </view>
+      <text class="eyebrow">PAYMENT SUCCESS</text>
+      <text class="display-title success-title">订单完成</text>
+      <text class="micro-copy">订单状态与库存已经同步。</text>
+
+      <view class="success-meta">
+        <view class="success-meta-row">
+          <text class="success-meta-label">订单号</text>
+          <text class="success-meta-value">{{successOrder.orderNo}}</text>
+        </view>
+        <view class="success-meta-row">
+          <text class="success-meta-label">支付金额</text>
+          <text class="success-meta-value">¥{{successOrder.payAmount}}</text>
+        </view>
+        <view class="success-meta-row">
+          <text class="success-meta-label">履约状态</text>
+          <text class="success-meta-value">{{successOrder.deliveryStatusLabel}}</text>
+        </view>
+      </view>
+
+      <navigator class="ghost-button full-width" url="/pages/member/index">去会员中心查看权益</navigator>
+    </view>
+  </view>
+
+  <view wx:elif="{{errorTitle}}" class="page-scroll empty-state">
+    <text class="empty-title">{{errorTitle}}</text>
+    <text class="empty-subtitle">{{errorMessage}}</text>
+    <navigator class="ghost-button" url="/pages/cart/index">返回购物袋</navigator>
+  </view>
+</view>

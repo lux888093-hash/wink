@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "Estate",
+  "navigationBarTitleText": "专属酒庄",
   "usingComponents": {
     "editorial-tabbar": "/components/editorial-tabbar/index"
   }

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "酒廊商城",
+  "usingComponents": {
+    "boutique-tabbar": "/components/boutique-tabbar/index"
+  }
+}

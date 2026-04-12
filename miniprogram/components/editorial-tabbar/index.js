@@ -2,7 +2,7 @@ Component({
   properties: {
     active: {
       type: String,
-      value: 'detail'
+      value: 'cellar'
     }
   },
 
@@ -17,4 +17,3 @@ Component({
     }
   }
 });
-

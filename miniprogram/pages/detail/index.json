@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "Wine",
+  "navigationBarTitleText": "酒款详情",
   "usingComponents": {
     "editorial-tabbar": "/components/editorial-tabbar/index"
   }

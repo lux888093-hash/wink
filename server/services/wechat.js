@@ -1,10 +1,11 @@
 const fs = require('fs');
 const path = require('path');
+const { runtimeConfig } = require('./config');
 
 let cachedToken = null;
 
 function hasWechatCredentials() {
-  return Boolean(process.env.WECHAT_APPID && process.env.WECHAT_APPSECRET);
+  return Boolean(runtimeConfig.wechatAppId && runtimeConfig.wechatAppSecret);
 }
 
 async function getAccessToken() {
@@ -19,8 +20,8 @@ async function getAccessToken() {
 
   const params = new URLSearchParams({
     grant_type: 'client_credential',
-    appid: process.env.WECHAT_APPID,
-    secret: process.env.WECHAT_APPSECRET
+    appid: runtimeConfig.wechatAppId,
+    secret: runtimeConfig.wechatAppSecret
   });
 
   const response = await fetch(`https://api.weixin.qq.com/cgi-bin/token?${params.toString()}`);
@@ -51,7 +52,7 @@ async function generateMiniProgramCode({ scene, token, page }) {
         scene,
         page,
         check_path: true,
-        env_version: process.env.WECHAT_ENV_VERSION || 'release',
+        env_version: runtimeConfig.wechatEnvVersion,
         width: 430,
         auto_color: false,
         line_color: {
@@ -89,4 +90,3 @@ module.exports = {
   hasWechatCredentials,
   generateMiniProgramCode
 };
-

@@ -1,16 +1,22 @@
 {
   "pages": [
+    "pages/home/index",
+    "pages/store/index",
+    "pages/product-detail/index",
+    "pages/cart/index",
+    "pages/order-confirm/index",
+    "pages/member/index",
     "pages/redeem/index",
     "pages/cellar/index",
     "pages/detail/index",
     "pages/melody/index"
   ],
   "window": {
-    "navigationBarTitleText": "Hongjiu Estate",
-    "navigationBarBackgroundColor": "#0a0a0a",
+    "navigationBarTitleText": "鸿玖酒庄",
+    "navigationBarBackgroundColor": "#100d0c",
     "navigationBarTextStyle": "white",
     "backgroundTextStyle": "light",
-    "backgroundColor": "#131313"
+    "backgroundColor": "#110d0c"
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",

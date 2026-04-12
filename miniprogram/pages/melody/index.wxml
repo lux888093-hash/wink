@@ -3,26 +3,20 @@
     <view class="melody-stage">
       <image class="melody-stage-bg" src="{{currentTrack.cover}}" mode="aspectFill"></image>
       <view class="melody-stage-mask"></view>
-
       <view class="melody-stage-copy">
-        <text class="eyebrow">Music Pairing</text>
-        <text class="display-title">Quiet Sessions</text>
-        <text class="melody-stage-subtitle">{{wine.moodLine}}</text>
+        <text class="eyebrow">CELLAR SCORE</text>
+        <text class="display-title">{{currentTrack.cnTitle}}</text>
+        <text class="muted-copy line-clamp-2">{{currentTrack.description}}</text>
       </view>
     </view>
 
-    <view class="section-card section-card--paper melody-player-card">
-      <view class="player-top">
-        <image
-          class="player-cover {{isPlaying ? 'player-cover--playing' : ''}}"
-          src="{{currentTrack.cover}}"
-          mode="aspectFill"
-        ></image>
-
+    <view class="paper-panel player-card">
+      <view class="player-head">
+        <image class="player-cover" src="{{currentTrack.cover}}" mode="aspectFill"></image>
         <view class="player-copy">
-          <text class="paper-eyebrow">{{currentTrack.mood}}</text>
-          <text class="paper-title paper-title--small">{{currentTrack.title}}</text>
-          <text class="paper-copy">{{currentTrack.description}}</text>
+          <text class="eyebrow player-kicker">{{wine.name}}</text>
+          <text class="section-title">{{currentTrack.title}}</text>
+          <text class="micro-copy line-clamp-2">{{wine.moodLine}}</text>
         </view>
       </view>
 
@@ -30,7 +24,6 @@
         <view class="progress-rail">
           <view class="progress-fill" style="width: {{progress}}%;"></view>
         </view>
-
         <view class="progress-labels">
           <text>{{currentTimeLabel}}</text>
           <text>{{durationLabel}}</text>
@@ -38,23 +31,24 @@
       </view>
 
       <view class="control-row">
-        <button class="control-key" bindtap="playPrev">Prev</button>
-        <button class="control-play" bindtap="togglePlayback">
-          {{isPlaying ? 'PAUSE' : 'PLAY'}}
-        </button>
-        <button class="control-key" bindtap="playNext">Next</button>
+        <button class="ghost-button player-mini" bindtap="playPrev">上一曲</button>
+        <button class="primary-button player-main" bindtap="togglePlayback">{{isPlaying ? '暂停' : '播放'}}</button>
+        <button class="ghost-button player-mini" bindtap="playNext">下一曲</button>
       </view>
-    </view>
 
-    <view class="section-card melody-note">
-      <text class="eyebrow">Current Pour</text>
-      <text class="section-heading melody-note-title">{{wine.title}}</text>
-      <text class="muted-copy">{{wine.quote}}</text>
+      <view wx:if="{{gateMessage}}" class="gate-panel">
+        <text class="micro-copy line-clamp-2">{{gateMessage}}</text>
+        <view class="gate-actions">
+          <button wx:if="{{entryScope === 'exclusive'}}" class="soft-button gate-button" bindtap="openDetail">查看酒款</button>
+          <button wx:else class="soft-button gate-button" bindtap="openMember">会员权益</button>
+          <button class="ghost-button gate-button" bindtap="unlockCurrentTrack">单曲解锁</button>
+        </view>
+      </view>
     </view>
 
     <view class="track-list">
       <view
-        class="section-card track-card {{currentTrackIndex === index ? 'track-card--active' : ''}}"
+        class="track-item {{currentTrackIndex === index ? 'is-active' : ''}}"
         wx:for="{{tracks}}"
         wx:key="id"
         wx:for-index="index"
@@ -62,23 +56,23 @@
         bindtap="selectTrack"
       >
         <text class="track-no">0{{index + 1}}</text>
-        <image class="track-thumb" src="{{item.cover}}" mode="aspectFill"></image>
-        <view class="track-copy">
-          <text class="track-mood">{{item.mood}}</text>
-          <text class="track-title">{{item.title}}</text>
-          <text class="track-description">{{item.description}}</text>
+        <view class="track-main">
+          <text class="track-name">{{item.cnTitle}}</text>
+          <text class="micro-copy">{{item.access.canPlayFull ? '完整' : '试听'}}</text>
         </view>
         <text class="track-time">{{item.durationLabel}}</text>
       </view>
     </view>
 
-    <view class="tabbar-gap"></view>
-    <editorial-tabbar active="melody"></editorial-tabbar>
+    <view class="tabbar-gap" wx:if="{{!trackId}}"></view>
+    <editorial-tabbar wx:if="{{!trackId}}" active="melody"></editorial-tabbar>
   </view>
 
   <view wx:else class="page-scroll empty-state">
     <text class="empty-title">{{errorTitle}}</text>
     <text class="empty-subtitle">{{errorMessage}}</text>
-    <navigator class="ghost-button" url="/pages/redeem/index">Back To Entry</navigator>
+    <navigator wx:if="{{entryScope === 'exclusive'}}" class="ghost-button" url="/pages/redeem/index">返回扫码页</navigator>
+    <navigator wx:elif="{{entryScope === 'member'}}" class="ghost-button" url="/pages/member/index">返回会员中心</navigator>
+    <navigator wx:else class="ghost-button" url="/pages/home/index">返回首页</navigator>
   </view>
 </view>

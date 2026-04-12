@@ -1,0 +1,125 @@
+.order-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.order-head {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.order-paper {
+  padding: 24rpx;
+}
+
+.order-paper-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8rpx;
+}
+
+.order-delivery-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38rpx;
+  padding: 0 14rpx;
+  border-radius: 999rpx;
+  background: rgba(63, 42, 20, 0.08);
+  color: rgba(63, 42, 20, 0.78);
+  font-size: 15rpx;
+}
+
+.order-list {
+  padding: 24rpx;
+}
+
+.order-list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10rpx;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18rpx;
+  padding: 14rpx 0;
+}
+
+.order-item-name {
+  color: var(--ink);
+  font-size: 20rpx;
+  line-height: 1.56;
+}
+
+.order-item-price {
+  color: var(--gold-strong);
+  font-size: 20rpx;
+}
+
+.order-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18rpx;
+}
+
+.order-total-label {
+  color: var(--ink-faint);
+  font-size: 18rpx;
+}
+
+.success-panel {
+  padding: 28rpx 24rpx 30rpx;
+}
+
+.success-seal {
+  width: 118rpx;
+  height: 118rpx;
+  margin-bottom: 20rpx;
+  border-radius: 999rpx;
+  border: 1rpx solid rgba(214, 177, 124, 0.28);
+  background: rgba(214, 177, 124, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-seal-text {
+  color: var(--gold-strong);
+  font-size: 18rpx;
+  letter-spacing: 0.24em;
+}
+
+.success-title {
+  margin: 14rpx 0 10rpx;
+}
+
+.success-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+  margin: 22rpx 0 26rpx;
+}
+
+.success-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
+.success-meta-label {
+  color: var(--ink-faint);
+  font-size: 18rpx;
+}
+
+.success-meta-value {
+  color: var(--ink);
+  font-size: 20rpx;
+}

@@ -1,0 +1,54 @@
+<view class="shell">
+  <view wx:if="{{ready}}" class="page-scroll cart-page">
+    <view class="cart-head">
+      <text class="eyebrow">SHOPPING BAG</text>
+      <text class="display-title">购物袋</text>
+      <text class="micro-copy">保留当前主选项，确认后进入支付。</text>
+    </view>
+
+    <view wx:if="{{hasItems}}" class="cart-list">
+      <view class="section-panel cart-item" wx:for="{{cart.items}}" wx:key="id">
+        <image class="cart-image" src="{{item.coverImage}}" mode="aspectFill"></image>
+        <view class="cart-copy">
+          <text class="cart-title line-clamp-2">{{item.productName}}</text>
+          <text class="micro-copy">{{item.specName}}</text>
+          <view class="price-row">
+            <text class="price-current">¥{{item.lineAmount}}</text>
+            <text class="price-original">¥{{item.marketPrice}}</text>
+          </view>
+        </view>
+        <view class="cart-actions">
+          <view class="qty-stepper">
+            <button class="qty-button" data-item-id="{{item.id}}" data-step="-1" bindtap="changeQuantity">-</button>
+            <text class="qty-value">{{item.quantity}}</text>
+            <button class="qty-button" data-item-id="{{item.id}}" data-step="1" bindtap="changeQuantity">+</button>
+          </view>
+          <button class="remove-button" data-item-id="{{item.id}}" bindtap="removeItem">删除</button>
+        </view>
+      </view>
+    </view>
+
+    <view wx:else class="empty-inline">
+      <text class="muted-copy">购物袋还是空的，先去酒廊挑一件礼盒。</text>
+      <navigator class="ghost-button" url="/pages/store/index">去选酒</navigator>
+    </view>
+
+    <view wx:if="{{hasItems}}" class="checkout-bar section-panel">
+      <view class="checkout-copy">
+        <text class="checkout-label">合计</text>
+        <text class="price-current">¥{{cart.totalAmount}}</text>
+        <text class="micro-copy">{{cart.totalCount}} 件待结算</text>
+      </view>
+      <button class="primary-button checkout-button" bindtap="checkout">确认订单</button>
+    </view>
+
+    <view class="tabbar-gap"></view>
+    <boutique-tabbar active="cart" cartCount="{{cartCount}}"></boutique-tabbar>
+  </view>
+
+  <view wx:elif="{{errorTitle}}" class="page-scroll empty-state">
+    <text class="empty-title">{{errorTitle}}</text>
+    <text class="empty-subtitle">{{errorMessage}}</text>
+    <button class="ghost-button" bindtap="loadCart">重新加载</button>
+  </view>
+</view>

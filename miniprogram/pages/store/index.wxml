@@ -1,0 +1,64 @@
+<view class="shell">
+  <view wx:if="{{pageReady}}" class="page-scroll store-page">
+    <view class="store-head">
+      <text class="eyebrow">BOUTIQUE STORE</text>
+      <text class="display-title store-title">酒廊目录</text>
+      <text class="muted-copy line-clamp-2">先陈列少量主推礼盒，再展开完整目录。</text>
+    </view>
+
+    <scroll-view class="category-scroll" scroll-x enable-flex show-scrollbar="{{false}}">
+      <view class="category-row">
+        <button
+          wx:for="{{categories}}"
+          wx:key="*this"
+          class="category-chip {{activeCategory === item ? 'is-active' : ''}}"
+          data-category="{{item}}"
+          bindtap="switchCategory"
+        >
+          {{item}}
+        </button>
+      </view>
+    </scroll-view>
+
+    <view class="catalog-list">
+      <view
+        class="section-panel catalog-card"
+        wx:for="{{items}}"
+        wx:key="id"
+        data-product-id="{{item.id}}"
+        bindtap="openProduct"
+      >
+        <image class="catalog-image" src="{{item.coverImage}}" mode="aspectFill"></image>
+        <view class="catalog-copy">
+          <view class="chip-row">
+            <text class="chip">{{item.badge}}</text>
+            <text class="chip">{{item.category}}</text>
+          </view>
+          <text class="section-title catalog-title">{{item.name}}</text>
+          <text class="muted-copy line-clamp-2">{{item.story}}</text>
+
+          <view class="catalog-tags">
+            <text class="catalog-tag" wx:for="{{item.tags}}" wx:key="*this">{{item}}</text>
+          </view>
+
+          <view class="catalog-footer">
+            <view class="price-row">
+              <text class="price-current">¥{{item.lowestPrice}}</text>
+              <text class="price-original" wx:if="{{item.hasSkus}}">¥{{item.firstMarketPrice}}</text>
+            </view>
+            <text class="catalog-cta">进入</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="tabbar-gap"></view>
+    <boutique-tabbar active="store" cartCount="{{cartCount}}"></boutique-tabbar>
+  </view>
+
+  <view wx:elif="{{errorTitle}}" class="page-scroll empty-state">
+    <text class="empty-title">{{errorTitle}}</text>
+    <text class="empty-subtitle">{{errorMessage}}</text>
+    <button class="ghost-button" bindtap="loadPage">重新加载</button>
+  </view>
+</view>

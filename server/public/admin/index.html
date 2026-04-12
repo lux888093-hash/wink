@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>鸿玖酒庄运营台</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="grain"></div>
+    <div class="admin-shell">
+      <aside class="nav-rail">
+        <div class="brand-lockup">
+          <p class="brand-kicker">HONGJIU ESTATE</p>
+          <h1 class="brand-title">运营台</h1>
+          <p class="brand-copy">
+            按“品牌体验 + 商城交易 + 会员权益”三条线统一管理，而不是零散堆页面。
+          </p>
+        </div>
+
+        <nav class="nav-stack">
+          <button class="nav-item is-active" data-view="dashboard">概览</button>
+          <button class="nav-item" data-view="wines">酒款</button>
+          <button class="nav-item" data-view="codes">码池</button>
+          <button class="nav-item" data-view="products">商品</button>
+          <button class="nav-item" data-view="orders">订单</button>
+          <button class="nav-item" data-view="members">会员</button>
+          <button class="nav-item" data-view="audit">审计</button>
+        </nav>
+
+        <div class="nav-note">
+          <p>本页是本地演示后台。</p>
+          <p>当前已切到 PostgreSQL 兼容实体仓库，接口与小程序、后台联动。</p>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="topbar-kicker">CURATOR CONSOLE</p>
+            <h2 class="topbar-title" id="view-title">项目概览</h2>
+          </div>
+
+          <div class="topbar-actions">
+            <div class="session-pill" id="session-pill">未登录</div>
+            <button class="outline-button" id="refresh-button">刷新数据</button>
+            <button class="outline-button" id="logout-button">退出登录</button>
+          </div>
+        </header>
+
+        <div class="status-banner" id="status-banner" aria-live="polite"></div>
+
+        <section class="view is-active" id="view-dashboard">
+          <div class="metric-grid" id="dashboard-cards"></div>
+
+          <div class="split-grid">
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">RECENT ORDERS</p>
+                  <h3 class="panel-title">最近订单</h3>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div class="table-shell">
+                  <table class="data-table" id="orders-preview-table"></table>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">CODE HEALTH</p>
+                  <h3 class="panel-title">码池分布</h3>
+                </div>
+              </div>
+              <div class="panel-body" id="code-health"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="view-wines">
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <p class="panel-kicker">CONTENT</p>
+                <h3 class="panel-title">酒款内容配置</h3>
+              </div>
+            </div>
+            <div class="panel-body" id="wines-list"></div>
+          </section>
+        </section>
+
+        <section class="view" id="view-codes">
+          <div class="split-grid">
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">BATCH GENERATOR</p>
+                  <h3 class="panel-title">生成二维码批次</h3>
+                </div>
+              </div>
+              <div class="panel-body">
+                <form id="batch-form" class="batch-form">
+                  <label>
+                    <span>绑定酒款</span>
+                    <select id="batch-wine"></select>
+                  </label>
+                  <label>
+                    <span>批次数量</span>
+                    <input id="batch-quantity" type="number" min="1" max="200" value="12" />
+                  </label>
+                  <label>
+                    <span>批次号</span>
+                    <input id="batch-batch-no" type="text" placeholder="可选，留空自动生成" />
+                  </label>
+                  <button class="primary-button" type="submit">生成批次</button>
+                </form>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">STATUS FEED</p>
+                  <h3 class="panel-title">最新二维码</h3>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div class="table-shell">
+                  <table class="data-table" id="codes-table"></table>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="view-products">
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <p class="panel-kicker">STORE OPS</p>
+                <h3 class="panel-title">商品与价格管理</h3>
+              </div>
+            </div>
+            <div class="panel-body" id="products-list"></div>
+          </section>
+        </section>
+
+        <section class="view" id="view-orders">
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <p class="panel-kicker">TRANSACTION</p>
+                <h3 class="panel-title">订单列表</h3>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="table-shell">
+                <table class="data-table" id="orders-table"></table>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" id="view-members">
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <p class="panel-kicker">MEMBERSHIP</p>
+                <h3 class="panel-title">会员与下载权益</h3>
+              </div>
+            </div>
+            <div class="panel-body" id="members-list"></div>
+          </section>
+        </section>
+
+        <section class="view" id="view-audit">
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <p class="panel-kicker">AUDIT</p>
+                <h3 class="panel-title">操作审计</h3>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="table-shell">
+                <table class="data-table" id="audit-table"></table>
+              </div>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <div class="login-overlay" id="login-overlay">
+      <div class="login-card">
+        <div class="login-visual">
+          <div class="login-image"></div>
+          <div class="login-copy">
+            <p class="panel-kicker">ADMIN ACCESS</p>
+            <h2 class="login-title">鸿玖酒庄运营台</h2>
+            <p class="login-subtitle">
+              当前演示账号：`curator / Curator!2026`。登录后可直接新增、编辑、归档酒款与商品，并修改码池、订单和会员状态。
+            </p>
+          </div>
+        </div>
+
+        <form id="login-form" class="login-form">
+          <label>
+            <span>账号</span>
+            <input id="login-username" type="text" value="curator" />
+          </label>
+          <label>
+            <span>密码</span>
+            <input id="login-password" type="password" value="Curator!2026" />
+          </label>
+          <button class="primary-button" type="submit">进入运营台</button>
+          <p class="login-error" id="login-error"></p>
+        </form>
+      </div>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

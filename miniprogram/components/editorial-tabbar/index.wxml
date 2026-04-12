@@ -5,9 +5,8 @@
     data-url="/pages/cellar/index"
     bindtap="switchView"
   >
-    <view class="tabbar-mark"></view>
-    <text class="tabbar-label">Estate</text>
-    <text class="tabbar-meta">VISIT</text>
+    <text class="tabbar-label">酒庄</text>
+    <text class="tabbar-meta">EXCLUSIVE</text>
   </button>
 
   <button
@@ -16,9 +15,8 @@
     data-url="/pages/detail/index"
     bindtap="switchView"
   >
-    <view class="tabbar-mark"></view>
-    <text class="tabbar-label">Wine</text>
-    <text class="tabbar-meta">BOTTLE</text>
+    <text class="tabbar-label">酒款</text>
+    <text class="tabbar-meta">DETAIL</text>
   </button>
 
   <button
@@ -27,8 +25,7 @@
     data-url="/pages/melody/index"
     bindtap="switchView"
   >
-    <view class="tabbar-mark"></view>
-    <text class="tabbar-label">Music</text>
+    <text class="tabbar-label">配乐</text>
     <text class="tabbar-meta">LISTEN</text>
   </button>
 </view>

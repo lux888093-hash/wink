@@ -1,84 +1,52 @@
 <view class="shell">
   <view wx:if="{{ready}}" class="page-scroll cellar-page">
-    <view class="estate-hero-grid">
-      <view class="estate-visual">
-        <image class="estate-visual-image" src="{{wine.estateHeroImage}}" mode="aspectFill"></image>
-        <view class="estate-visual-mask"></view>
-
-        <view class="estate-visual-copy">
-          <text class="eyebrow">Moonlit Estate</text>
-          <text class="estate-visual-title">The estate before the bottle.</text>
-        </view>
-
-        <view class="estate-float-card">
-          <image class="estate-float-image" src="{{wine.estatePortraitImage}}" mode="aspectFill"></image>
-          <view class="estate-float-copy">
-            <text class="estate-float-title">The Lit House</text>
-            <text class="micro-copy">A single warm window gives the estate its memory.</text>
-          </view>
-        </view>
+    <view class="section-panel cellar-hero">
+      <image class="cellar-hero-image" src="{{wine.estateHeroImage}}" mode="aspectFill"></image>
+      <view class="cellar-hero-mask"></view>
+      <view class="cellar-hero-copy">
+        <text class="eyebrow">扫码专属</text>
+        <text class="display-title cellar-title">{{wine.name}}</text>
+        <text class="muted-copy line-clamp-3">{{wine.estateIntro}}</text>
       </view>
-
-      <view class="section-card section-card--paper estate-dossier">
-        <text class="paper-eyebrow">Estate Dossier</text>
-        <text class="paper-title">{{wine.estateName}}</text>
-        <text class="paper-subtitle">{{wine.estateTagline}}</text>
-        <text class="paper-copy">{{wine.estateIntro}}</text>
-
-        <view class="estate-stat-list">
-          <view class="estate-stat" wx:for="{{wine.estateStats}}" wx:key="label">
-            <text class="estate-stat-label">{{item.label}}</text>
-            <text class="estate-stat-value">{{item.value}}</text>
-          </view>
-        </view>
-
-        <view class="chip-row estate-chip-row">
-          <text class="chip">{{wine.region}}</text>
-          <text class="chip">{{wine.style}}</text>
-          <text class="chip">{{wine.serving}}</text>
-        </view>
-
-        <button class="cta" bindtap="openDetail">Explore The Wine</button>
+      <view class="cellar-hero-note">
+        <text class="micro-copy line-clamp-2">{{wine.quote}}</text>
       </view>
     </view>
 
-    <view class="estate-editorial-grid">
-      <view class="section-card estate-philosophy">
-        <text class="eyebrow">Estate Philosophy</text>
-        <text class="section-heading">Let the estate speak first.</text>
-        <text class="muted-copy">{{wine.estatePhilosophy}}</text>
-      </view>
+    <view class="paper-panel dossier-card">
+      <text class="eyebrow dossier-kicker">{{wine.estateName}}</text>
+      <text class="section-title">{{wine.estateTagline}}</text>
+      <text class="muted-copy">{{wine.estatePhilosophy}}</text>
 
-      <view class="estate-harvest-panel">
-        <image class="estate-harvest-image" src="{{wine.harvestImage}}" mode="aspectFill"></image>
-        <view class="estate-harvest-mask"></view>
-        <view class="estate-harvest-copy">
-          <text class="eyebrow">Night Harvest</text>
-          <text class="estate-harvest-title">Harvest after dark completes the estate's tone.</text>
-          <text class="micro-copy">When moonlight, fruit and hands appear together, the estate becomes part of the taste.</text>
+      <view class="dossier-list">
+        <view class="dossier-item" wx:for="{{wine.estateStats}}" wx:key="label">
+          <text class="dossier-label">{{item.label}}</text>
+          <text class="dossier-value">{{item.value}}</text>
         </view>
       </view>
     </view>
 
-    <view class="estate-memories">
-      <text class="section-heading">Three Estate Impressions</text>
+    <view class="section-head">
+      <view>
+        <text class="eyebrow">庄园印象</text>
+        <text class="section-title">庄园画面</text>
+      </view>
+    </view>
 
-      <view class="estate-moment-list">
-        <view class="section-card moment-card" wx:for="{{collection}}" wx:key="id">
-          <image class="moment-image" src="{{item.image}}" mode="aspectFill"></image>
-          <view class="moment-copy">
-            <text class="moment-meta">{{item.vintage}}</text>
-            <text class="moment-title">{{item.title}}</text>
-            <text class="micro-copy">{{item.note}}</text>
-          </view>
+    <view class="memory-list">
+      <view class="section-panel memory-card" wx:for="{{collection}}" wx:key="id">
+        <image class="memory-image" src="{{item.image}}" mode="aspectFill"></image>
+        <view class="memory-copy">
+          <text class="memory-meta">{{item.vintage}}</text>
+          <text class="memory-title">{{item.title}}</text>
+          <text class="micro-copy line-clamp-2">{{item.note}}</text>
         </view>
       </view>
     </view>
 
-    <view class="section-card estate-closing">
-      <text class="eyebrow">Estate Aftertaste</text>
-      <text class="section-heading">The estate is the first tasting note.</text>
-      <text class="muted-copy">A restrained winery site builds place before product. It feels calmer, rarer and easier to remember.</text>
+    <view class="action-row">
+      <button class="ghost-button action-button" bindtap="openDetail">看酒款</button>
+      <button class="primary-button action-button" bindtap="openMelody">听配乐</button>
     </view>
 
     <view class="tabbar-gap"></view>
@@ -88,6 +56,6 @@
   <view wx:else class="page-scroll empty-state">
     <text class="empty-title">{{errorTitle}}</text>
     <text class="empty-subtitle">{{errorMessage}}</text>
-    <navigator class="ghost-button" url="/pages/redeem/index">Back To Entry</navigator>
+    <navigator class="ghost-button" url="/pages/redeem/index">返回扫码页</navigator>
   </view>
 </view>

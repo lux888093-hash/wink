@@ -1,18 +1,36 @@
-function getBaseUrl() {
-  const app = getApp();
-  return app.globalData.apiBaseUrl;
+function getAppInstance() {
+  return getApp();
 }
 
-function request(options) {
-  const { url, method = 'GET', data = null } = options;
+function getBaseUrl() {
+  return getAppInstance().globalData.apiBaseUrl;
+}
+
+function getHeaders(extraHeaders) {
+  const app = getAppInstance();
+
+  return {
+    'content-type': 'application/json',
+    ...(app.globalData.userToken
+      ? { Authorization: `Bearer ${app.globalData.userToken}` }
+      : { 'x-demo-user-id': app.globalData.currentUserId || 'user_demo_guest' }),
+    ...(extraHeaders || {})
+  };
+}
+
+async function request(options) {
+  const { url, method = 'GET', data = null, headers = null } = options;
+  const app = getAppInstance();
+
+  if (app && typeof app.ensureUserSession === 'function' && !String(url).startsWith('/api/auth/')) {
+    await app.ensureUserSession();
+  }
 
   return new Promise((resolve, reject) => {
     const requestOptions = {
       url: `${getBaseUrl()}${url}`,
       method,
-      header: {
-        'content-type': 'application/json'
-      },
+      header: getHeaders(headers),
       success(res) {
         if (res.statusCode >= 200 && res.statusCode < 300 && res.data && res.data.ok !== false) {
           resolve(res.data);
@@ -26,8 +44,7 @@ function request(options) {
         reject(error);
       },
       fail() {
-        const error = new Error('NETWORK_ERROR');
-        reject(error);
+        reject(new Error('NETWORK_ERROR'));
       }
     };
 
@@ -40,5 +57,6 @@ function request(options) {
 }
 
 module.exports = {
+  getBaseUrl,
   request
 };

@@ -1,228 +1,127 @@
 .cellar-page {
   display: flex;
   flex-direction: column;
-  gap: 28rpx;
+  gap: 18rpx;
 }
 
-.estate-hero-grid {
+.cellar-hero {
+  min-height: 520rpx;
+  border-radius: 36rpx;
+}
+
+.cellar-hero-image,
+.cellar-hero-mask {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.cellar-hero-mask {
+  background:
+    linear-gradient(180deg, rgba(8, 6, 5, 0.12) 0%, rgba(8, 6, 5, 0.84) 100%),
+    radial-gradient(circle at 82% 16%, rgba(245, 219, 176, 0.16), rgba(245, 219, 176, 0));
+}
+
+.cellar-hero-copy {
+  position: relative;
+  z-index: 2;
+  padding: 34rpx 28rpx 162rpx;
+}
+
+.cellar-title {
+  margin: 10rpx 0 12rpx;
+}
+
+.cellar-hero-note {
+  position: absolute;
+  left: 18rpx;
+  right: 18rpx;
+  bottom: 18rpx;
+  z-index: 2;
+  padding: 20rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(180deg, rgba(13, 10, 10, 0.52), rgba(13, 10, 10, 0.4));
+}
+
+.dossier-card {
+  padding: 24rpx;
+}
+
+.dossier-kicker {
+  color: rgba(63, 42, 20, 0.68);
+}
+
+.dossier-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+  margin-top: 18rpx;
+}
+
+.dossier-item {
+  padding-bottom: 14rpx;
+  border-bottom: 1rpx solid rgba(63, 42, 20, 0.08);
+}
+
+.dossier-label {
+  display: block;
+  margin-bottom: 8rpx;
+  color: rgba(63, 42, 20, 0.56);
+  font-size: 16rpx;
+}
+
+.dossier-value {
+  display: block;
+  color: var(--paper-ink);
+  font-size: 22rpx;
+  line-height: 1.58;
+}
+
+.memory-list {
   display: flex;
   flex-direction: column;
   gap: 14rpx;
 }
 
-.estate-visual {
-  position: relative;
-  min-height: 520rpx;
-  border-radius: 28rpx;
-  overflow: hidden;
-  background: #0f0d0d;
-}
-
-.estate-visual-image,
-.estate-visual-mask {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.estate-visual-mask {
-  background:
-    linear-gradient(180deg, rgba(6, 5, 5, 0.08) 0%, rgba(6, 5, 5, 0.2) 24%, rgba(6, 5, 5, 0.76) 100%),
-    radial-gradient(circle at 58% 18%, rgba(255, 248, 220, 0.24), rgba(255, 248, 220, 0));
-}
-
-.estate-visual-copy {
-  position: relative;
-  z-index: 2;
-  padding: 22rpx 22rpx 0;
-}
-
-.estate-visual-title {
-  display: block;
-  max-width: 330rpx;
-  color: #f7eee4;
-  font-family: Baskerville, Georgia, "Times New Roman", serif;
-  font-size: 38rpx;
-  line-height: 1.12;
-}
-
-.estate-float-card {
-  position: absolute;
-  left: 22rpx;
-  right: 22rpx;
-  bottom: 22rpx;
-  z-index: 2;
+.memory-card {
   display: flex;
   gap: 14rpx;
-  padding: 10rpx;
-  border-radius: 22rpx;
-  background: rgba(14, 11, 11, 0.28);
-  border: 1rpx solid rgba(244, 235, 225, 0.06);
+  padding: 16rpx;
 }
 
-.estate-float-image {
-  width: 116rpx;
-  height: 116rpx;
-  border-radius: 16rpx;
+.memory-image {
+  width: 176rpx;
+  height: 156rpx;
+  border-radius: 22rpx;
   flex-shrink: 0;
 }
 
-.estate-float-copy {
+.memory-copy {
   flex: 1;
-  padding: 8rpx 0;
 }
 
-.estate-float-title {
+.memory-meta {
   display: block;
-  margin-bottom: 6rpx;
-  color: #f7eee4;
-  font-family: Baskerville, Georgia, "Times New Roman", serif;
-  font-size: 28rpx;
-}
-
-.estate-dossier {
-  padding-top: 24rpx;
-}
-
-.estate-stat-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8rpx;
-  margin: 22rpx 0;
-}
-
-.estate-stat {
-  padding: 14rpx 0;
-  border-top: 1rpx solid rgba(44, 33, 24, 0.12);
-}
-
-.estate-stat:first-child {
-  padding-top: 0;
-  border-top: 0;
-}
-
-.estate-stat-label {
-  display: block;
-  margin-bottom: 6rpx;
-  color: rgba(113, 81, 43, 0.86);
-  font-size: 16rpx;
-  letter-spacing: 0.18em;
-}
-
-.estate-stat-value {
-  display: block;
-  color: var(--paper-ink);
-  font-size: 24rpx;
-  line-height: 1.5;
-}
-
-.estate-chip-row {
-  margin-bottom: 22rpx;
-}
-
-.estate-editorial-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 24rpx;
-}
-
-.estate-philosophy {
-  padding-top: 8rpx;
-  border-top: 1rpx solid rgba(216, 180, 128, 0.12);
-}
-
-.estate-harvest-panel {
-  position: relative;
-  min-height: 330rpx;
-  border-radius: 26rpx;
-  overflow: hidden;
-  background: #100e0e;
-}
-
-.estate-harvest-image,
-.estate-harvest-mask {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.estate-harvest-mask {
-  background:
-    linear-gradient(180deg, rgba(10, 8, 8, 0.08) 0%, rgba(10, 8, 8, 0.28) 38%, rgba(10, 8, 8, 0.82) 100%),
-    radial-gradient(circle at 50% 16%, rgba(255, 229, 182, 0.16), rgba(255, 229, 182, 0));
-}
-
-.estate-harvest-copy {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  min-height: 330rpx;
-  padding: 22rpx;
-}
-
-.estate-harvest-title {
-  display: block;
-  max-width: 420rpx;
   margin-bottom: 8rpx;
-  color: #f7eee4;
-  font-family: Baskerville, Georgia, "Times New Roman", serif;
-  font-size: 32rpx;
-  line-height: 1.16;
-}
-
-.estate-memories {
-  padding-top: 2rpx;
-}
-
-.estate-moment-list {
-  display: flex;
-  flex-direction: column;
-  gap: 22rpx;
-}
-
-.moment-card {
-  padding: 0 0 22rpx;
-  border-bottom: 1rpx solid rgba(216, 180, 128, 0.1);
-}
-
-.moment-image {
-  width: 100%;
-  height: 210rpx;
-  border-radius: 20rpx;
-}
-
-.moment-copy {
-  padding: 16rpx 4rpx 0;
-}
-
-.moment-meta {
-  display: block;
-  margin-bottom: 6rpx;
   color: var(--gold);
-  font-size: 16rpx;
-  letter-spacing: 0.18em;
+  font-size: 14rpx;
+  letter-spacing: 0.16em;
 }
 
-.moment-title {
+.memory-title {
   display: block;
   margin-bottom: 8rpx;
   color: var(--ink);
   font-family: Baskerville, Georgia, "Times New Roman", serif;
-  font-size: 28rpx;
-  line-height: 1.14;
+  font-size: 27rpx;
 }
 
-.estate-closing {
-  padding-top: 6rpx;
-  border-top: 1rpx solid rgba(216, 180, 128, 0.12);
+.action-row {
+  display: flex;
+  gap: 12rpx;
+}
+
+.action-button {
+  flex: 1;
 }

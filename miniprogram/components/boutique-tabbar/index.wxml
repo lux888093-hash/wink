@@ -1,0 +1,42 @@
+<view class="dock-shell">
+  <button
+    class="dock-item {{active === 'home' ? 'is-active' : ''}}"
+    data-key="home"
+    data-url="/pages/home/index"
+    bindtap="switchView"
+  >
+    <text class="dock-label">庄园</text>
+    <text class="dock-meta">HOME</text>
+  </button>
+
+  <button
+    class="dock-item {{active === 'store' ? 'is-active' : ''}}"
+    data-key="store"
+    data-url="/pages/store/index"
+    bindtap="switchView"
+  >
+    <text class="dock-label">酒廊</text>
+    <text class="dock-meta">STORE</text>
+  </button>
+
+  <button
+    class="dock-item {{active === 'member' ? 'is-active' : ''}}"
+    data-key="member"
+    data-url="/pages/member/index"
+    bindtap="switchView"
+  >
+    <text class="dock-label">会员</text>
+    <text class="dock-meta">CLUB</text>
+  </button>
+
+  <button
+    class="dock-item {{active === 'cart' ? 'is-active' : ''}}"
+    data-key="cart"
+    data-url="/pages/cart/index"
+    bindtap="switchView"
+  >
+    <view class="dock-badge" wx:if="{{cartCount > 0}}">{{badgeText}}</view>
+    <text class="dock-label">购物袋</text>
+    <text class="dock-meta">BAG</text>
+  </button>
+</view>

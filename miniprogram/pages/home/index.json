@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "鸿玖酒庄",
+  "usingComponents": {
+    "boutique-tabbar": "/components/boutique-tabbar/index"
+  }
+}

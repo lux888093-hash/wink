@@ -1,106 +1,64 @@
 <view class="shell">
   <view wx:if="{{ready}}" class="page-scroll detail-page">
-    <view class="detail-hero-grid">
-      <view class="section-card section-card--paper detail-dossier">
-        <text class="paper-eyebrow">{{wine.eyebrow}}</text>
-        <text class="paper-title">{{wine.title}}</text>
-        <text class="paper-subtitle">{{wine.vintage}}</text>
+    <view class="detail-hero">
+      <view class="paper-panel detail-paper">
+      <text class="eyebrow detail-kicker">{{wine.eyebrow}}</text>
+      <text class="display-title detail-title">{{wine.name}}</text>
+      <text class="muted-copy line-clamp-2">{{wine.subtitle}}</text>
 
         <view class="chip-row detail-chip-row">
-          <text class="chip">{{wine.brand}}</text>
-          <text class="chip">{{wine.region}}</text>
-          <text class="chip">{{wine.style}}</text>
+          <text class="paper-chip">{{wine.region}}</text>
+          <text class="paper-chip">{{wine.grapes}}</text>
+          <text class="paper-chip">{{wine.abv}}</text>
         </view>
 
-        <text class="paper-copy">{{wine.overview}}</text>
+      <text class="muted-copy line-clamp-3">{{wine.overview}}</text>
 
-        <view class="detail-quote-card">
+        <view class="detail-quote">
           <text class="detail-quote-mark">“</text>
-          <text class="detail-quote-text">{{wine.quote}}</text>
+          <text class="detail-quote-text line-clamp-3">{{wine.quote}}</text>
         </view>
-
-        <button class="cta" bindtap="openMelody">Open Melody</button>
       </view>
 
-      <view class="detail-visual-panel">
+      <view class="section-panel detail-visual">
         <image class="detail-visual-bg" src="{{wine.posterImage}}" mode="aspectFill"></image>
         <view class="detail-visual-mask"></view>
         <image class="detail-bottle" src="{{wine.bottleImage}}" mode="aspectFit"></image>
-        <view class="detail-seal">
-          <text class="detail-seal-text">Estate Selection</text>
-        </view>
       </view>
     </view>
 
-    <view class="detail-feature-row">
-      <view class="section-card detail-gift-card">
-        <image class="detail-gift-image" src="{{wine.giftImage}}" mode="aspectFill"></image>
-        <view class="detail-gift-copy">
-          <text class="eyebrow">Gift Presentation</text>
-          <text class="section-heading detail-gift-title">The bottle and the case should both feel collectible.</text>
-          <text class="muted-copy">Luxury wine pages usually show packaging and ritual together, not only a bottle cut-out on a dark background.</text>
+    <view class="section-panel note-panel">
+      <text class="eyebrow">品鉴结构</text>
+      <view class="note-item" wx:for="{{wine.tasting}}" wx:key="key">
+        <view class="note-head">
+          <text class="note-title">{{item.key}}</text>
+          <text class="note-meter" wx:if="{{item.meter}}">{{item.meter}}</text>
         </view>
-      </view>
-
-      <view class="section-card detail-story-card">
-        <text class="eyebrow">Story</text>
-        <text class="section-heading">{{wine.storyTitle}}</text>
-        <text class="muted-copy">{{wine.story}}</text>
-
-        <view class="score-row">
-          <view class="score-pill" wx:for="{{wine.scores}}" wx:key="source">
-            <text class="score-pill-value">{{item.score}}</text>
-            <text class="score-pill-label">{{item.source}}</text>
-          </view>
-        </view>
+        <text class="muted-copy">{{item.text}}</text>
       </view>
     </view>
 
-    <view class="detail-section">
-      <text class="section-heading">Tasting Profile</text>
-      <view class="detail-grid">
-        <view class="section-card tasting-card" wx:for="{{wine.tasting}}" wx:key="key">
-          <text class="tasting-icon">{{item.icon}}</text>
-          <text class="tasting-title">{{item.key}}</text>
-          <text class="muted-copy">{{item.text}}</text>
-
-          <view wx:if="{{item.meter}}" class="meter-rail">
-            <view class="meter-fill" style="width: {{item.meter}}%;"></view>
-          </view>
-        </view>
+    <view class="paper-panel tech-panel">
+      <text class="eyebrow detail-kicker">饮用建议</text>
+      <view class="tech-item" wx:for="{{wine.technical}}" wx:key="label">
+        <text class="tech-label">{{item.label}}</text>
+        <text class="tech-value">{{item.value}}</text>
       </view>
     </view>
 
-    <view class="detail-section">
-      <view class="section-card section-card--paper tech-card">
-        <text class="paper-eyebrow">Serving Notes</text>
-        <text class="paper-title paper-title--small">Serving Ritual</text>
-
-        <view class="tech-row" wx:for="{{wine.technical}}" wx:key="label">
-          <text class="tech-label">{{item.label}}</text>
-          <text class="tech-value">{{item.value}}</text>
-        </view>
-      </view>
+    <view class="detail-actions">
+      <button class="primary-button detail-action" bindtap="openMelody">听配乐</button>
+      <button wx:if="{{showMall}}" class="ghost-button detail-action" bindtap="openProduct">看礼盒</button>
     </view>
 
-    <view class="detail-closing">
-      <image class="detail-closing-image" src="{{wine.posterImage}}" mode="aspectFill"></image>
-      <view class="detail-closing-mask"></view>
-      <view class="detail-closing-copy">
-        <text class="eyebrow">Wine To Melody</text>
-        <text class="display-title detail-closing-title">Let the melody receive the wine.</text>
-        <text class="muted-copy">{{wine.moodLine}}</text>
-        <button class="ghost-button" bindtap="openMelody">Enter Melody Room</button>
-      </view>
-    </view>
-
-    <view class="tabbar-gap"></view>
-    <editorial-tabbar active="detail"></editorial-tabbar>
+    <view wx:if="{{!showMall}}" class="tabbar-gap"></view>
+    <editorial-tabbar wx:if="{{!showMall}}" active="detail"></editorial-tabbar>
   </view>
 
   <view wx:else class="page-scroll empty-state">
     <text class="empty-title">{{errorTitle}}</text>
     <text class="empty-subtitle">{{errorMessage}}</text>
-    <navigator class="ghost-button" url="/pages/redeem/index">Back To Entry</navigator>
+    <navigator wx:if="{{entryScope === 'exclusive'}}" class="ghost-button" url="/pages/redeem/index">返回扫码页</navigator>
+    <navigator wx:else class="ghost-button" url="/pages/home/index">返回首页</navigator>
   </view>
 </view>
