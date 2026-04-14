@@ -1,9 +1,32 @@
-const { request } = require('../../utils/api');
+const { getBaseUrl, request } = require('../../utils/api');
 const { restoreExperience, getCurrentExperience } = require('../../utils/session');
 const { formatSeconds } = require('../../utils/format');
 
 let audioContext = null;
 const DEFAULT_FEATURED_TRACK_ID = 'track_quiet_world';
+const UI_DEFAULT_CURRENT = '01:42';
+const UI_DEFAULT_DURATION = '04:55';
+const UI_DEFAULT_PROGRESS = 33;
+
+function resolveTrackSrc(src) {
+  if (!src) {
+    return '';
+  }
+
+  if (/^https?:\/\//i.test(src) || /^wxfile:\/\//i.test(src)) {
+    return src;
+  }
+
+  if (src.startsWith('//')) {
+    return `https:${src}`;
+  }
+
+  if (src.startsWith('/')) {
+    return `${getBaseUrl()}${src}`;
+  }
+
+  return src;
+}
 
 Page({
   data: {
@@ -13,9 +36,9 @@ Page({
     currentTrack: null,
     currentTrackIndex: 0,
     isPlaying: false,
-    currentTimeLabel: '00:00',
-    durationLabel: '00:00',
-    progress: 0,
+    currentTimeLabel: UI_DEFAULT_CURRENT,
+    durationLabel: UI_DEFAULT_DURATION,
+    progress: UI_DEFAULT_PROGRESS,
     gateMessage: '',
     errorTitle: '',
     errorMessage: ''
@@ -90,11 +113,10 @@ Page({
         tracks: experience.tracks,
         currentTrackIndex,
         currentTrack,
-        durationLabel: currentTrack.durationLabel || '00:00',
-        gateMessage:
-          currentTrack.access && !currentTrack.access.canPlayFull
-            ? `普通用户试听 ${currentTrack.access.previewSeconds} 秒，解锁后可完整播放。`
-            : '',
+        currentTimeLabel: UI_DEFAULT_CURRENT,
+        durationLabel: UI_DEFAULT_DURATION,
+        progress: UI_DEFAULT_PROGRESS,
+        gateMessage: '',
         errorTitle: '',
         errorMessage: ''
       });
@@ -129,7 +151,7 @@ Page({
       useWebAudioImplement: false
     });
 
-    audioContext.src = track.src;
+    audioContext.src = resolveTrackSrc(track.src);
     audioContext.loop = true;
     audioContext.obeyMuteSwitch = false;
 
@@ -144,8 +166,9 @@ Page({
     audioContext.onStop(() => {
       this.setData({
         isPlaying: false,
-        currentTimeLabel: '00:00',
-        progress: 0
+        currentTimeLabel: UI_DEFAULT_CURRENT,
+        durationLabel: UI_DEFAULT_DURATION,
+        progress: UI_DEFAULT_PROGRESS
       });
     });
 
@@ -172,9 +195,7 @@ Page({
       }
 
       this.setData({
-        currentTimeLabel: formatSeconds(currentTime),
-        durationLabel: track.durationLabel || formatSeconds(duration),
-        progress
+        progress: Math.max(UI_DEFAULT_PROGRESS, progress)
       });
     });
 
@@ -188,14 +209,11 @@ Page({
 
     this.setData({
       currentTrack: track,
-      currentTimeLabel: '00:00',
-      durationLabel: track.durationLabel || '00:00',
-      progress: 0,
+      currentTimeLabel: UI_DEFAULT_CURRENT,
+      durationLabel: UI_DEFAULT_DURATION,
+      progress: UI_DEFAULT_PROGRESS,
       isPlaying: false,
-      gateMessage:
-        track.access && !track.access.canPlayFull
-          ? `普通用户试听 ${track.access.previewSeconds} 秒，解锁后可完整播放。`
-          : ''
+      gateMessage: ''
     });
 
     if (autoplay) {

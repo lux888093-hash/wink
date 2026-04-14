@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -80,10 +81,38 @@ const { hasWechatCredentials, generateMiniProgramCode } = require('./services/we
 const app = express();
 const port = runtimeConfig.port;
 const pagePath = 'pages/redeem/index';
+const audioStaticDirs = [
+  path.join(__dirname, '..', 'miniprogram', 'assets', 'audio'),
+  path.join(__dirname, '..', 'music')
+];
 
 ensureStoreFile();
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
+
+function decodeAssetFilename(fileUrl = '') {
+  const basename = path.posix.basename(String(fileUrl).split('?')[0]);
+
+  try {
+    return decodeURIComponent(basename);
+  } catch (error) {
+    return basename;
+  }
+}
+
+function resolveAudioFilePath(fileUrl = '') {
+  const filename = decodeAssetFilename(fileUrl);
+
+  for (const directory of audioStaticDirs) {
+    const candidate = path.join(directory, filename);
+
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+
+  return '';
+}
 
 function clientIp(req) {
   const forwarded = req.headers['x-forwarded-for'];
@@ -226,7 +255,9 @@ app.use('/api', (req, res, next) => {
 app.use('/preview', express.static(path.join(__dirname, 'public', 'preview')));
 app.use('/admin', express.static(path.join(__dirname, 'public', 'admin')));
 app.use('/assets/images', express.static(path.join(__dirname, '..', 'miniprogram', 'assets', 'images')));
-app.use('/assets/audio', express.static(path.join(__dirname, '..', 'miniprogram', 'assets', 'audio')));
+audioStaticDirs.forEach((directory) => {
+  app.use('/assets/audio', express.static(directory));
+});
 app.use('/qrcodes', express.static(path.join(__dirname, 'public', 'qrcodes')));
 
 app.use((error, _req, res, next) => {
@@ -734,9 +765,13 @@ app.get('/api/downloads/logs', (req, res) => {
 app.get('/api/downloads/file', (req, res) => {
   try {
     const payload = consumeDownloadTicket(req.query.token);
-    const filename = path.basename(payload.asset.fileUrl);
-    const localPath = path.join(__dirname, '..', 'miniprogram', 'assets', 'audio', filename);
-    res.download(localPath, `${payload.track.cnTitle || payload.track.title}.wav`);
+    const localPath = resolveAudioFilePath(payload.asset.fileUrl);
+
+    if (!localPath) {
+      throw new Error('DOWNLOAD_FILE_NOT_FOUND');
+    }
+
+    res.download(localPath, `${payload.track.cnTitle || payload.track.title}${path.extname(localPath) || '.wav'}`);
   } catch (error) {
     respondError(res, error);
   }

@@ -21,8 +21,10 @@
       </view>
 
       <text class="eyebrow melody-kicker">AMBIENT PAIRING</text>
-      <text class="display-title melody-title">{{currentTrack.title}}</text>
-      <text class="muted-copy melody-description line-clamp-2">{{currentTrack.description}}</text>
+      <text class="display-title melody-title">Vintage Noir</text>
+      <text class="muted-copy melody-description">
+        Soft cello and distant rain, curated for an aged Cabernet Sauvignon.
+      </text>
 
       <view class="progress-wrap">
         <view class="progress-rail">
@@ -35,51 +37,26 @@
       </view>
 
       <view class="control-row">
-        <button class="control-side" bindtap="playPrev">
-          <image class="control-side-icon" src="/assets/icons/skip_previous.svg" mode="aspectFit"></image>
-        </button>
-        <button class="control-main" bindtap="togglePlayback">
-          <image
-            wx:if="{{isPlaying}}"
-            class="control-main-icon"
-            src="/assets/icons/pause.svg"
-            mode="aspectFit"
-          ></image>
-          <image
-            wx:else
-            class="control-main-icon play-icon"
-            src="/assets/icons/play_arrow.svg"
-            mode="aspectFit"
-          ></image>
-        </button>
-        <button class="control-side" bindtap="playNext">
-          <image class="control-side-icon" src="/assets/icons/skip_next.svg" mode="aspectFit"></image>
-        </button>
-      </view>
-
-      <view wx:if="{{gateMessage}}" class="gate-inline">
-        <text class="micro-copy gate-copy">{{gateMessage}}</text>
-        <view class="gate-links">
-          <button wx:if="{{entryScope === 'exclusive'}}" class="gate-link" bindtap="openDetail">查看酒款</button>
-          <button wx:else class="gate-link" bindtap="openMember">会员权益</button>
-          <text class="gate-sep">/</text>
-          <button class="gate-link" bindtap="unlockCurrentTrack">单曲解锁</button>
+        <view class="control-side control-touch" bindtap="playPrev" hover-class="control-touch-active">
+          <view class="skip-icon skip-prev">
+            <view class="skip-bar"></view>
+            <view class="skip-triangle skip-triangle-prev"></view>
+            <view class="skip-triangle skip-triangle-prev overlap"></view>
+          </view>
         </view>
-      </view>
-
-      <view class="selector-wrap">
-        <text class="selector-label">SELECT WINE MOOD</text>
-        <view class="selector-row">
-          <button
-            class="track-chip {{currentTrackIndex === index ? 'is-active' : ''}}"
-            wx:for="{{tracks}}"
-            wx:key="id"
-            wx:for-index="index"
-            data-index="{{index}}"
-            bindtap="selectTrack"
-          >
-            {{item.title}}
-          </button>
+        <view class="control-main control-touch" bindtap="togglePlayback" hover-class="control-touch-active">
+          <view wx:if="{{isPlaying}}" class="pause-icon">
+            <view class="pause-bar"></view>
+            <view class="pause-bar"></view>
+          </view>
+          <view wx:else class="play-icon-shape"></view>
+        </view>
+        <view class="control-side control-touch" bindtap="playNext" hover-class="control-touch-active">
+          <view class="skip-icon skip-next">
+            <view class="skip-bar"></view>
+            <view class="skip-triangle skip-triangle-next"></view>
+            <view class="skip-triangle skip-triangle-next overlap"></view>
+          </view>
         </view>
       </view>
     </view>
