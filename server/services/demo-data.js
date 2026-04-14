@@ -327,7 +327,7 @@ function createSeedStore() {
         src: '/assets/audio/classical-piano.wav',
         durationLabel: '00:20',
         art: 'ivory',
-        cover: '/assets/images/wine-bottle-poster.jpg',
+        cover: '/assets/images/melody-phone-cover.jpg',
         playRule: 'member',
         previewSeconds: 12,
         unlockPrice: 49

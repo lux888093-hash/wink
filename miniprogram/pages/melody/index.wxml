@@ -1,24 +1,28 @@
 <view class="shell">
   <view wx:if="{{ready}}" class="page-scroll melody-page">
-    <view class="melody-stage">
-      <image class="melody-stage-bg" src="{{currentTrack.cover}}" mode="aspectFill"></image>
-      <view class="melody-stage-mask"></view>
-      <view class="melody-stage-copy">
-        <text class="eyebrow">CELLAR SCORE</text>
-        <text class="display-title">{{currentTrack.cnTitle}}</text>
-        <text class="muted-copy line-clamp-2">{{currentTrack.description}}</text>
-      </view>
+    <image class="melody-bg" src="/assets/images/melody-phone-bg.jpg" mode="aspectFill"></image>
+    <view class="melody-bg-shadow"></view>
+    <view class="melody-bg-overlay"></view>
+
+    <view class="melody-topbar">
+      <button class="topbar-button">
+        <image class="topbar-icon" src="/assets/icons/menu.svg" mode="aspectFit"></image>
+      </button>
+      <text class="topbar-title">THE CURATOR</text>
+      <button class="topbar-button">
+        <image class="topbar-icon" src="/assets/icons/search.svg" mode="aspectFit"></image>
+      </button>
     </view>
 
-    <view class="paper-panel player-card">
-      <view class="player-head">
-        <image class="player-cover" src="{{currentTrack.cover}}" mode="aspectFill"></image>
-        <view class="player-copy">
-          <text class="eyebrow player-kicker">{{wine.name}}</text>
-          <text class="section-title">{{currentTrack.title}}</text>
-          <text class="micro-copy line-clamp-2">{{wine.moodLine}}</text>
-        </view>
+    <view class="melody-stage">
+      <view class="cover-shell">
+        <image class="cover-image" src="/assets/images/melody-phone-cover.jpg" mode="aspectFill"></image>
+        <view class="cover-core"></view>
       </view>
+
+      <text class="eyebrow melody-kicker">AMBIENT PAIRING</text>
+      <text class="display-title melody-title">{{currentTrack.title}}</text>
+      <text class="muted-copy melody-description line-clamp-2">{{currentTrack.description}}</text>
 
       <view class="progress-wrap">
         <view class="progress-rail">
@@ -31,36 +35,52 @@
       </view>
 
       <view class="control-row">
-        <button class="ghost-button player-mini" bindtap="playPrev">上一曲</button>
-        <button class="primary-button player-main" bindtap="togglePlayback">{{isPlaying ? '暂停' : '播放'}}</button>
-        <button class="ghost-button player-mini" bindtap="playNext">下一曲</button>
+        <button class="control-side" bindtap="playPrev">
+          <image class="control-side-icon" src="/assets/icons/skip_previous.svg" mode="aspectFit"></image>
+        </button>
+        <button class="control-main" bindtap="togglePlayback">
+          <image
+            wx:if="{{isPlaying}}"
+            class="control-main-icon"
+            src="/assets/icons/pause.svg"
+            mode="aspectFit"
+          ></image>
+          <image
+            wx:else
+            class="control-main-icon play-icon"
+            src="/assets/icons/play_arrow.svg"
+            mode="aspectFit"
+          ></image>
+        </button>
+        <button class="control-side" bindtap="playNext">
+          <image class="control-side-icon" src="/assets/icons/skip_next.svg" mode="aspectFit"></image>
+        </button>
       </view>
 
-      <view wx:if="{{gateMessage}}" class="gate-panel">
-        <text class="micro-copy line-clamp-2">{{gateMessage}}</text>
-        <view class="gate-actions">
-          <button wx:if="{{entryScope === 'exclusive'}}" class="soft-button gate-button" bindtap="openDetail">查看酒款</button>
-          <button wx:else class="soft-button gate-button" bindtap="openMember">会员权益</button>
-          <button class="ghost-button gate-button" bindtap="unlockCurrentTrack">单曲解锁</button>
+      <view wx:if="{{gateMessage}}" class="gate-inline">
+        <text class="micro-copy gate-copy">{{gateMessage}}</text>
+        <view class="gate-links">
+          <button wx:if="{{entryScope === 'exclusive'}}" class="gate-link" bindtap="openDetail">查看酒款</button>
+          <button wx:else class="gate-link" bindtap="openMember">会员权益</button>
+          <text class="gate-sep">/</text>
+          <button class="gate-link" bindtap="unlockCurrentTrack">单曲解锁</button>
         </view>
       </view>
-    </view>
 
-    <view class="track-list">
-      <view
-        class="track-item {{currentTrackIndex === index ? 'is-active' : ''}}"
-        wx:for="{{tracks}}"
-        wx:key="id"
-        wx:for-index="index"
-        data-index="{{index}}"
-        bindtap="selectTrack"
-      >
-        <text class="track-no">0{{index + 1}}</text>
-        <view class="track-main">
-          <text class="track-name">{{item.cnTitle}}</text>
-          <text class="micro-copy">{{item.access.canPlayFull ? '完整' : '试听'}}</text>
+      <view class="selector-wrap">
+        <text class="selector-label">SELECT WINE MOOD</text>
+        <view class="selector-row">
+          <button
+            class="track-chip {{currentTrackIndex === index ? 'is-active' : ''}}"
+            wx:for="{{tracks}}"
+            wx:key="id"
+            wx:for-index="index"
+            data-index="{{index}}"
+            bindtap="selectTrack"
+          >
+            {{item.title}}
+          </button>
         </view>
-        <text class="track-time">{{item.durationLabel}}</text>
       </view>
     </view>
 

@@ -3,6 +3,7 @@ const { restoreExperience, getCurrentExperience } = require('../../utils/session
 const { formatSeconds } = require('../../utils/format');
 
 let audioContext = null;
+const DEFAULT_FEATURED_TRACK_ID = 'track_quiet_world';
 
 Page({
   data: {
@@ -77,7 +78,10 @@ Page({
             0,
             experience.tracks.findIndex((item) => item.id === this.trackId)
           )
-        : 0;
+        : Math.max(
+            0,
+            experience.tracks.findIndex((item) => item.id === DEFAULT_FEATURED_TRACK_ID)
+          );
       const currentTrack = experience.tracks[currentTrackIndex] || experience.tracks[0];
 
       this.setData({
