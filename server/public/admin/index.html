@@ -21,6 +21,8 @@
         <nav class="nav-stack">
           <button class="nav-item is-active" data-view="dashboard">概览</button>
           <button class="nav-item" data-view="wines">酒款</button>
+          <button class="nav-item" data-view="wineries">酒庄</button>
+          <button class="nav-item" data-view="tracks">音乐</button>
           <button class="nav-item" data-view="codes">码池</button>
           <button class="nav-item" data-view="products">商品</button>
           <button class="nav-item" data-view="orders">订单</button>
@@ -52,6 +54,8 @@
 
         <section class="view is-active" id="view-dashboard">
           <div class="metric-grid" id="dashboard-cards"></div>
+
+          <div class="insight-grid" id="dashboard-insights"></div>
 
           <div class="split-grid">
             <section class="panel">
@@ -92,13 +96,37 @@
           </section>
         </section>
 
+        <section class="view" id="view-wineries">
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <p class="panel-kicker">WINERY</p>
+                <h3 class="panel-title">酒庄内容管理</h3>
+              </div>
+            </div>
+            <div class="panel-body" id="wineries-list"></div>
+          </section>
+        </section>
+
+        <section class="view" id="view-tracks">
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <p class="panel-kicker">MUSIC</p>
+                <h3 class="panel-title">音乐资源管理</h3>
+              </div>
+            </div>
+            <div class="panel-body" id="tracks-list"></div>
+          </section>
+        </section>
+
         <section class="view" id="view-codes">
           <div class="split-grid">
             <section class="panel">
               <div class="panel-head">
                 <div>
                   <p class="panel-kicker">BATCH GENERATOR</p>
-                  <h3 class="panel-title">生成二维码批次</h3>
+                  <h3 class="panel-title">生成提取码批次</h3>
                 </div>
               </div>
               <div class="panel-body">
@@ -124,8 +152,9 @@
               <div class="panel-head">
                 <div>
                   <p class="panel-kicker">STATUS FEED</p>
-                  <h3 class="panel-title">最新二维码</h3>
+                  <h3 class="panel-title">提取码列表</h3>
                 </div>
+                <button class="outline-button" id="export-codes-button">导出 CSV</button>
               </div>
               <div class="panel-body">
                 <div class="table-shell">

@@ -68,7 +68,7 @@
   <view wx:else class="page-scroll empty-state">
     <text class="empty-title">{{errorTitle}}</text>
     <text class="empty-subtitle">{{errorMessage}}</text>
-    <navigator wx:if="{{entryScope === 'exclusive'}}" class="ghost-button" url="/pages/redeem/index">返回扫码页</navigator>
+    <navigator wx:if="{{entryScope === 'exclusive'}}" class="ghost-button" url="/pages/redeem/index">返回提取码页</navigator>
     <navigator wx:elif="{{entryScope === 'member'}}" class="ghost-button" url="/pages/member/index">返回会员中心</navigator>
     <navigator wx:else class="ghost-button" url="/pages/home/index">返回首页</navigator>
   </view>

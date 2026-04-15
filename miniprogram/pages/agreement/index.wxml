@@ -1,0 +1,65 @@
+<view class="shell">
+  <scroll-view scroll-y class="page-scroll legal-page">
+    <view class="legal-header">
+      <text class="eyebrow">TERMS OF SERVICE</text>
+      <text class="display-title legal-title">用户服务协议</text>
+      <text class="micro-copy legal-updated">更新日期：2026年4月15日 | 生效日期：2026年4月15日</text>
+    </view>
+
+    <view class="legal-body">
+      <text class="legal-section-title">一、总则</text>
+      <text class="legal-paragraph">1.1 欢迎使用鸿玖酒庄微信小程序（以下简称"本平台"）。本协议是您与鸿玖酒庄（以下简称"我们"）之间关于使用本平台服务所订立的协议。</text>
+      <text class="legal-paragraph">1.2 在使用本平台服务前，请您务必仔细阅读并充分理解本协议各条款。一旦您开始使用本平台服务，即视为您已充分理解并同意本协议全部内容。</text>
+      <text class="legal-paragraph">1.3 我们有权根据法律法规变化及业务发展需要，对本协议进行修订。修订后的协议将在本平台公布，若您继续使用服务，即视为接受修订后的协议。</text>
+
+      <text class="legal-section-title">二、服务内容</text>
+      <text class="legal-paragraph">2.1 本平台为用户提供酒庄品牌体验、酒款信息浏览、音乐欣赏、商品购买及会员权益等服务。</text>
+      <text class="legal-paragraph">2.2 提取码服务：用户可通过输入六位数字提取码，解锁对应酒款的专属内容体验（包括酒款介绍、酒庄故事及配套音乐）。每个提取码仅限使用一次，使用后即刻失效。</text>
+      <text class="legal-paragraph">2.3 会员服务：用户可购买会员套餐，享受音乐无限播放、数字内容下载等权益。会员权益的具体内容以购买时展示的权益说明为准。</text>
+      <text class="legal-paragraph">2.4 商品购买：用户可在商城浏览并购买酒类商品。购买行为受相关法律法规约束，我们保留拒绝向不符合条件的用户出售酒类商品的权利。</text>
+
+      <text class="legal-section-title">三、用户资格与行为规范</text>
+      <text class="legal-paragraph">3.1 根据《中华人民共和国未成年人保护法》及相关法律法规的规定，本平台不向未成年人出售酒类商品。用户在购买酒类商品时，即代表其已确认自身年满十八周岁。</text>
+      <text class="legal-paragraph">3.2 用户应妥善保管提取码、账号信息及会员权益，因用户自身原因导致的泄露、丢失或被盗用，我们不承担相关责任。</text>
+      <text class="legal-paragraph">3.3 用户不得利用本平台从事任何违反法律法规、侵害他人合法权益或扰乱平台正常运营秩序的行为，包括但不限于：</text>
+      <text class="legal-sub-item">（1）使用自动化工具批量尝试提取码；</text>
+      <text class="legal-sub-item">（2）恶意攻击平台系统或接口；</text>
+      <text class="legal-sub-item">（3）通过技术手段绕过会员限制；</text>
+      <text class="legal-sub-item">（4）传播违法、侵权或不当内容。</text>
+
+      <text class="legal-section-title">四、支付与订单</text>
+      <text class="legal-paragraph">4.1 用户通过本平台进行的支付行为，均通过微信支付完成。支付成功后，相关订单即时生效。</text>
+      <text class="legal-paragraph">4.2 实物商品订单：用户支付成功后，我们将按照订单信息安排发货。具体配送时间和方式以商品详情页说明为准。</text>
+      <text class="legal-paragraph">4.3 数字权益订单（会员、下载等）：支付成功后，系统即时发放相关权益。数字权益商品一经购买，非法定情形不支持退款。</text>
+      <text class="legal-paragraph">4.4 我们保留对异常订单进行调查和处理的权利，包括但不限于取消欺诈性订单。</text>
+
+      <text class="legal-section-title">五、知识产权</text>
+      <text class="legal-paragraph">5.1 本平台上的所有内容（包括但不限于文字、图片、音频、视频、设计、商标、标识等）均受知识产权法律保护，归鸿玖酒庄或相关权利人所有。</text>
+      <text class="legal-paragraph">5.2 用户通过会员权益获得的数字内容（包括音乐下载），仅限个人非商业用途使用。未经授权，用户不得复制、传播、公开展示或用于任何商业目的。</text>
+      <text class="legal-paragraph">5.3 音乐作品受《中华人民共和国著作权法》保护。用户下载的音乐文件仅供个人欣赏，不得用于其他用途。</text>
+
+      <text class="legal-section-title">六、隐私保护</text>
+      <text class="legal-paragraph">6.1 我们重视用户隐私保护，具体隐私保护政策请详见《隐私政策》。</text>
+      <text class="legal-paragraph">6.2 我们将按照法律法规的要求，采取合理的安全措施保护用户的个人信息。</text>
+
+      <text class="legal-section-title">七、免责声明</text>
+      <text class="legal-paragraph">7.1 因不可抗力、系统故障、网络中断等原因导致服务暂时无法使用的，我们不承担由此造成的损失。</text>
+      <text class="legal-paragraph">7.2 我们不对用户因自身原因（如设备故障、操作失误等）导致的服务使用障碍承担责任。</text>
+      <text class="legal-paragraph">7.3 本平台提供的酒款信息仅供参考，不构成任何饮酒建议。过量饮酒有害健康，请理性饮酒。</text>
+
+      <text class="legal-section-title">八、争议解决</text>
+      <text class="legal-paragraph">8.1 本协议的订立、执行和解释均适用中华人民共和国法律。</text>
+      <text class="legal-paragraph">8.2 因使用本平台产生的争议，双方应首先协商解决。协商不成的，任何一方均有权向我们所在地有管辖权的人民法院提起诉讼。</text>
+
+      <text class="legal-section-title">九、其他</text>
+      <text class="legal-paragraph">9.1 本协议中部分条款因任何原因被认定为无效的，不影响其他条款的效力。</text>
+      <text class="legal-paragraph">9.2 我们未行使或延迟行使本协议项下的任何权利，不构成对该权利的放弃。</text>
+      <text class="legal-paragraph">9.3 如您对本协议有任何疑问，请通过平台内的客服入口与我们联系。</text>
+    </view>
+
+    <view class="legal-footer">
+      <text class="micro-copy">鸿玖酒庄</text>
+      <text class="micro-copy">© 2026 Hongjiu Estate. All rights reserved.</text>
+    </view>
+  </scroll-view>
+</view>

@@ -1,5 +1,5 @@
 const { getBaseUrl, request } = require('../../utils/api');
-const { restoreExperience, getCurrentExperience } = require('../../utils/session');
+const { getCurrentExperience } = require('../../utils/session');
 const { formatSeconds } = require('../../utils/format');
 
 let audioContext = null;
@@ -84,7 +84,7 @@ Page({
         });
         experience = payload.experience;
       } else {
-        experience = getCurrentExperience() || (await restoreExperience());
+        experience = getCurrentExperience();
       }
 
       if (!experience || !experience.tracks || !experience.tracks.length) {

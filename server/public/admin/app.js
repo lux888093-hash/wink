@@ -17,6 +17,8 @@ const state = {
   health: null,
   dashboard: null,
   wines: [],
+  wineries: [],
+  tracks: [],
   codes: [],
   products: [],
   orders: [],
@@ -41,10 +43,13 @@ const els = {
   ordersPreviewTable: document.getElementById('orders-preview-table'),
   codeHealth: document.getElementById('code-health'),
   winesList: document.getElementById('wines-list'),
+  wineriesList: document.getElementById('wineries-list'),
+  tracksList: document.getElementById('tracks-list'),
   batchForm: document.getElementById('batch-form'),
   batchWine: document.getElementById('batch-wine'),
   batchQuantity: document.getElementById('batch-quantity'),
   batchBatchNo: document.getElementById('batch-batch-no'),
+  exportCodesButton: document.getElementById('export-codes-button'),
   codesTable: document.getElementById('codes-table'),
   productsList: document.getElementById('products-list'),
   ordersTable: document.getElementById('orders-table'),
@@ -53,6 +58,8 @@ const els = {
   views: {
     dashboard: document.getElementById('view-dashboard'),
     wines: document.getElementById('view-wines'),
+    wineries: document.getElementById('view-wineries'),
+    tracks: document.getElementById('view-tracks'),
     codes: document.getElementById('view-codes'),
     products: document.getElementById('view-products'),
     orders: document.getElementById('view-orders'),
@@ -64,7 +71,9 @@ const els = {
 const viewTitles = {
   dashboard: '项目概览',
   wines: '酒款内容',
-  codes: '二维码批次',
+  wineries: '酒庄管理',
+  tracks: '音乐资源',
+  codes: '提取码管理',
   products: '商品与价格',
   orders: '订单管理',
   members: '会员权益',
@@ -147,7 +156,7 @@ function getErrorMessage(error) {
     INVALID_INPUT: '提交内容未通过校验，请检查后重试。',
     PRODUCT_NOT_FOUND: '商品不存在，可能已被其他人处理。',
     WINE_NOT_FOUND: '酒款不存在，可能已被其他人处理。',
-    CODE_NOT_FOUND: '二维码不存在。',
+    CODE_NOT_FOUND: '提取码不存在。',
     ORDER_NOT_FOUND: '订单不存在。',
     PLAN_NOT_FOUND: '会员套餐不存在。',
     ADMIN_PASSWORD_INVALID: '当前密码不正确。',
@@ -207,6 +216,29 @@ function renderDashboard() {
     )
     .join('');
 
+  const metrics = dashboard.metrics || {};
+  const insightItems = [
+    { label: '提取码验证成功率', value: `${metrics.codeSuccessRate || 0}%`, sub: `总计 ${metrics.codeTotal || 0} 个提取码` },
+    { label: '会员转化率', value: `${metrics.memberRate || 0}%`, sub: `${metrics.activeMembers || 0}/${metrics.totalUsers || 0} 位用户` },
+    { label: '下单转化率', value: `${metrics.orderRate || 0}%`, sub: '下单用户占总用户比例' },
+    { label: '下载量', value: `${metrics.totalDownloads || 0}`, sub: `近24h ${metrics.downloads24h || 0} 次下载` }
+  ];
+
+  const insightsEl = document.getElementById('dashboard-insights');
+  if (insightsEl) {
+    insightsEl.innerHTML = insightItems
+      .map(
+        (item) => `
+          <article class="insight-card">
+            <div class="insight-label">${item.label}</div>
+            <div class="insight-value">${item.value}</div>
+            <div class="insight-detail">${item.sub}</div>
+          </article>
+        `
+      )
+      .join('');
+  }
+
   const orderRows = dashboard.recentOrders
     .map(
       (order) => `
@@ -236,7 +268,7 @@ function renderDashboard() {
   const total = Math.max(1, summary.ready + summary.claimed + summary.expired + summary.disabled);
   const items = [
     ['待消费', summary.ready],
-    ['已首扫', summary.claimed],
+    ['已使用', summary.claimed],
     ['已过期', summary.expired],
     ['已停用', summary.disabled]
   ];
@@ -317,6 +349,141 @@ function renderWines() {
       .join('');
 }
 
+function renderWineries() {
+  const createForm = `
+    <article class="editor-card create-card">
+      <div class="card-body">
+        <form class="form-grid create-winery-form">
+          <label><span>酒庄名称</span><input name="name" placeholder="例如：鸿玖酒庄" required /></label>
+          <label><span>英文名称</span><input name="englishName" placeholder="例如：Hongjiu Estate" /></label>
+          <label><span>标语</span><input name="tagline" placeholder="例如：Moonlit Vineyard Residency" /></label>
+          <label style="grid-column:1 / -1"><span>简介</span><input name="intro" placeholder="酒庄品牌简介" /></label>
+          <label style="grid-column:1 / -1"><span>品牌故事</span><input name="story" placeholder="酒庄品牌叙事" /></label>
+          <label><span>主图</span><input name="heroImage" placeholder="酒庄主图 URL" /></label>
+          <label><span>侧写图</span><input name="portraitImage" placeholder="侧写图 URL" /></label>
+          <label><span>采摘图</span><input name="harvestImage" placeholder="采摘图 URL" /></label>
+          <label><span>礼盒图</span><input name="giftImage" placeholder="礼盒图 URL" /></label>
+          <button class="primary-button" type="submit">新增酒庄</button>
+        </form>
+      </div>
+    </article>
+  `;
+
+  els.wineriesList.innerHTML =
+    createForm +
+    state.wineries
+      .map(
+        (winery) => `
+        <article class="editor-card">
+          <div class="editor-card-header">
+            <img class="thumb" src="${escapeHtml(winery.heroImage)}" alt="${escapeHtml(winery.name)}" />
+            <div>
+              <h4 class="card-title">${escapeHtml(winery.name)}</h4>
+              <p class="card-subtitle">${escapeHtml(winery.englishName || '')}</p>
+              <div class="tag-row">
+                <span class="tag">${escapeHtml(winery.tagline || '无标语')}</span>
+                <span class="tag">${winery.wineCount || 0} 款酒</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <form class="form-grid winery-form" data-winery-id="${winery.id}">
+              <label><span>酒庄名称</span><input name="name" value="${escapeHtml(winery.name || '')}" /></label>
+              <label><span>英文名称</span><input name="englishName" value="${escapeHtml(winery.englishName || '')}" /></label>
+              <label><span>标语</span><input name="tagline" value="${escapeHtml(winery.tagline || '')}" /></label>
+              <label style="grid-column:1 / -1"><span>简介</span><input name="intro" value="${escapeHtml(winery.intro || '')}" /></label>
+              <label style="grid-column:1 / -1"><span>品牌故事</span><input name="story" value="${escapeHtml(winery.story || '')}" /></label>
+              <label><span>主图</span><input name="heroImage" value="${escapeHtml(winery.heroImage || '')}" /></label>
+              <label><span>侧写图</span><input name="portraitImage" value="${escapeHtml(winery.portraitImage || '')}" /></label>
+              <label><span>采摘图</span><input name="harvestImage" value="${escapeHtml(winery.harvestImage || '')}" /></label>
+              <label><span>礼盒图</span><input name="giftImage" value="${escapeHtml(winery.giftImage || '')}" /></label>
+              <button class="outline-button" type="submit">保存酒庄内容</button>
+            </form>
+          </div>
+        </article>
+      `
+      )
+      .join('');
+}
+
+function renderTracks() {
+  const createForm = `
+    <article class="editor-card create-card">
+      <div class="card-body">
+        <form class="form-grid create-track-form">
+          <label>
+            <span>绑定酒款</span>
+            <select name="wineId">${state.wines
+              .map((wine) => `<option value="${escapeHtml(wine.id)}">${escapeHtml(wine.name)}</option>`)
+              .join('')}</select>
+          </label>
+          <label><span>曲名 (英文)</span><input name="title" placeholder="例如：A Transparent Dream" required /></label>
+          <label><span>曲名 (中文)</span><input name="cnTitle" placeholder="例如：透明之梦" /></label>
+          <label><span>氛围</span><input name="mood" placeholder="例如：Dreamscape" /></label>
+          <label style="grid-column:1 / -1"><span>描述</span><input name="description" placeholder="曲目描述" /></label>
+          <label><span>音频路径</span><input name="src" placeholder="/assets/audio/xxx.wav" /></label>
+          <label><span>时长</span><input name="durationLabel" placeholder="00:24" /></label>
+          <label><span>封面图</span><input name="cover" placeholder="封面图 URL" /></label>
+          <label>
+            <span>播放规则</span>
+            <select name="playRule">${renderOptions(['trial', 'scan_or_member', 'member'], 'member')}</select>
+          </label>
+          <label><span>试听秒数</span><input name="previewSeconds" type="number" value="12" /></label>
+          <label><span>解锁价格</span><input name="unlockPrice" type="number" value="29" /></label>
+          <button class="primary-button" type="submit">新增曲目</button>
+        </form>
+      </div>
+    </article>
+  `;
+
+  els.tracksList.innerHTML =
+    createForm +
+    state.tracks
+      .map(
+        (track) => `
+        <article class="editor-card">
+          <div class="editor-card-header">
+            <img class="thumb" src="${escapeHtml(track.cover || '')}" alt="${escapeHtml(track.title)}" />
+            <div>
+              <h4 class="card-title">${escapeHtml(track.title)}</h4>
+              <p class="card-subtitle">${escapeHtml(track.cnTitle || '')}</p>
+              <div class="tag-row">
+                <span class="tag">${escapeHtml(track.wineName || '-')}</span>
+                <span class="tag">${escapeHtml(track.playRule)}</span>
+                <span class="tag">${escapeHtml(track.mood || '')}</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <form class="form-grid track-form" data-track-id="${track.id}">
+              <label>
+                <span>绑定酒款</span>
+                <select name="wineId">${state.wines
+                  .map((wine) => `<option value="${escapeHtml(wine.id)}" ${wine.id === track.wineId ? 'selected' : ''}>${escapeHtml(wine.name)}</option>`)
+                  .join('')}</select>
+              </label>
+              <label><span>曲名 (英文)</span><input name="title" value="${escapeHtml(track.title || '')}" /></label>
+              <label><span>曲名 (中文)</span><input name="cnTitle" value="${escapeHtml(track.cnTitle || '')}" /></label>
+              <label><span>氛围</span><input name="mood" value="${escapeHtml(track.mood || '')}" /></label>
+              <label style="grid-column:1 / -1"><span>描述</span><input name="description" value="${escapeHtml(track.description || '')}" /></label>
+              <label><span>音频路径</span><input name="src" value="${escapeHtml(track.src || '')}" /></label>
+              <label><span>时长</span><input name="durationLabel" value="${escapeHtml(track.durationLabel || '')}" /></label>
+              <label><span>封面图</span><input name="cover" value="${escapeHtml(track.cover || '')}" /></label>
+              <label>
+                <span>播放规则</span>
+                <select name="playRule">${renderOptions(['trial', 'scan_or_member', 'member'], track.playRule)}</select>
+              </label>
+              <label><span>试听秒数</span><input name="previewSeconds" type="number" value="${track.previewSeconds || 12}" /></label>
+              <label><span>解锁价格</span><input name="unlockPrice" type="number" value="${track.unlockPrice || 29}" /></label>
+              <button class="outline-button" type="submit">保存曲目信息</button>
+            </form>
+          </div>
+        </article>
+      `
+      )
+      .join('');
+}
+
 function renderCodes() {
   els.batchWine.innerHTML = state.wines
     .map((wine) => `<option value="${escapeHtml(wine.id)}">${escapeHtml(wine.name)}</option>`)
@@ -325,21 +492,21 @@ function renderCodes() {
   els.codesTable.innerHTML = `
     <thead>
       <tr>
-        <th>Token</th>
+        <th>提取码</th>
         <th>酒款</th>
         <th>批次</th>
         <th>状态</th>
-        <th>首扫时间</th>
+        <th>使用时间</th>
         <th>操作</th>
       </tr>
     </thead>
     <tbody>
       ${state.codes
-        .slice(0, 20)
+        .slice(0, 30)
         .map(
           (code) => `
             <tr>
-              <td>${escapeHtml(code.token)}</td>
+              <td><strong>${escapeHtml(code.redeemCode || code.token)}</strong></td>
               <td>${escapeHtml(code.wine ? code.wine.name : '-')}</td>
               <td>${escapeHtml(code.batchNo)}</td>
               <td>${escapeHtml(code.status)}</td>
@@ -372,7 +539,7 @@ function renderProducts() {
               .join('')}</select>
           </label>
           <label><span>商品名称</span><input name="name" placeholder="例如：月影庄园典藏礼盒" /></label>
-          <label><span>副标题</span><input name="subtitle" placeholder="例如：扫码限定礼盒" /></label>
+          <label><span>副标题</span><input name="subtitle" placeholder="例如：提取码限定礼盒" /></label>
           <label><span>类目</span><input name="category" placeholder="例如：礼盒" /></label>
           <label><span>默认规格</span><input name="specName" placeholder="例如：单瓶礼盒" /></label>
           <label><span>销售价</span><input name="price" type="number" value="399" /></label>
@@ -632,6 +799,94 @@ function bindDynamicEvents() {
     });
   });
 
+  document.querySelectorAll('.create-winery-form').forEach((form) => {
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const formData = new FormData(form);
+      const created = await runTask(
+        () =>
+          api('/api/admin/wineries', {
+            method: 'POST',
+            body: JSON.stringify(Object.fromEntries(formData.entries()))
+          }),
+        '酒庄已创建。'
+      );
+      if (!created) {
+        return;
+      }
+      await loadData();
+      form.reset();
+      setView('wineries');
+    });
+  });
+
+  document.querySelectorAll('.winery-form').forEach((form) => {
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const wineryId = form.dataset.wineryId;
+      const formData = new FormData(form);
+      const saved = await runTask(
+        () =>
+          api(`/api/admin/wineries/${wineryId}`, {
+            method: 'PUT',
+            body: JSON.stringify(Object.fromEntries(formData.entries()))
+          }),
+        '酒庄内容已保存。'
+      );
+      if (!saved) {
+        return;
+      }
+      await loadData();
+    });
+  });
+
+  document.querySelectorAll('.create-track-form').forEach((form) => {
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      data.previewSeconds = Number(data.previewSeconds) || 12;
+      data.unlockPrice = Number(data.unlockPrice) || 29;
+      const created = await runTask(
+        () =>
+          api('/api/admin/tracks', {
+            method: 'POST',
+            body: JSON.stringify(data)
+          }),
+        '曲目已创建。'
+      );
+      if (!created) {
+        return;
+      }
+      await loadData();
+      form.reset();
+      setView('tracks');
+    });
+  });
+
+  document.querySelectorAll('.track-form').forEach((form) => {
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const trackId = form.dataset.trackId;
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      data.previewSeconds = Number(data.previewSeconds) || 12;
+      data.unlockPrice = Number(data.unlockPrice) || 29;
+      const saved = await runTask(
+        () =>
+          api(`/api/admin/tracks/${trackId}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+          }),
+        '曲目信息已保存。'
+      );
+      if (!saved) {
+        return;
+      }
+      await loadData();
+    });
+  });
+
   document.querySelectorAll('.create-product-form').forEach((form) => {
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -793,10 +1048,12 @@ function bindDynamicEvents() {
 }
 
 async function loadData() {
-  const [health, dashboard, wines, codes, products, orders, members, auditLogs, storeHome] = await Promise.all([
+  const [health, dashboard, wines, wineries, tracks, codes, products, orders, members, auditLogs, storeHome] = await Promise.all([
     api('/api/health'),
     api('/api/admin/dashboard'),
     api('/api/admin/wines'),
+    api('/api/admin/wineries'),
+    api('/api/admin/tracks'),
     api('/api/admin/codes'),
     api('/api/admin/products'),
     api('/api/admin/orders'),
@@ -808,6 +1065,8 @@ async function loadData() {
   state.health = health;
   state.dashboard = dashboard;
   state.wines = wines.items;
+  state.wineries = wineries.items;
+  state.tracks = tracks.items;
   state.codes = codes.items;
   state.products = products.items;
   state.orders = orders.items;
@@ -819,6 +1078,8 @@ async function loadData() {
 
   renderDashboard();
   renderWines();
+  renderWineries();
+  renderTracks();
   renderCodes();
   renderProducts();
   renderOrders();
@@ -898,7 +1159,7 @@ els.batchForm.addEventListener('submit', async (event) => {
           batchNo: els.batchBatchNo.value || undefined
         })
       }),
-    '二维码批次已生成。'
+    '提取码批次已生成。'
   );
   if (!created) {
     return;
@@ -906,6 +1167,10 @@ els.batchForm.addEventListener('submit', async (event) => {
   els.batchBatchNo.value = '';
   await loadData();
   setView('codes');
+});
+
+els.exportCodesButton.addEventListener('click', () => {
+  window.open('/api/admin/codes/export', '_blank');
 });
 
 (async function init() {

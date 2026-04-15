@@ -1,4 +1,4 @@
-const { restoreExperience, getCurrentExperience } = require('../../utils/session');
+const { getCurrentExperience } = require('../../utils/session');
 
 Page({
   data: {
@@ -13,36 +13,29 @@ Page({
     this.loadExperience();
   },
 
-  async loadExperience() {
-    try {
-      const experience = getCurrentExperience() || (await restoreExperience());
+  loadExperience() {
+    const experience = getCurrentExperience();
 
-      if (!experience) {
-        this.setData({
-          ready: false,
-          errorTitle: '专属页未激活',
-          errorMessage: '请先通过礼盒二维码进入，才能查看这瓶酒的专属内容。'
-        });
-        return;
-      }
-
-      this.setData({
-        ready: true,
-        wine: experience.wine,
-        collection: experience.collection || [],
-        errorTitle: '',
-        errorMessage: ''
-      });
-    } catch (error) {
+    if (!experience) {
       this.setData({
         ready: false,
-        errorTitle: '专属会话不可用',
-        errorMessage:
-          error.message === 'NETWORK_ERROR'
-            ? '本地服务端未启动。'
-            : '当前专属体验已过期，请重新扫码进入。'
+        errorTitle: '专属页未激活',
+        errorMessage: '请先输入有效的提取码，才能查看这瓶酒的专属内容。'
       });
+      return;
     }
+
+    this.setData({
+      ready: true,
+      wine: experience.wine,
+      collection: experience.collection || [],
+      errorTitle: '',
+      errorMessage: ''
+    });
+  },
+
+  goBack() {
+    wx.redirectTo({ url: '/pages/redeem/index' });
   },
 
   openDetail() {

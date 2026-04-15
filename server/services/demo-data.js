@@ -686,6 +686,7 @@ function createSeedStore() {
       }
     ],
     downloadTickets: [],
+    redeemFailLogs: [],
     codeBatches: [
       {
         id: 'batch_spring_2026',
@@ -700,7 +701,8 @@ function createSeedStore() {
       {
         id: 'code_demo_ready',
         token: 'demo_vintage_noir',
-        label: '礼盒首扫演示码',
+        redeemCode: '385721',
+        label: '演示提取码',
         wineId: 'soundless-a-quiet-world-2022',
         batchNo: 'HJ2026SPRING',
         status: 'ready',
@@ -713,7 +715,8 @@ function createSeedStore() {
       {
         id: 'code_demo_claimed',
         token: 'claimed_cellar_pass',
-        label: '已使用示例码',
+        redeemCode: '619403',
+        label: '已使用提取码',
         wineId: 'soundless-a-quiet-world-2022',
         batchNo: 'HJ2026SPRING',
         status: 'claimed',
@@ -726,7 +729,8 @@ function createSeedStore() {
       {
         id: 'code_demo_expired',
         token: 'expired_cellar_pass',
-        label: '过期示例码',
+        redeemCode: '502874',
+        label: '过期提取码',
         wineId: 'amber-nocturne-reserve-2021',
         batchNo: 'HJ2026SPRING',
         status: 'expired',
@@ -739,7 +743,8 @@ function createSeedStore() {
       {
         id: 'code_demo_disabled',
         token: 'disabled_cellar_pass',
-        label: '作废示例码',
+        redeemCode: '731596',
+        label: '作废提取码',
         wineId: 'dawn-rose-2023',
         batchNo: 'HJ2026SPRING',
         status: 'disabled',

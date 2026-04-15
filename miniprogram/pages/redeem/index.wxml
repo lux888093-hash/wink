@@ -6,17 +6,31 @@
     <view class="redeem-copy">
       <text class="eyebrow">EXCLUSIVE ENTRY</text>
       <text class="display-title redeem-title">专属入口</text>
-      <text class="muted-copy redeem-subtitle">礼盒首扫，从这里进入。</text>
+      <text class="muted-copy redeem-subtitle">输入酒瓶标签上的六位提取码，开启这瓶酒的专属体验。</text>
     </view>
 
     <view class="redeem-card">
-      <text class="eyebrow">扫码消费</text>
+      <text class="eyebrow">{{state === 'idle' || state === 'error' ? '提取码验证' : title}}</text>
       <text class="section-title redeem-card-title">{{title}}</text>
       <text class="muted-copy line-clamp-3">{{message}}</text>
 
-      <button wx:if="{{state === 'idle' || state === 'error'}}" class="primary-button full-width" bindtap="useLocalDemo">
-        开始首扫
-      </button>
+      <view wx:if="{{state === 'idle' || state === 'error'}}" class="code-input-area">
+        <view class="digit-row">
+          <input
+            wx:for="{{codeDigits}}"
+            wx:key="index"
+            class="digit-box {{fullCode.length === 6 ? 'digit-filled' : ''}}"
+            type="number"
+            maxlength="1"
+            data-index="{{index}}"
+            value="{{item}}"
+            focus="{{focusIndex === index}}"
+            bindinput="onDigitInput"
+            bindfocus="onDigitFocus"
+            confirm-type="next"
+          />
+        </view>
+      </view>
 
       <view wx:if="{{state === 'loading'}}" class="loading-row">
         <view class="loading-dot"></view>
@@ -28,7 +42,7 @@
         <text class="success-seal-text">OPEN</text>
       </view>
 
-      <button class="ghost-button full-width" bindtap="reloadPage">重新准备入口</button>
+      <button wx:if="{{state === 'error'}}" class="ghost-button full-width" bindtap="clearInput">重新输入</button>
     </view>
   </view>
 </view>

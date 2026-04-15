@@ -9,7 +9,9 @@
     "pages/redeem/index",
     "pages/cellar/index",
     "pages/detail/index",
-    "pages/melody/index"
+    "pages/melody/index",
+    "pages/agreement/index",
+    "pages/privacy/index"
   ],
   "window": {
     "navigationBarTitleText": "鸿玖酒庄",

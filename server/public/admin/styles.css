@@ -253,6 +253,38 @@ select {
   color: var(--ink-soft);
 }
 
+.insight-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.insight-card {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(24, 18, 17, 0.72), rgba(15, 11, 10, 0.68));
+}
+
+.insight-label {
+  color: var(--ink-faint);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.insight-value {
+  margin: 10px 0 4px;
+  font: 28px/1.05 Baskerville, Georgia, serif;
+  color: var(--ink);
+}
+
+.insight-detail {
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
 .split-grid {
   display: grid;
   grid-template-columns: 1.3fr 0.9fr;
@@ -610,6 +642,7 @@ select:focus,
   }
 
   .metric-grid,
+  .insight-grid,
   .split-grid,
   .login-card {
     grid-template-columns: 1fr;

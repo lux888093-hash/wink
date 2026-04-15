@@ -668,16 +668,30 @@ function writeAudit(store, action, target, actor = 'system') {
   });
 }
 
+function generateSixDigitCode(existingCodes) {
+  const existingSet = new Set(existingCodes.map((item) => item.redeemCode).filter(Boolean));
+  let attempts = 0;
+  while (attempts < 100) {
+    const code = String(crypto.randomInt(0, 1000000)).padStart(6, '0');
+    if (!existingSet.has(code)) {
+      return code;
+    }
+    attempts += 1;
+  }
+  throw createAppError('CODE_GENERATION_FAILED', 500);
+}
+
 function createSeedCodeForReset(store) {
-  const demoCode = store.scanCodes.find((item) => item.token === 'demo_vintage_noir');
+  const demoCode = store.scanCodes.find((item) => item.redeemCode === '888888');
   if (demoCode) {
     return demoCode;
   }
 
   const fallback = {
     id: randomId('code'),
-    token: 'demo_vintage_noir',
-    label: '礼盒首扫演示码',
+    token: randomId('card'),
+    redeemCode: '888888',
+    label: '演示提取码',
     wineId: store.wines[0].id,
     batchNo: 'RESET_BATCH',
     status: 'ready',
@@ -713,14 +727,26 @@ function createOneTimeCode(input = {}) {
     throw createAppError('WINE_NOT_FOUND', 404);
   }
 
+  const redeemCode = ensureText(input.redeemCode, {
+    field: 'redeemCode',
+    min: 6,
+    max: 6,
+    defaultValue: generateSixDigitCode(store.scanCodes)
+  });
+
+  if (!/^\d{6}$/.test(redeemCode)) {
+    throw createValidationError('redeemCode', 'must_be_6_digits');
+  }
+
+  if (store.scanCodes.some((item) => item.redeemCode === redeemCode)) {
+    throw createAppError('CODE_TOKEN_EXISTS', 409);
+  }
+
   const code = {
     id: randomId('code'),
-    token: ensureText(input.token || randomId('card'), {
-      field: 'token',
-      min: 6,
-      max: 80
-    }),
-    label: ensureText(input.label || `${wine.name || wine.title} 首扫码`, {
+    token: randomId('card'),
+    redeemCode,
+    label: ensureText(input.label || `${wine.name || wine.title} 提取码`, {
       field: 'label',
       min: 2,
       max: 80
@@ -735,16 +761,12 @@ function createOneTimeCode(input = {}) {
     createdAt: nowIso(),
     expiresAt: ensureIsoDate(input.expiresAt, {
       field: 'expiresAt',
-      defaultValue: plusDays(14)
+      defaultValue: plusDays(180)
     }),
     firstUsedAt: null,
     firstUserId: null,
     sessionId: null
   };
-
-  if (store.scanCodes.some((item) => item.token === code.token)) {
-    throw createAppError('CODE_TOKEN_EXISTS', 409);
-  }
 
   store.scanCodes.unshift(code);
   writeAudit(store, 'code.created', code.id, DEFAULT_ADMIN_USERNAME);
@@ -791,24 +813,26 @@ function createCodeBatch(input = {}) {
     throw createAppError('BATCH_NO_EXISTS', 409);
   }
 
-  const codes = Array.from({ length: quantity }).map((_, index) => ({
-    id: randomId('code'),
-    token: `${batchNo.toLowerCase()}_${String(index + 1).padStart(3, '0')}_${crypto
-      .randomBytes(3)
-      .toString('hex')}`,
-    label: `${wine.name || wine.title} 批次码 ${index + 1}`,
-    wineId: wine.id,
-    batchNo,
-    status: 'ready',
-    createdAt: nowIso(),
-    expiresAt: ensureIsoDate(input.expiresAt, {
-      field: 'expiresAt',
-      defaultValue: plusDays(180)
-    }),
-    firstUsedAt: null,
-    firstUserId: null,
-    sessionId: null
-  }));
+  const codes = Array.from({ length: quantity }).map((_, index) => {
+    const redeemCode = generateSixDigitCode([...store.scanCodes, ...codes || []]);
+    return {
+      id: randomId('code'),
+      token: randomId('card'),
+      redeemCode,
+      label: `${wine.name || wine.title} 提取码 ${index + 1}`,
+      wineId: wine.id,
+      batchNo,
+      status: 'ready',
+      createdAt: nowIso(),
+      expiresAt: ensureIsoDate(input.expiresAt, {
+        field: 'expiresAt',
+        defaultValue: plusDays(180)
+      }),
+      firstUsedAt: null,
+      firstUserId: null,
+      sessionId: null
+    };
+  });
 
   store.codeBatches.unshift(batch);
   store.scanCodes.unshift(...codes);
@@ -841,27 +865,54 @@ function sessionPayload(store, sessionId, userId) {
   };
 }
 
-function consumeOneTimeCode(sceneValue, userId) {
-  const scene = sanitizeScene(sceneValue);
+function logRedeemFailure(store, redeemCode, reason, meta) {
+  store.redeemFailLogs.unshift({
+    id: randomId('rfail'),
+    code: redeemCode,
+    reason,
+    ip: (meta && meta.ip) || 'unknown',
+    userId: (meta && meta.userId) || 'anonymous',
+    createdAt: nowIso()
+  });
+  writeAudit(store, 'code.redeem.failed', `code=${redeemCode}&reason=${reason}`, (meta && meta.userId) || 'anonymous');
+}
+
+function consumeOneTimeCode(redeemCodeValue, userId, requestMeta) {
+  const redeemCode = String(redeemCodeValue || '').trim();
+
+  if (!redeemCode || !/^\d{6}$/.test(redeemCode)) {
+    const store = readStore();
+    logRedeemFailure(store, redeemCode, 'INVALID_FORMAT', requestMeta);
+    writeStore(store);
+    throw createAppError('INVALID_REDEEM_CODE', 400);
+  }
+
   const store = readStore();
-  const code = store.scanCodes.find((item) => item.token === scene);
+  const code = store.scanCodes.find((item) => item.redeemCode === redeemCode);
   const user = getUserById(store, userId);
 
   if (!code) {
+    logRedeemFailure(store, redeemCode, 'CODE_NOT_FOUND', requestMeta);
+    writeStore(store);
     throw createAppError('CODE_NOT_FOUND', 404);
   }
 
   if (code.status === 'disabled') {
+    logRedeemFailure(store, redeemCode, 'CODE_DISABLED', requestMeta);
+    writeStore(store);
     throw createAppError('CODE_DISABLED', 410, code);
   }
 
   if (isExpired(code.expiresAt) || code.status === 'expired') {
     code.status = 'expired';
+    logRedeemFailure(store, redeemCode, 'CODE_EXPIRED', requestMeta);
     writeStore(store);
     throw createAppError('CODE_EXPIRED', 410, code);
   }
 
   if (code.status === 'claimed' || code.firstUsedAt) {
+    logRedeemFailure(store, redeemCode, 'CODE_ALREADY_USED', requestMeta);
+    writeStore(store);
     throw createAppError('CODE_ALREADY_USED', 410, code);
   }
 
@@ -870,13 +921,13 @@ function consumeOneTimeCode(sceneValue, userId) {
     codeId: code.id,
     userId: user.id,
     wineId: code.wineId,
-    sessionType: 'scan',
+    sessionType: 'redeem',
     scopeJson: {
       visibility: 'exclusive',
       trackIds: (getWineById(store, code.wineId) || { trackIds: [] }).trackIds || []
     },
     createdAt: nowIso(),
-    expiredAt: plusDays(7)
+    expiredAt: plusMinutes(30)
   };
 
   code.status = 'claimed';
@@ -884,7 +935,7 @@ function consumeOneTimeCode(sceneValue, userId) {
   code.firstUserId = user.id;
   code.sessionId = session.id;
   store.scanSessions.unshift(session);
-  writeAudit(store, 'code.claimed', code.id, user.id);
+  writeAudit(store, 'code.redeemed', code.id, user.id);
   writeStore(store);
 
   return sessionPayload(store, session.id, user.id);
@@ -1651,7 +1702,7 @@ function unlockTrack(userId, trackId, payload = {}) {
   };
 }
 
-function signDownload(userId, trackId) {
+function signDownload(userId, trackId, requestMeta) {
   const store = readStore();
   const user = getUserById(store, userId);
   const track = getTrackById(store, trackId);
@@ -1686,7 +1737,7 @@ function signDownload(userId, trackId) {
   };
 }
 
-function consumeDownloadTicket(token) {
+function consumeDownloadTicket(token, requestMeta) {
   const store = readStore();
   const ticket = store.downloadTickets.find((item) => item.token === token);
 
@@ -1721,8 +1772,8 @@ function consumeDownloadTicket(token) {
     userId: ticket.userId,
     trackId: ticket.trackId,
     assetId: asset.id,
-    ip: '127.0.0.1',
-    deviceInfo: 'mini-program-demo',
+    ip: (requestMeta && requestMeta.ip) || '127.0.0.1',
+    deviceInfo: (requestMeta && requestMeta.deviceInfo) || 'mini-program',
     downloadAt: ticket.usedAt
   });
 
@@ -1904,17 +1955,50 @@ function adminDashboard() {
   const claimedCodes = store.scanCodes.filter((code) => code.status === 'claimed').length;
   const readyCodes = store.scanCodes.filter((code) => code.status === 'ready').length;
   const disabledCodes = store.scanCodes.filter((code) => code.status === 'disabled').length;
+  const totalCodes = store.scanCodes.length;
+  const failLogs = store.redeemFailLogs || [];
+  const failLogs24h = failLogs.filter(
+    (log) => Date.now() - new Date(log.createdAt).getTime() < 24 * 60 * 60 * 1000
+  ).length;
   const activeMembers = store.memberships.filter(
     (membership) => membership.status === 'active' && !isExpired(membership.expireAt)
   ).length;
+  const totalUsers = store.users.length;
+
+  // 提取码验证成功率（总尝试 = 成功 + 失败）
+  const totalAttempts = claimedCodes + failLogs.length;
+  const successRate = totalAttempts > 0 ? Math.round((claimedCodes / totalAttempts) * 100) : 0;
+
+  // 会员转化率（有会员的用户 / 总用户）
+  const memberRate = totalUsers > 0 ? Math.round((activeMembers / totalUsers) * 100) : 0;
+
+  // 下载统计
+  const totalDownloads = store.downloadLogs.length;
+  const downloads24h = store.downloadLogs.filter(
+    (log) => Date.now() - new Date(log.downloadAt).getTime() < 24 * 60 * 60 * 1000
+  ).length;
+
+  // 订单转化（下单数/总用户）
+  const orderUsers = new Set(store.orders.map((o) => o.userId)).size;
+  const orderRate = totalUsers > 0 ? Math.round((orderUsers / totalUsers) * 100) : 0;
 
   return {
     cards: [
       { label: '累计成交', value: `¥${revenue}`, detail: `${paidOrders.length} 笔已支付订单` },
-      { label: '首扫成功', value: `${claimedCodes}`, detail: `${readyCodes} 个待消费码` },
-      { label: '会员用户', value: `${activeMembers}`, detail: `${store.downloadLogs.length} 次下载记录` },
-      { label: '异常码', value: `${disabledCodes}`, detail: '作废与停用码需客服跟进' }
+      { label: '提取码已使用', value: `${claimedCodes}`, detail: `${readyCodes} 个待使用 · 成功率 ${successRate}%` },
+      { label: '会员用户', value: `${activeMembers}`, detail: `${totalUsers} 位用户 · 转化率 ${memberRate}%` },
+      { label: '24h验证失败', value: `${failLogs24h}`, detail: `${failLogs.length} 条历史失败记录` }
     ],
+    metrics: {
+      codeSuccessRate: successRate,
+      codeTotal: totalCodes,
+      memberRate: memberRate,
+      orderRate: orderRate,
+      totalDownloads: totalDownloads,
+      downloads24h: downloads24h,
+      totalUsers: totalUsers,
+      activeMembers: activeMembers
+    },
     recentOrders: store.orders
       .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())
       .slice(0, 6)
@@ -1938,6 +2022,272 @@ function adminListWines() {
     ...wine,
     trackCount: (wine.trackIds || []).length
   }));
+}
+
+function adminListWineries() {
+  const store = readStore();
+  return store.wineries.map((winery) => ({
+    ...winery,
+    wineCount: store.wines.filter((wine) => wine.wineryId === winery.id).length
+  }));
+}
+
+function adminCreateWinery(payload = {}) {
+  const store = readStore();
+  const name = ensureText(payload.name, {
+    field: 'name',
+    required: true,
+    min: 2,
+    max: 80
+  });
+  const id = payload.id || slugifyId(`${name}-${Date.now()}`, 'winery');
+
+  if (store.wineries.some((item) => item.id === id)) {
+    throw createAppError('WINERY_ID_EXISTS', 409);
+  }
+
+  const winery = {
+    id,
+    name,
+    englishName: ensureText(payload.englishName, {
+      field: 'englishName',
+      min: 0,
+      max: 80,
+      defaultValue: ''
+    }),
+    tagline: ensureText(payload.tagline, {
+      field: 'tagline',
+      min: 0,
+      max: 120,
+      defaultValue: ''
+    }),
+    intro: ensureText(payload.intro, {
+      field: 'intro',
+      min: 0,
+      max: 1000,
+      defaultValue: ''
+    }),
+    story: ensureText(payload.story, {
+      field: 'story',
+      min: 0,
+      max: 2000,
+      defaultValue: ''
+    }),
+    heroImage: ensureText(payload.heroImage, {
+      field: 'heroImage',
+      min: 0,
+      max: 500,
+      defaultValue: '/assets/images/winery-vineyard-moon.jpg'
+    }),
+    portraitImage: ensureText(payload.portraitImage, {
+      field: 'portraitImage',
+      min: 0,
+      max: 500,
+      defaultValue: ''
+    }),
+    harvestImage: ensureText(payload.harvestImage, {
+      field: 'harvestImage',
+      min: 0,
+      max: 500,
+      defaultValue: ''
+    }),
+    giftImage: ensureText(payload.giftImage, {
+      field: 'giftImage',
+      min: 0,
+      max: 500,
+      defaultValue: ''
+    })
+  };
+
+  store.wineries.unshift(winery);
+  writeAudit(store, 'winery.created', winery.id, DEFAULT_ADMIN_USERNAME);
+  writeStore(store);
+  return winery;
+}
+
+function adminListTracks() {
+  const store = readStore();
+  return store.tracks.map((track) => ({
+    ...track,
+    wineName: (getWineById(store, track.wineId) || {}).name || '-'
+  }));
+}
+
+function adminCreateTrack(payload = {}) {
+  const store = readStore();
+  const title = ensureText(payload.title, {
+    field: 'title',
+    required: true,
+    min: 1,
+    max: 120
+  });
+  const wineId = ensureText(payload.wineId, {
+    field: 'wineId',
+    required: true,
+    min: 2,
+    max: 120
+  });
+  const wine = getWineById(store, wineId);
+  if (!wine) {
+    throw createAppError('WINE_NOT_FOUND', 404);
+  }
+
+  const id = payload.id || slugifyId(`${title}-${Date.now()}`, 'track');
+  if (store.tracks.some((item) => item.id === id)) {
+    throw createAppError('TRACK_ID_EXISTS', 409);
+  }
+
+  const track = {
+    id,
+    wineId,
+    mood: ensureText(payload.mood, { field: 'mood', min: 0, max: 40, defaultValue: '' }),
+    title,
+    cnTitle: ensureText(payload.cnTitle, { field: 'cnTitle', min: 0, max: 80, defaultValue: '' }),
+    description: ensureText(payload.description, { field: 'description', min: 0, max: 500, defaultValue: '' }),
+    src: ensureText(payload.src, { field: 'src', min: 0, max: 500, defaultValue: '' }),
+    durationLabel: ensureText(payload.durationLabel, { field: 'durationLabel', min: 0, max: 20, defaultValue: '' }),
+    art: ensureText(payload.art, { field: 'art', min: 0, max: 40, defaultValue: 'noir' }),
+    cover: ensureText(payload.cover, { field: 'cover', min: 0, max: 500, defaultValue: '' }),
+    playRule: ensureEnum(payload.playRule, ['trial', 'scan_or_member', 'member'], { field: 'playRule', defaultValue: 'member' }),
+    previewSeconds: ensureInteger(payload.previewSeconds, { field: 'previewSeconds', min: 5, max: 60, defaultValue: 12 }),
+    unlockPrice: ensureInteger(payload.unlockPrice, { field: 'unlockPrice', min: 0, max: 999, defaultValue: 29 })
+  };
+
+  store.tracks.unshift(track);
+
+  if (!wine.trackIds) {
+    wine.trackIds = [];
+  }
+  if (!wine.trackIds.includes(track.id)) {
+    wine.trackIds.push(track.id);
+  }
+
+  const asset = {
+    id: `asset_${track.id}`,
+    trackId: track.id,
+    fileUrl: track.src,
+    fileHash: `hash-${track.id}`,
+    fileSize: 0,
+    downloadRule: 'entitlement'
+  };
+  if (!store.downloadAssets.some((item) => item.trackId === track.id)) {
+    store.downloadAssets.unshift(asset);
+  }
+
+  writeAudit(store, 'track.created', track.id, DEFAULT_ADMIN_USERNAME);
+  writeStore(store);
+  return { ...track, wineName: wine.name };
+}
+
+function adminSaveTrack(payload = {}) {
+  const store = readStore();
+  const track = store.tracks.find((item) => item.id === payload.id);
+
+  if (!track) {
+    throw createAppError('TRACK_NOT_FOUND', 404);
+  }
+
+  const fields = ['title', 'cnTitle', 'mood', 'description', 'src', 'durationLabel', 'art', 'cover'];
+  const fieldRules = {
+    title: { min: 1, max: 120 },
+    cnTitle: { min: 0, max: 80 },
+    mood: { min: 0, max: 40 },
+    description: { min: 0, max: 500 },
+    src: { min: 0, max: 500 },
+    durationLabel: { min: 0, max: 20 },
+    art: { min: 0, max: 40 },
+    cover: { min: 0, max: 500 }
+  };
+
+  fields.forEach((field) => {
+    if (payload[field] !== undefined) {
+      track[field] = ensureText(payload[field], {
+        field,
+        required: field === 'title',
+        min: fieldRules[field].min,
+        max: fieldRules[field].max
+      });
+    }
+  });
+
+  if (payload.playRule !== undefined) {
+    track.playRule = ensureEnum(payload.playRule, ['trial', 'scan_or_member', 'member'], { field: 'playRule' });
+  }
+
+  if (payload.previewSeconds !== undefined) {
+    track.previewSeconds = ensureInteger(payload.previewSeconds, { field: 'previewSeconds', min: 5, max: 60 });
+  }
+
+  if (payload.unlockPrice !== undefined) {
+    track.unlockPrice = ensureInteger(payload.unlockPrice, { field: 'unlockPrice', min: 0, max: 999 });
+  }
+
+  if (payload.wineId !== undefined) {
+    const newWineId = ensureText(payload.wineId, { field: 'wineId', min: 2, max: 120 });
+    if (newWineId !== track.wineId) {
+      const oldWine = getWineById(store, track.wineId);
+      if (oldWine && oldWine.trackIds) {
+        oldWine.trackIds = oldWine.trackIds.filter((id) => id !== track.id);
+      }
+      const newWine = getWineById(store, newWineId);
+      if (!newWine) {
+        throw createAppError('WINE_NOT_FOUND', 404);
+      }
+      if (!newWine.trackIds) {
+        newWine.trackIds = [];
+      }
+      if (!newWine.trackIds.includes(track.id)) {
+        newWine.trackIds.push(track.id);
+      }
+      track.wineId = newWineId;
+    }
+  }
+
+  const asset = store.downloadAssets.find((item) => item.trackId === track.id);
+  if (asset && track.src && asset.fileUrl !== track.src) {
+    asset.fileUrl = track.src;
+  }
+
+  writeAudit(store, 'track.updated', track.id, DEFAULT_ADMIN_USERNAME);
+  writeStore(store);
+  return { ...track, wineName: (getWineById(store, track.wineId) || {}).name || '-' };
+}
+
+function adminSaveWinery(payload = {}) {
+  const store = readStore();
+  const winery = store.wineries.find((item) => item.id === payload.id);
+
+  if (!winery) {
+    throw createAppError('WINERY_NOT_FOUND', 404);
+  }
+
+  const fields = ['name', 'englishName', 'tagline', 'intro', 'story', 'heroImage', 'portraitImage', 'harvestImage', 'giftImage'];
+  const fieldRules = {
+    name: { min: 2, max: 80 },
+    englishName: { min: 0, max: 80 },
+    tagline: { min: 0, max: 120 },
+    intro: { min: 0, max: 1000 },
+    story: { min: 0, max: 2000 },
+    heroImage: { min: 0, max: 500 },
+    portraitImage: { min: 0, max: 500 },
+    harvestImage: { min: 0, max: 500 },
+    giftImage: { min: 0, max: 500 }
+  };
+
+  fields.forEach((field) => {
+    if (payload[field] !== undefined) {
+      winery[field] = ensureText(payload[field], {
+        field,
+        required: field === 'name',
+        min: fieldRules[field].min,
+        max: fieldRules[field].max
+      });
+    }
+  });
+
+  writeAudit(store, 'winery.updated', winery.id, DEFAULT_ADMIN_USERNAME);
+  writeStore(store);
+  return winery;
 }
 
 function adminCreateWine(payload = {}) {
@@ -2130,6 +2480,19 @@ function adminDeleteWine(wineId) {
     mode: 'deleted',
     item: wine
   };
+}
+
+function adminExportCodesCsv() {
+  const store = readStore();
+  const header = '提取码,酒款,批次,状态,创建时间,使用时间,使用用户\n';
+  const rows = store.scanCodes
+    .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())
+    .map((code) => {
+      const wineName = code.wineId ? (getWineById(store, code.wineId) || {}).name || '' : '';
+      return `${code.redeemCode || code.token},${wineName},${code.batchNo || ''},${code.status},${code.createdAt || ''},${code.firstUsedAt || ''},${code.firstUserId || ''}`;
+    })
+    .join('\n');
+  return header + rows;
 }
 
 function adminListCodes() {
@@ -2576,6 +2939,20 @@ function adminGrantMembership(payload = {}) {
   };
 }
 
+function adminListRedeemFailLogs(limit) {
+  const store = readStore();
+  const normalizedLimit = ensureInteger(limit, {
+    field: 'limit',
+    min: 1,
+    max: 200,
+    defaultValue: 60
+  });
+
+  return (store.redeemFailLogs || [])
+    .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())
+    .slice(0, normalizedLimit);
+}
+
 function adminSetCodeStatus(codeId, status) {
   const store = readStore();
   const code = store.scanCodes.find((item) => item.id === codeId);
@@ -2615,9 +2992,17 @@ module.exports = {
   adminCreateWine,
   adminDeleteProduct,
   adminDeleteWine,
+  adminExportCodesCsv,
   adminGrantMembership,
   adminListAuditLogs,
   adminListCodes,
+  adminListRedeemFailLogs,
+  adminListWineries,
+  adminCreateWinery,
+  adminSaveWinery,
+  adminListTracks,
+  adminCreateTrack,
+  adminSaveTrack,
   adminListMemberships,
   adminListOrders,
   adminListProducts,

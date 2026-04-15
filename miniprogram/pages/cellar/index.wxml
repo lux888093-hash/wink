@@ -4,7 +4,7 @@
       <image class="cellar-hero-image" src="{{wine.estateHeroImage}}" mode="aspectFill"></image>
       <view class="cellar-hero-mask"></view>
       <view class="cellar-hero-copy">
-        <text class="eyebrow">扫码专属</text>
+        <text class="eyebrow">提取码专属</text>
         <text class="display-title cellar-title">{{wine.name}}</text>
         <text class="muted-copy line-clamp-3">{{wine.estateIntro}}</text>
       </view>
@@ -56,6 +56,6 @@
   <view wx:else class="page-scroll empty-state">
     <text class="empty-title">{{errorTitle}}</text>
     <text class="empty-subtitle">{{errorMessage}}</text>
-    <navigator class="ghost-button" url="/pages/redeem/index">返回扫码页</navigator>
+    <button class="ghost-button" bindtap="goBack">返回输入提取码</button>
   </view>
 </view>

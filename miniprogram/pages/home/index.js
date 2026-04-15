@@ -103,5 +103,13 @@ Page({
     wx.navigateTo({
       url: `/pages/product-detail/index?id=${productId}`
     });
+  },
+
+  openAgreement() {
+    wx.navigateTo({ url: '/pages/agreement/index' });
+  },
+
+  openPrivacy() {
+    wx.navigateTo({ url: '/pages/privacy/index' });
   }
 });

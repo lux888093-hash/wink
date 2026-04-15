@@ -1,0 +1,68 @@
+<view class="shell">
+  <scroll-view scroll-y class="page-scroll legal-page">
+    <view class="legal-header">
+      <text class="eyebrow">PRIVACY POLICY</text>
+      <text class="display-title legal-title">隐私政策</text>
+      <text class="micro-copy legal-updated">更新日期：2026年4月15日 | 生效日期：2026年4月15日</text>
+    </view>
+
+    <view class="legal-body">
+      <text class="legal-section-title">一、我们如何收集和使用您的个人信息</text>
+      <text class="legal-paragraph">1.1 我们将通过本平台收集您的个人信息，仅用于为您提供平台服务。个人信息的收集和使用将遵循合法、正当、必要的原则。</text>
+      <text class="legal-paragraph">1.2 在您使用本平台时，我们可能收集以下信息：</text>
+      <text class="legal-sub-item">（1）微信授权信息：当您使用微信登录时，我们会获取您的微信 OpenID 用于身份识别。在您授权的情况下，我们可能获取您的微信昵称和头像。</text>
+      <text class="legal-sub-item">（2）订单信息：当您购买商品或会员服务时，我们会收集您的订单详情、支付信息。</text>
+      <text class="legal-sub-item">（3）提取码使用记录：当您输入提取码时，我们会记录提取码验证结果和使用时间。</text>
+      <text class="legal-sub-item">（4）设备与日志信息：我们会自动收集您的设备型号、操作系统版本、IP地址、浏览器类型等标准日志信息。</text>
+
+      <text class="legal-section-title">二、我们如何使用您的个人信息</text>
+      <text class="legal-paragraph">2.1 我们收集的信息将用于以下目的：</text>
+      <text class="legal-sub-item">（1）提供和维护平台服务，包括提取码验证、内容展示、音乐播放等；</text>
+      <text class="legal-sub-item">（2）处理订单和支付，确保交易安全；</text>
+      <text class="legal-sub-item">（3）管理会员权益和数字内容下载权限；</text>
+      <text class="legal-sub-item">（4）进行安全防护，识别和预防欺诈行为；</text>
+      <text class="legal-sub-item">（5）改进服务体验，进行必要的数据分析。</text>
+
+      <text class="legal-section-title">三、我们如何存储和保护您的个人信息</text>
+      <text class="legal-paragraph">3.1 您的个人信息存储在中华人民共和国境内的服务器上。未经您的单独同意，我们不会将您的个人信息传输至境外。</text>
+      <text class="legal-paragraph">3.2 我们采取以下安全措施保护您的个人信息：</text>
+      <text class="legal-sub-item">（1）使用加密技术（如 HTTPS/TLS）传输敏感数据；</text>
+      <text class="legal-sub-item">（2）对存储的密码进行不可逆哈希加密；</text>
+      <text class="legal-sub-item">（3）实施访问控制，限制员工对个人信息的访问权限；</text>
+      <text class="legal-sub-item">（4）定期进行安全评估和系统审计。</text>
+      <text class="legal-paragraph">3.3 我们仅在最短必要期限内保留您的个人信息。超出必要期限后，我们将删除或匿名化处理您的个人信息。</text>
+
+      <text class="legal-section-title">四、我们如何共享、转让和公开披露您的个人信息</text>
+      <text class="legal-paragraph">4.1 未经您的同意，我们不会与第三方共享、转让您的个人信息，但以下情况除外：</text>
+      <text class="legal-sub-item">（1）与微信支付等必要的服务提供商共享，以完成交易处理；</text>
+      <text class="legal-sub-item">（2）根据法律法规的要求，或应政府主管部门的合法要求；</text>
+      <text class="legal-sub-item">（3）与关联方共享，但仅限于本声明中声明的目的。</text>
+
+      <text class="legal-section-title">五、您的权利</text>
+      <text class="legal-paragraph">5.1 根据相关法律法规，您享有以下权利：</text>
+      <text class="legal-sub-item">（1）访问权：您有权访问您的个人信息；</text>
+      <text class="legal-sub-item">（2）更正权：当您的个人信息不准确时，您有权要求更正；</text>
+      <text class="legal-sub-item">（3）删除权：在特定情况下，您有权要求我们删除您的个人信息；</text>
+      <text class="legal-sub-item">（4）撤回同意权：您有权撤回此前给予的同意。</text>
+      <text class="legal-paragraph">5.2 如需行使以上权利，请通过平台内的客服入口与我们联系。我们将在收到请求后十五个工作日内予以回复。</text>
+
+      <text class="legal-section-title">六、未成年人保护</text>
+      <text class="legal-paragraph">6.1 我们非常重视对未成年人个人信息的保护。根据《中华人民共和国未成年人保护法》等法律法规，我们不向未成年人提供酒类商品销售服务。</text>
+      <text class="legal-paragraph">6.2 如果您是未成年人的监护人，当您对您所监护的未成年人的个人信息处理有疑问时，请通过平台客服与我们联系。</text>
+
+      <text class="legal-section-title">七、隐私政策的更新</text>
+      <text class="legal-paragraph">7.1 我们可能会适时修订本隐私政策。当政策条款发生变更时，我们会在本平台公布修订后的版本。</text>
+      <text class="legal-paragraph">7.2 对于重大变更，我们会通过弹窗、推送通知或其他显著方式通知您。若您在政策变更后继续使用本平台服务，即视为您同意受修订后的政策约束。</text>
+
+      <text class="legal-section-title">八、联系我们</text>
+      <text class="legal-paragraph">8.1 如您对本隐私政策有任何疑问、意见或建议，请通过以下方式与我们联系：</text>
+      <text class="legal-sub-item">通过本平台内的客服入口提交反馈。</text>
+      <text class="legal-paragraph">8.2 我们将在收到您的反馈后十五个工作日内予以回复。</text>
+    </view>
+
+    <view class="legal-footer">
+      <text class="micro-copy">鸿玖酒庄</text>
+      <text class="micro-copy">© 2026 Hongjiu Estate. All rights reserved.</text>
+    </view>
+  </scroll-view>
+</view>

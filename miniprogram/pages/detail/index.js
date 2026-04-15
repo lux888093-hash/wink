@@ -1,5 +1,5 @@
 const { request } = require('../../utils/api');
-const { restoreExperience, getCurrentExperience } = require('../../utils/session');
+const { getCurrentExperience } = require('../../utils/session');
 
 Page({
   data: {
@@ -33,7 +33,7 @@ Page({
         });
         experience = payload.experience;
       } else {
-        experience = getCurrentExperience() || (await restoreExperience());
+        experience = getCurrentExperience();
       }
 
       if (!experience) {

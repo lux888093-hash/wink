@@ -11,7 +11,7 @@
 
         <view class="hero-actions">
           <button class="primary-button" bindtap="openStore">进入酒廊</button>
-          <button class="ghost-button" bindtap="openRedeem">扫码</button>
+          <button class="ghost-button" bindtap="openRedeem">提取码</button>
         </view>
       </view>
 
@@ -123,6 +123,19 @@
           <text class="micro-copy line-clamp-2">{{item.quote}}</text>
         </view>
       </view>
+    </view>
+
+    <view class="compliance-footer">
+      <view class="compliance-warn">
+        <text class="compliance-warn-icon">⚠</text>
+        <text class="compliance-warn-text">理性饮酒，拒绝酒驾。未成年人禁止饮酒。</text>
+      </view>
+      <view class="compliance-links">
+        <text class="compliance-link" bindtap="openAgreement">用户协议</text>
+        <text class="compliance-divider">|</text>
+        <text class="compliance-link" bindtap="openPrivacy">隐私政策</text>
+      </view>
+      <text class="compliance-copy">© 2026 鸿玖酒庄 Hongjiu Estate</text>
     </view>
 
     <view class="tabbar-gap"></view>

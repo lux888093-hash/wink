@@ -12,9 +12,17 @@ const {
   adminCreateWine,
   adminDeleteProduct,
   adminDeleteWine,
+  adminExportCodesCsv,
   adminGrantMembership,
   adminListAuditLogs,
   adminListCodes,
+  adminListRedeemFailLogs,
+  adminListWineries,
+  adminCreateWinery,
+  adminSaveWinery,
+  adminListTracks,
+  adminCreateTrack,
+  adminSaveTrack,
   adminListMemberships,
   adminListOrders,
   adminListProducts,
@@ -174,6 +182,13 @@ const loginLimiter = createRateLimiter({
   max: runtimeConfig.loginRateLimitMax,
   code: 'LOGIN_RATE_LIMITED',
   key: (req) => `login:${clientIp(req)}`
+});
+
+const redeemLimiter = createRateLimiter({
+  windowMs: 5 * 60 * 1000,
+  max: 10,
+  code: 'REDEEM_RATE_LIMITED',
+  key: (req) => `redeem:${clientIp(req)}`
 });
 
 const writeLimiter = createRateLimiter({
@@ -411,14 +426,15 @@ app.post('/api/admin/dev/reset', withAdmin((_req, res) => {
     note: 'Local demo data has been reset.',
     code,
     wine,
-    scene: code.token
+    redeemCode: code.redeemCode
   });
 }));
 
-app.post('/api/redeem/consume', (req, res) => {
+app.post('/api/redeem/consume', redeemLimiter, (req, res) => {
   try {
-    const scene = (req.body && (req.body.scene || req.body.token)) || '';
-    const payload = consumeOneTimeCode(scene, resolveUserId(req));
+    const code = (req.body && (req.body.code || req.body.redeemCode)) || '';
+    const requestMeta = { ip: clientIp(req), userId: resolveUserId(req) };
+    const payload = consumeOneTimeCode(code, requestMeta.userId, requestMeta);
     res.json({
       ok: true,
       sessionId: payload.session.id,
@@ -740,7 +756,11 @@ app.post('/api/tracks/:trackId/unlock', (req, res) => {
 
 app.post('/api/downloads/:trackId/sign', (req, res) => {
   try {
-    const payload = signDownload(resolveUserId(req), req.params.trackId);
+    const requestMeta = {
+      ip: clientIp(req),
+      deviceInfo: req.headers['user-agent'] || 'unknown'
+    };
+    const payload = signDownload(resolveUserId(req), req.params.trackId, requestMeta);
     res.json({
       ok: true,
       ...payload,
@@ -764,7 +784,11 @@ app.get('/api/downloads/logs', (req, res) => {
 
 app.get('/api/downloads/file', (req, res) => {
   try {
-    const payload = consumeDownloadTicket(req.query.token);
+    const requestMeta = {
+      ip: clientIp(req),
+      deviceInfo: req.headers['user-agent'] || 'unknown'
+    };
+    const payload = consumeDownloadTicket(req.query.token, requestMeta);
     const localPath = resolveAudioFilePath(payload.asset.fileUrl);
 
     if (!localPath) {
@@ -840,6 +864,54 @@ app.delete('/api/admin/wines/:wineId', withAdmin((req, res) => {
   });
 }));
 
+app.get('/api/admin/wineries', withAdmin((_req, res) => {
+  res.json({
+    ok: true,
+    items: adminListWineries()
+  });
+}));
+
+app.post('/api/admin/wineries', withAdmin((req, res) => {
+  res.json({
+    ok: true,
+    item: adminCreateWinery(req.body || {})
+  });
+}));
+
+app.put('/api/admin/wineries/:wineryId', withAdmin((req, res) => {
+  res.json({
+    ok: true,
+    item: adminSaveWinery({
+      ...(req.body || {}),
+      id: req.params.wineryId
+    })
+  });
+}));
+
+app.get('/api/admin/tracks', withAdmin((_req, res) => {
+  res.json({
+    ok: true,
+    items: adminListTracks()
+  });
+}));
+
+app.post('/api/admin/tracks', withAdmin((req, res) => {
+  res.json({
+    ok: true,
+    item: adminCreateTrack(req.body || {})
+  });
+}));
+
+app.put('/api/admin/tracks/:trackId', withAdmin((req, res) => {
+  res.json({
+    ok: true,
+    item: adminSaveTrack({
+      ...(req.body || {}),
+      id: req.params.trackId
+    })
+  });
+}));
+
 app.post('/api/admin/code-batches', withAdmin((req, res) => {
   res.json({
     ok: true,
@@ -859,6 +931,13 @@ app.put('/api/admin/codes/:codeId/status', withAdmin((req, res) => {
     ok: true,
     item: adminSetCodeStatus(req.params.codeId, req.body && req.body.status)
   });
+}));
+
+app.get('/api/admin/codes/export', withAdmin((_req, res) => {
+  const csv = adminExportCodesCsv();
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename=redeem-codes.csv');
+  res.send('\uFEFF' + csv);
 }));
 
 app.get('/api/admin/products', withAdmin((_req, res) => {
@@ -938,46 +1017,22 @@ app.get('/api/admin/audit-logs', withAdmin((req, res) => {
   });
 }));
 
+app.get('/api/admin/redeem-fail-logs', withAdmin((req, res) => {
+  res.json({
+    ok: true,
+    items: adminListRedeemFailLogs(req.query.limit)
+  });
+}));
+
 app.post('/api/admin/codes', withAdmin(async (req, res) => {
   try {
     const { code, wine } = createOneTimeCode(req.body || {});
-    const scene = code.token;
-    const wechatPayload = {
-      scene,
-      page: pagePath,
-      check_path: true,
-      env_version: runtimeConfig.wechatEnvVersion
-    };
-
-    let qr = {
-      generated: false,
-      pendingIntegration: true,
-      scene,
-      page: pagePath,
-      wechatPayload
-    };
-
-    if (hasWechatCredentials()) {
-      const generated = await generateMiniProgramCode({
-        scene,
-        token: code.token,
-        page: pagePath
-      });
-
-      qr = {
-        generated: true,
-        pendingIntegration: false,
-        scene,
-        page: pagePath,
-        imageUrl: `${runtimeConfig.miniprogramBaseUrl}${generated.publicPath}`
-      };
-    }
 
     res.json({
       ok: true,
       code,
       wine,
-      qr
+      redeemCode: code.redeemCode
     });
   } catch (error) {
     respondError(res, error);
