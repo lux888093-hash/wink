@@ -109,16 +109,21 @@
 
 .track-actions {
   display: flex;
+  justify-content: flex-end;
   gap: 12rpx;
   margin-top: 6rpx;
 }
 
 .soft-inline,
 .ghost-inline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto !important;
   min-height: 56rpx;
-  padding: 0 18rpx;
+  padding: 0 24rpx;
   border-radius: 999rpx;
-  font-size: 17rpx;
+  font-size: 20rpx;
 }
 
 .soft-inline {

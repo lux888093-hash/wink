@@ -45,6 +45,7 @@ button {
   border: 0;
   background: transparent;
   line-height: 1.2;
+  width: auto;
 }
 
 button::after {
