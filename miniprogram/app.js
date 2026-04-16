@@ -72,10 +72,7 @@ App({
       console.warn('system info unavailable', error);
     }
 
-    const savedSessionId = wx.getStorageSync(SESSION_STORAGE_KEY);
-    if (savedSessionId) {
-      this.globalData.sessionId = savedSessionId;
-    }
+    wx.removeStorageSync(SESSION_STORAGE_KEY);
 
     const savedUserId = wx.getStorageSync(USER_STORAGE_KEY);
     if (savedUserId) {
@@ -88,6 +85,10 @@ App({
     }
 
     this.authPromise = this.bootstrapUserSession();
+  },
+
+  onHide() {
+    this.clearExperience();
   },
 
   async bootstrapUserSession(force = false) {
@@ -138,7 +139,7 @@ App({
   setExperience(sessionId, experience) {
     this.globalData.sessionId = sessionId;
     this.globalData.experience = experience;
-    wx.setStorageSync(SESSION_STORAGE_KEY, sessionId);
+    wx.removeStorageSync(SESSION_STORAGE_KEY);
   },
 
   clearExperience() {

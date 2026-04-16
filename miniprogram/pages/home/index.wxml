@@ -27,15 +27,6 @@
       </view>
     </view>
 
-    <view wx:if="{{exclusiveEntry}}" class="exclusive-row paper-panel">
-      <view class="exclusive-copy">
-        <text class="eyebrow exclusive-kicker">专属入口</text>
-        <text class="section-title">首扫记录已保留</text>
-        <text class="micro-copy line-clamp-2">这支酒的专属页仍在，可直接继续进入。</text>
-      </view>
-      <button class="soft-button exclusive-button" bindtap="enterExclusive">继续进入</button>
-    </view>
-
     <view class="editorial-grid">
       <view class="paper-panel archive-card">
         <image class="archive-image" src="{{winery.portraitImage}}" mode="aspectFill"></image>

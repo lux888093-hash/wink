@@ -1,6 +1,6 @@
 <view class="shell">
   <view wx:if="{{ready}}" class="page-scroll melody-page">
-    <image class="melody-bg" src="/assets/images/melody-phone-bg.jpg" mode="aspectFill"></image>
+    <image class="melody-bg" src="{{currentTrack.cover || wine.posterImage || '/assets/images/melody-phone-bg.jpg'}}" mode="aspectFill"></image>
     <view class="melody-bg-shadow"></view>
     <view class="melody-bg-overlay"></view>
 
@@ -16,15 +16,14 @@
 
     <view class="melody-stage">
       <view class="cover-shell">
-        <image class="cover-image" src="/assets/images/melody-phone-cover.jpg" mode="aspectFill"></image>
+        <image class="cover-image" src="{{currentTrack.cover || wine.posterImage || '/assets/images/melody-phone-cover.jpg'}}" mode="aspectFill"></image>
         <view class="cover-core"></view>
       </view>
 
-      <text class="eyebrow melody-kicker">AMBIENT PAIRING</text>
-      <text class="display-title melody-title">Vintage Noir</text>
-      <text class="muted-copy melody-description">
-        Soft cello and distant rain, curated for an aged Cabernet Sauvignon.
-      </text>
+      <text class="eyebrow melody-kicker">{{currentTrack.mood || 'AMBIENT PAIRING'}}</text>
+      <text class="display-title melody-title">{{currentTrack.cnTitle || currentTrack.title}}</text>
+      <text class="muted-copy melody-description line-clamp-3">{{currentTrack.description}}</text>
+      <text wx:if="{{gateMessage}}" class="gate-message">{{gateMessage}}</text>
 
       <view class="progress-wrap">
         <view class="progress-rail">
@@ -58,6 +57,11 @@
             <view class="skip-triangle skip-triangle-next overlap"></view>
           </view>
         </view>
+      </view>
+
+      <view wx:if="{{currentTrack && currentTrack.access && !currentTrack.access.canPlayFull}}" class="melody-actions">
+        <button class="ghost-button melody-action" bindtap="openMember">开通会员</button>
+        <button class="primary-button melody-action" bindtap="unlockCurrentTrack">解锁 ¥{{currentTrack.access.unlockPrice}}</button>
       </view>
     </view>
 

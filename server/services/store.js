@@ -326,6 +326,26 @@ function getTrackById(store, trackId) {
   return store.tracks.find((track) => track.id === trackId);
 }
 
+function getDefaultTrackForWine(store, wineId) {
+  const wine = getWineById(store, wineId);
+  const trackId = wine && Array.isArray(wine.trackIds) && wine.trackIds.length ? wine.trackIds[0] : '';
+  return trackId ? getTrackById(store, trackId) : store.tracks.find((track) => track.wineId === wineId);
+}
+
+function getTrackForWine(store, wineId, trackId) {
+  const track = trackId ? getTrackById(store, trackId) : getDefaultTrackForWine(store, wineId);
+
+  if (!track) {
+    throw createAppError('TRACK_NOT_FOUND', 404);
+  }
+
+  if (track.wineId !== wineId) {
+    throw createAppError('TRACK_WINE_MISMATCH', 400);
+  }
+
+  return track;
+}
+
 function getAssetByTrackId(store, trackId) {
   return store.downloadAssets.find((asset) => asset.trackId === trackId);
 }
@@ -528,8 +548,11 @@ function buildWineExperience(store, wineId, userId, options = {}) {
   }
 
   const winery = store.wineries.find((item) => item.id === wine.wineryId) || null;
-  const tracks = (wine.trackIds || [])
+  const scopedTrackIds =
+    Array.isArray(options.trackIds) && options.trackIds.length ? options.trackIds : wine.trackIds || [];
+  const tracks = scopedTrackIds
     .map((trackId) => getTrackById(store, trackId))
+    .filter((track) => track && track.wineId === wine.id)
     .filter(Boolean)
     .map((track) => buildTrackCard(store, userId, track, options));
 
@@ -684,8 +707,12 @@ function generateSixDigitCode(existingCodes) {
 function createSeedCodeForReset(store) {
   const demoCode = store.scanCodes.find((item) => item.redeemCode === '888888');
   if (demoCode) {
+    if (!demoCode.trackId) {
+      demoCode.trackId = getTrackForWine(store, demoCode.wineId).id;
+    }
     return demoCode;
   }
+  const track = getTrackForWine(store, store.wines[0].id);
 
   const fallback = {
     id: randomId('code'),
@@ -693,6 +720,7 @@ function createSeedCodeForReset(store) {
     redeemCode: '888888',
     label: '演示提取码',
     wineId: store.wines[0].id,
+    trackId: track.id,
     batchNo: 'RESET_BATCH',
     status: 'ready',
     createdAt: nowIso(),
@@ -726,6 +754,7 @@ function createOneTimeCode(input = {}) {
   if (!wine) {
     throw createAppError('WINE_NOT_FOUND', 404);
   }
+  const track = getTrackForWine(store, wine.id, input.trackId);
 
   const redeemCode = ensureText(input.redeemCode, {
     field: 'redeemCode',
@@ -752,6 +781,7 @@ function createOneTimeCode(input = {}) {
       max: 80
     }),
     wineId: wine.id,
+    trackId: track.id,
     batchNo: ensureText(input.batchNo || 'CUSTOM', {
       field: 'batchNo',
       min: 2,
@@ -791,6 +821,7 @@ function createCodeBatch(input = {}) {
   if (!wine) {
     throw createAppError('WINE_NOT_FOUND', 404);
   }
+  const track = getTrackForWine(store, wine.id, input.trackId);
 
   const batchNo =
     ensureText(input.batchNo, {
@@ -804,6 +835,7 @@ function createCodeBatch(input = {}) {
     id: randomId('batch'),
     batchNo,
     wineId: wine.id,
+    trackId: track.id,
     quantity,
     createdAt: nowIso(),
     createdBy: input.createdBy || DEFAULT_ADMIN_USERNAME
@@ -813,14 +845,16 @@ function createCodeBatch(input = {}) {
     throw createAppError('BATCH_NO_EXISTS', 409);
   }
 
-  const codes = Array.from({ length: quantity }).map((_, index) => {
-    const redeemCode = generateSixDigitCode([...store.scanCodes, ...codes || []]);
-    return {
+  const codes = [];
+  for (let index = 0; index < quantity; index += 1) {
+    const redeemCode = generateSixDigitCode([...store.scanCodes, ...codes]);
+    codes.push({
       id: randomId('code'),
       token: randomId('card'),
       redeemCode,
       label: `${wine.name || wine.title} 提取码 ${index + 1}`,
       wineId: wine.id,
+      trackId: track.id,
       batchNo,
       status: 'ready',
       createdAt: nowIso(),
@@ -831,8 +865,8 @@ function createCodeBatch(input = {}) {
       firstUsedAt: null,
       firstUserId: null,
       sessionId: null
-    };
-  });
+    });
+  }
 
   store.codeBatches.unshift(batch);
   store.scanCodes.unshift(...codes);
@@ -860,7 +894,8 @@ function sessionPayload(store, sessionId, userId) {
     session,
     experience: buildWineExperience(store, session.wineId, userId || session.userId, {
       visibility: 'exclusive',
-      scanWineId: session.wineId
+      scanWineId: session.wineId,
+      trackIds: session.scopeJson && session.scopeJson.trackIds ? session.scopeJson.trackIds : []
     })
   };
 }
@@ -915,6 +950,7 @@ function consumeOneTimeCode(redeemCodeValue, userId, requestMeta) {
     writeStore(store);
     throw createAppError('CODE_ALREADY_USED', 410, code);
   }
+  const track = getTrackForWine(store, code.wineId, code.trackId);
 
   const session = {
     id: randomId('ses'),
@@ -924,13 +960,14 @@ function consumeOneTimeCode(redeemCodeValue, userId, requestMeta) {
     sessionType: 'redeem',
     scopeJson: {
       visibility: 'exclusive',
-      trackIds: (getWineById(store, code.wineId) || { trackIds: [] }).trackIds || []
+      trackIds: [track.id]
     },
     createdAt: nowIso(),
     expiredAt: plusMinutes(30)
   };
 
   code.status = 'claimed';
+  code.trackId = track.id;
   code.firstUsedAt = nowIso();
   code.firstUserId = user.id;
   code.sessionId = session.id;
@@ -956,9 +993,6 @@ function getStoreHome(userId) {
   const user = getUserById(store, userId);
   const membership = buildMembershipView(store, user.id);
   const cart = buildCartSummary(store, user.id);
-  const exclusiveSession = [...store.scanSessions]
-    .filter((session) => session.userId === user.id && !isExpired(session.expiredAt))
-    .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())[0];
 
   return {
     hero: store.settings.homeHero,
@@ -980,12 +1014,7 @@ function getStoreHome(userId) {
       quote: wine.quote
     })),
     membershipPlans: store.membershipPlans,
-    exclusiveEntry: exclusiveSession
-      ? {
-          sessionId: exclusiveSession.id,
-          wine: getWineById(store, exclusiveSession.wineId)
-        }
-      : null
+    exclusiveEntry: null
   };
 }
 
@@ -2484,12 +2513,14 @@ function adminDeleteWine(wineId) {
 
 function adminExportCodesCsv() {
   const store = readStore();
-  const header = '提取码,酒款,批次,状态,创建时间,使用时间,使用用户\n';
+  const header = '提取码,酒款,歌曲,批次,状态,创建时间,使用时间,使用用户\n';
   const rows = store.scanCodes
     .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())
     .map((code) => {
       const wineName = code.wineId ? (getWineById(store, code.wineId) || {}).name || '' : '';
-      return `${code.redeemCode || code.token},${wineName},${code.batchNo || ''},${code.status},${code.createdAt || ''},${code.firstUsedAt || ''},${code.firstUserId || ''}`;
+      const track = code.trackId ? getTrackById(store, code.trackId) : null;
+      const trackName = track ? track.cnTitle || track.title || '' : '';
+      return `${code.redeemCode || code.token},${wineName},${trackName},${code.batchNo || ''},${code.status},${code.createdAt || ''},${code.firstUsedAt || ''},${code.firstUserId || ''}`;
     })
     .join('\n');
   return header + rows;
@@ -2502,7 +2533,8 @@ function adminListCodes() {
     .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())
     .map((code) => ({
       ...code,
-      wine: getWineById(store, code.wineId)
+      wine: getWineById(store, code.wineId),
+      track: getTrackById(store, code.trackId)
     }));
 }
 

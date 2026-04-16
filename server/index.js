@@ -309,6 +309,12 @@ function respondError(res, error) {
   });
 }
 
+function appError(code, statusCode = 400) {
+  const error = new Error(code);
+  error.statusCode = statusCode;
+  return error;
+}
+
 function resolveUserId(req) {
   const authHeader = String(req.headers.authorization || req.headers['x-user-token'] || '').trim();
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : authHeader;
@@ -336,7 +342,9 @@ function withAdmin(handler) {
       const { readStore } = require('./services/store');
       const store = readStore();
       const admin = assertAdmin(store, resolveAdminToken(req));
-      handler(req, res, admin);
+      Promise.resolve(handler(req, res, admin)).catch((error) => {
+        respondError(res, error);
+      });
     } catch (error) {
       respondError(res, error);
     }
@@ -448,13 +456,7 @@ app.post('/api/redeem/consume', redeemLimiter, (req, res) => {
 
 app.get('/api/sessions/:sessionId', (req, res) => {
   try {
-    const payload = getSessionExperience(req.params.sessionId, resolveUserId(req));
-    res.json({
-      ok: true,
-      sessionId: payload.session.id,
-      session: payload.session,
-      experience: payload.experience
-    });
+    throw appError('SESSION_RESTORE_DISABLED', 410);
   } catch (error) {
     respondError(res, error);
   }
@@ -830,6 +832,27 @@ app.get('/api/admin/dashboard', withAdmin((_req, res) => {
   res.json({
     ok: true,
     ...adminDashboard()
+  });
+}));
+
+app.post('/api/admin/qrcode/fixed-redeem', withAdmin(async (_req, res) => {
+  if (!hasWechatCredentials()) {
+    throw appError('WECHAT_CREDENTIALS_REQUIRED', 400);
+  }
+
+  const scene = 'fixed_redeem';
+  const generated = await generateMiniProgramCode({
+    scene,
+    token: 'fixed-redeem',
+    page: pagePath
+  });
+
+  res.json({
+    ok: true,
+    page: pagePath,
+    scene,
+    path: generated.publicPath,
+    url: `${runtimeConfig.miniprogramBaseUrl}${generated.publicPath}`
   });
 }));
 

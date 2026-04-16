@@ -165,12 +165,32 @@
   font-style: italic;
 }
 
+.gate-message {
+  display: block;
+  max-width: 590rpx;
+  margin-top: 22rpx;
+  color: rgba(231, 200, 150, 0.92);
+  font-size: 20rpx;
+  line-height: 1.6;
+}
+
 .control-row {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 78rpx;
   margin-top: 62rpx;
+}
+
+.melody-actions {
+  display: flex;
+  width: 100%;
+  gap: 18rpx;
+  margin-top: 42rpx;
+}
+
+.melody-action {
+  flex: 1;
 }
 
 .control-side,

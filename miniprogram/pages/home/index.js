@@ -9,7 +9,6 @@ Page({
     featuredProducts: [],
     featuredWines: [],
     membershipPlans: [],
-    exclusiveEntry: null,
     user: null,
     cartCount: 0,
     errorTitle: '',
@@ -42,7 +41,6 @@ Page({
           ...item,
           benefitsLabel: (item.benefits || []).join(' · ')
         })),
-        exclusiveEntry: payload.exclusiveEntry || null,
         user: payload.user,
         cartCount: payload.cartCount || 0
       });
@@ -55,26 +53,6 @@ Page({
           error.message === 'NETWORK_ERROR'
             ? '请先启动本地服务端，再重新进入首页。'
             : '首页数据加载失败，请稍后重试。'
-      });
-    }
-  },
-
-  async enterExclusive() {
-    const entry = this.data.exclusiveEntry;
-    if (!entry || !entry.sessionId) {
-      return;
-    }
-
-    try {
-      const payload = await request({
-        url: `/api/sessions/${entry.sessionId}`
-      });
-      getApp().setExperience(payload.sessionId, payload.experience);
-      wx.navigateTo({ url: '/pages/cellar/index' });
-    } catch (error) {
-      wx.showToast({
-        title: error.message === 'SESSION_EXPIRED' ? '专属体验已过期' : '进入失败',
-        icon: 'none'
       });
     }
   },

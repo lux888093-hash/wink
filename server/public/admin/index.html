@@ -136,6 +136,10 @@
                     <select id="batch-wine"></select>
                   </label>
                   <label>
+                    <span>绑定歌曲</span>
+                    <select id="batch-track"></select>
+                  </label>
+                  <label>
                     <span>批次数量</span>
                     <input id="batch-quantity" type="number" min="1" max="200" value="12" />
                   </label>
@@ -145,6 +149,20 @@
                   </label>
                   <button class="primary-button" type="submit">生成批次</button>
                 </form>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">FIXED ENTRY</p>
+                  <h3 class="panel-title">固定小程序码</h3>
+                </div>
+              </div>
+              <div class="panel-body">
+                <p class="card-subtitle">生成指向提取码页的固定小程序码。需要先配置真实 AppID 和 AppSecret。</p>
+                <button class="outline-button" id="fixed-qrcode-button">生成固定码</button>
+                <p class="card-subtitle" id="fixed-qrcode-result"></p>
               </div>
             </section>
 

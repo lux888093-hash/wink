@@ -692,6 +692,7 @@ function createSeedStore() {
         id: 'batch_spring_2026',
         batchNo: 'HJ2026SPRING',
         wineId: 'soundless-a-quiet-world-2022',
+        trackId: 'track_moonlit_path',
         quantity: 48,
         createdAt: shiftDays(-10),
         createdBy: DEFAULT_ADMIN_USERNAME
@@ -704,6 +705,7 @@ function createSeedStore() {
         redeemCode: '385721',
         label: '演示提取码',
         wineId: 'soundless-a-quiet-world-2022',
+        trackId: 'track_moonlit_path',
         batchNo: 'HJ2026SPRING',
         status: 'ready',
         createdAt: shiftDays(-1),
@@ -718,6 +720,7 @@ function createSeedStore() {
         redeemCode: '619403',
         label: '已使用提取码',
         wineId: 'soundless-a-quiet-world-2022',
+        trackId: 'track_harvest_whisper',
         batchNo: 'HJ2026SPRING',
         status: 'claimed',
         createdAt: shiftDays(-8),
@@ -732,6 +735,7 @@ function createSeedStore() {
         redeemCode: '502874',
         label: '过期提取码',
         wineId: 'amber-nocturne-reserve-2021',
+        trackId: 'track_amber_salon',
         batchNo: 'HJ2026SPRING',
         status: 'expired',
         createdAt: shiftDays(-40),
@@ -746,6 +750,7 @@ function createSeedStore() {
         redeemCode: '731596',
         label: '作废提取码',
         wineId: 'dawn-rose-2023',
+        trackId: 'track_copper_dawn',
         batchNo: 'HJ2026SPRING',
         status: 'disabled',
         createdAt: shiftDays(-20),
@@ -761,10 +766,10 @@ function createSeedStore() {
         codeId: 'code_demo_claimed',
         userId: memberId,
         wineId: 'soundless-a-quiet-world-2022',
-        sessionType: 'scan',
+        sessionType: 'redeem',
         scopeJson: {
           visibility: 'exclusive',
-          trackIds: ['track_moonlit_path', 'track_harvest_whisper', 'track_quiet_world']
+          trackIds: ['track_harvest_whisper']
         },
         createdAt: shiftDays(-2),
         expiredAt: shiftDays(5)

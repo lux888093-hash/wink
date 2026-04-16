@@ -47,8 +47,11 @@ const els = {
   tracksList: document.getElementById('tracks-list'),
   batchForm: document.getElementById('batch-form'),
   batchWine: document.getElementById('batch-wine'),
+  batchTrack: document.getElementById('batch-track'),
   batchQuantity: document.getElementById('batch-quantity'),
   batchBatchNo: document.getElementById('batch-batch-no'),
+  fixedQrcodeButton: document.getElementById('fixed-qrcode-button'),
+  fixedQrcodeResult: document.getElementById('fixed-qrcode-result'),
   exportCodesButton: document.getElementById('export-codes-button'),
   codesTable: document.getElementById('codes-table'),
   productsList: document.getElementById('products-list'),
@@ -159,6 +162,9 @@ function getErrorMessage(error) {
     CODE_NOT_FOUND: '提取码不存在。',
     ORDER_NOT_FOUND: '订单不存在。',
     PLAN_NOT_FOUND: '会员套餐不存在。',
+    TRACK_NOT_FOUND: '当前酒款没有可绑定的曲目。',
+    TRACK_WINE_MISMATCH: '歌曲不属于当前酒款。',
+    WECHAT_CREDENTIALS_REQUIRED: '缺少微信 AppID/AppSecret，暂不能生成固定码。',
     ADMIN_PASSWORD_INVALID: '当前密码不正确。',
     ADMIN_PASSWORD_WEAK: '新密码强度不足，请使用大小写字母、数字和符号组合。',
     ADMIN_PASSWORD_REUSED: '新密码不能与当前密码相同。'
@@ -488,12 +494,14 @@ function renderCodes() {
   els.batchWine.innerHTML = state.wines
     .map((wine) => `<option value="${escapeHtml(wine.id)}">${escapeHtml(wine.name)}</option>`)
     .join('');
+  renderBatchTrackOptions();
 
   els.codesTable.innerHTML = `
     <thead>
       <tr>
         <th>提取码</th>
         <th>酒款</th>
+        <th>歌曲</th>
         <th>批次</th>
         <th>状态</th>
         <th>使用时间</th>
@@ -508,6 +516,7 @@ function renderCodes() {
             <tr>
               <td><strong>${escapeHtml(code.redeemCode || code.token)}</strong></td>
               <td>${escapeHtml(code.wine ? code.wine.name : '-')}</td>
+              <td>${escapeHtml(code.track ? code.track.cnTitle || code.track.title : '-')}</td>
               <td>${escapeHtml(code.batchNo)}</td>
               <td>${escapeHtml(code.status)}</td>
               <td>${escapeHtml(code.firstUsedAt || '-')}</td>
@@ -525,6 +534,17 @@ function renderCodes() {
         .join('')}
     </tbody>
   `;
+}
+
+function renderBatchTrackOptions() {
+  const wineId = els.batchWine.value || (state.wines[0] && state.wines[0].id) || '';
+  const tracks = state.tracks.filter((track) => track.wineId === wineId);
+
+  els.batchTrack.innerHTML = tracks.length
+    ? tracks
+        .map((track) => `<option value="${escapeHtml(track.id)}">${escapeHtml(track.cnTitle || track.title)}</option>`)
+        .join('')
+    : '<option value="">当前酒款无曲目</option>';
 }
 
 function renderProducts() {
@@ -1155,6 +1175,7 @@ els.batchForm.addEventListener('submit', async (event) => {
         method: 'POST',
         body: JSON.stringify({
           wineId: els.batchWine.value,
+          trackId: els.batchTrack.value,
           quantity: Number(els.batchQuantity.value),
           batchNo: els.batchBatchNo.value || undefined
         })
@@ -1167,6 +1188,28 @@ els.batchForm.addEventListener('submit', async (event) => {
   els.batchBatchNo.value = '';
   await loadData();
   setView('codes');
+});
+
+els.batchWine.addEventListener('change', () => {
+  renderBatchTrackOptions();
+});
+
+els.fixedQrcodeButton.addEventListener('click', async () => {
+  const payload = await runTask(
+    () =>
+      api('/api/admin/qrcode/fixed-redeem', {
+        method: 'POST',
+        body: JSON.stringify({})
+      }),
+    '固定小程序码已生成。'
+  );
+
+  if (!payload) {
+    els.fixedQrcodeResult.textContent = '未生成。请确认微信 AppID/AppSecret 已配置。';
+    return;
+  }
+
+  els.fixedQrcodeResult.innerHTML = `页面：${escapeHtml(payload.page)} · <a href="${escapeHtml(payload.path)}" target="_blank">打开固定码</a>`;
 });
 
 els.exportCodesButton.addEventListener('click', () => {

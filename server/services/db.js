@@ -39,6 +39,49 @@ function normalizeStore(store) {
     }
   });
 
+  const firstTrackForWine = (wineId) => {
+    const wine = normalized.wines.find((item) => item.id === wineId);
+    if (wine && Array.isArray(wine.trackIds) && wine.trackIds.length) {
+      return wine.trackIds[0];
+    }
+
+    const track = normalized.tracks.find((item) => item.wineId === wineId);
+    return track ? track.id : '';
+  };
+
+  const batchTrackByNo = new Map();
+  normalized.codeBatches = normalized.codeBatches.map((batch) => {
+    const trackId = batch.trackId || firstTrackForWine(batch.wineId);
+    batchTrackByNo.set(batch.batchNo, trackId);
+    return {
+      ...batch,
+      trackId
+    };
+  });
+
+  normalized.scanCodes = normalized.scanCodes.map((code) => ({
+    ...code,
+    trackId: code.trackId || batchTrackByNo.get(code.batchNo) || firstTrackForWine(code.wineId)
+  }));
+
+  normalized.scanSessions = normalized.scanSessions.map((session) => {
+    const code = normalized.scanCodes.find((item) => item.id === session.codeId);
+    const trackIds =
+      code && code.trackId
+          ? [code.trackId]
+          : session.scopeJson && Array.isArray(session.scopeJson.trackIds) && session.scopeJson.trackIds.length
+            ? session.scopeJson.trackIds
+            : [firstTrackForWine(session.wineId)].filter(Boolean);
+
+    return {
+      ...session,
+      scopeJson: {
+        ...(session.scopeJson || {}),
+        trackIds
+      }
+    };
+  });
+
   return normalized;
 }
 

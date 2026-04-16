@@ -4,9 +4,9 @@ const { formatSeconds } = require('../../utils/format');
 
 let audioContext = null;
 const DEFAULT_FEATURED_TRACK_ID = 'track_quiet_world';
-const UI_DEFAULT_CURRENT = '01:42';
-const UI_DEFAULT_DURATION = '04:55';
-const UI_DEFAULT_PROGRESS = 33;
+const UI_DEFAULT_CURRENT = '00:00';
+const UI_DEFAULT_DURATION = '00:00';
+const UI_DEFAULT_PROGRESS = 0;
 
 function resolveTrackSrc(src) {
   if (!src) {
@@ -26,6 +26,14 @@ function resolveTrackSrc(src) {
   }
 
   return src;
+}
+
+function trackGateMessage(track) {
+  if (!track || !track.access || track.access.canPlayFull) {
+    return '';
+  }
+
+  return `当前为试听模式，可播放 ${track.access.previewSeconds || 12} 秒。开通会员或解锁曲目后可完整播放与下载。`;
 }
 
 Page({
@@ -114,14 +122,14 @@ Page({
         currentTrackIndex,
         currentTrack,
         currentTimeLabel: UI_DEFAULT_CURRENT,
-        durationLabel: UI_DEFAULT_DURATION,
+        durationLabel: currentTrack.durationLabel || UI_DEFAULT_DURATION,
         progress: UI_DEFAULT_PROGRESS,
-        gateMessage: '',
+        gateMessage: trackGateMessage(currentTrack),
         errorTitle: '',
         errorMessage: ''
       });
 
-      this.setupAudio(currentTrack);
+      this.setupAudio(currentTrack, this.entryScope === 'exclusive');
     } catch (error) {
       this.setData({
         ready: false,
@@ -167,9 +175,18 @@ Page({
       this.setData({
         isPlaying: false,
         currentTimeLabel: UI_DEFAULT_CURRENT,
-        durationLabel: UI_DEFAULT_DURATION,
+        durationLabel: track.durationLabel || UI_DEFAULT_DURATION,
         progress: UI_DEFAULT_PROGRESS
       });
+    });
+
+    audioContext.onCanplay(() => {
+      setTimeout(() => {
+        const duration = audioContext ? audioContext.duration || 0 : 0;
+        if (duration > 0) {
+          this.setData({ durationLabel: formatSeconds(duration) });
+        }
+      }, 200);
     });
 
     audioContext.onTimeUpdate(() => {
@@ -188,6 +205,9 @@ Page({
       ) {
         this.previewStopped = true;
         audioContext.pause();
+        this.setData({
+          gateMessage: trackGateMessage(track)
+        });
         wx.showToast({
           title: '试听已结束',
           icon: 'none'
@@ -195,7 +215,9 @@ Page({
       }
 
       this.setData({
-        progress: Math.max(UI_DEFAULT_PROGRESS, progress)
+        currentTimeLabel: formatSeconds(currentTime),
+        durationLabel: safeDuration ? formatSeconds(safeDuration) : track.durationLabel || UI_DEFAULT_DURATION,
+        progress
       });
     });
 
@@ -210,14 +232,18 @@ Page({
     this.setData({
       currentTrack: track,
       currentTimeLabel: UI_DEFAULT_CURRENT,
-      durationLabel: UI_DEFAULT_DURATION,
+      durationLabel: track.durationLabel || UI_DEFAULT_DURATION,
       progress: UI_DEFAULT_PROGRESS,
       isPlaying: false,
-      gateMessage: ''
+      gateMessage: trackGateMessage(track)
     });
 
     if (autoplay) {
-      audioContext.play();
+      setTimeout(() => {
+        if (audioContext) {
+          audioContext.play();
+        }
+      }, 120);
     }
   },
 

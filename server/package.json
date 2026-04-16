@@ -5,7 +5,8 @@
   "description": "Local backend for one-time WeChat mini-program wine experiences.",
   "scripts": {
     "start": "node index.js",
-    "dev": "node --watch index.js"
+    "dev": "node --watch index.js",
+    "test": "node tests/stage0-stage1.test.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
