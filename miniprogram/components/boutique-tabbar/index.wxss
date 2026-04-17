@@ -1,12 +1,12 @@
 .dock-shell {
   position: fixed;
-  left: 18rpx;
-  right: 18rpx;
-  bottom: 18rpx;
+  left: 20rpx;
+  right: 20rpx;
+  bottom: 16rpx;
   display: flex;
-  gap: 8rpx;
-  padding: 10rpx;
-  border-radius: 40rpx;
+  gap: 6rpx;
+  padding: 7rpx;
+  border-radius: 30rpx;
   background:
     linear-gradient(180deg, rgba(26, 20, 18, 0.94), rgba(11, 8, 8, 0.96)),
     rgba(15, 11, 10, 0.92);
@@ -18,44 +18,46 @@
 .dock-item {
   position: relative;
   flex: 1;
-  min-height: 78rpx;
-  padding: 12rpx 8rpx 14rpx;
-  border-radius: 28rpx;
+  min-height: 58rpx;
+  padding: 7rpx 6rpx 8rpx;
+  border-radius: 20rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4rpx;
+  gap: 2rpx;
   color: rgba(246, 239, 232, 0.52);
 }
 
 .dock-label {
   color: inherit;
-  font-size: 18rpx;
-  letter-spacing: 0.08em;
+  font-size: 17rpx;
+  line-height: 1;
+  letter-spacing: 0.04em;
 }
 
 .dock-meta {
   color: inherit;
-  font-size: 10rpx;
-  letter-spacing: 0.32em;
+  font-size: 9rpx;
+  line-height: 1;
+  letter-spacing: 0.24em;
   opacity: 0.86;
 }
 
 .dock-badge {
   position: absolute;
-  top: 6rpx;
-  right: 14rpx;
-  min-width: 30rpx;
-  min-height: 30rpx;
-  padding: 0 8rpx;
+  top: 2rpx;
+  right: 10rpx;
+  min-width: 26rpx;
+  min-height: 26rpx;
+  padding: 0 7rpx;
   border-radius: 999rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #f1dfc0 0%, #c48a45 100%);
   color: #2a170f;
-  font-size: 16rpx;
+  font-size: 14rpx;
   font-weight: 700;
 }
 

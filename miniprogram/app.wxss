@@ -289,5 +289,5 @@ button::after {
 }
 
 .tabbar-gap {
-  height: 188rpx;
+  height: 152rpx;
 }
