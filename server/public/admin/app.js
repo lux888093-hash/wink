@@ -56,6 +56,9 @@ const els = {
   codesTable: document.getElementById('codes-table'),
   productsList: document.getElementById('products-list'),
   ordersTable: document.getElementById('orders-table'),
+  reconciliationButton: document.getElementById('reconciliation-button'),
+  exportOrdersButton: document.getElementById('export-orders-button'),
+  closeExpiredOrdersButton: document.getElementById('close-expired-orders-button'),
   membersList: document.getElementById('members-list'),
   auditTable: document.getElementById('audit-table'),
   views: {
@@ -83,7 +86,39 @@ const viewTitles = {
   audit: '操作审计'
 };
 
+const viewPermissions = {
+  dashboard: 'dashboard.read',
+  wines: 'wines.read',
+  wineries: 'wineries.read',
+  tracks: 'tracks.read',
+  codes: 'codes.read',
+  products: 'products.read',
+  orders: 'orders.read',
+  members: 'memberships.read',
+  audit: 'audit.read'
+};
+
 let statusTimer = 0;
+
+function can(permission) {
+  if (!permission || !state.user || !Array.isArray(state.user.permissions) || !state.user.permissions.length) {
+    return true;
+  }
+
+  return state.user.permissions.some((allowed) => {
+    if (allowed === '*') {
+      return true;
+    }
+    if (allowed === permission) {
+      return true;
+    }
+    if (allowed.endsWith('.*')) {
+      const prefix = allowed.slice(0, -2);
+      return permission === prefix || permission.startsWith(`${prefix}.`);
+    }
+    return false;
+  });
+}
 
 async function api(url, options = {}) {
   const response = await fetch(url, {
@@ -137,7 +172,24 @@ function clearSession() {
 
 function updateSessionPill() {
   const mode = state.health && state.health.persistence ? state.health.persistence.mode : '未连接';
-  els.sessionPill.textContent = state.user ? `${state.user.displayName} · ${mode}` : mode;
+  const role = state.user && state.user.roleName ? ` · ${state.user.roleName}` : '';
+  els.sessionPill.textContent = state.user ? `${state.user.displayName}${role} · ${mode}` : mode;
+}
+
+function updatePermissionUi() {
+  els.navItems.forEach((item) => {
+    const permission = viewPermissions[item.dataset.view];
+    item.hidden = !can(permission);
+  });
+  if (els.closeExpiredOrdersButton) {
+    els.closeExpiredOrdersButton.hidden = !can('orders.write');
+  }
+  if (els.reconciliationButton) {
+    els.reconciliationButton.hidden = !can('dashboard.read');
+  }
+  if (els.exportOrdersButton) {
+    els.exportOrdersButton.hidden = !can('orders.read');
+  }
 }
 
 function showStatus(message, tone = 'success') {
@@ -167,7 +219,8 @@ function getErrorMessage(error) {
     WECHAT_CREDENTIALS_REQUIRED: '缺少微信 AppID/AppSecret，暂不能生成固定码。',
     ADMIN_PASSWORD_INVALID: '当前密码不正确。',
     ADMIN_PASSWORD_WEAK: '新密码强度不足，请使用大小写字母、数字和符号组合。',
-    ADMIN_PASSWORD_REUSED: '新密码不能与当前密码相同。'
+    ADMIN_PASSWORD_REUSED: '新密码不能与当前密码相同。',
+    ADMIN_FORBIDDEN: '当前账号没有执行该操作的权限。'
   };
 
   return messages[error.message] || '操作未完成，请稍后重试。';
@@ -194,6 +247,10 @@ async function runTask(task, successMessage, options = {}) {
 }
 
 function setView(view) {
+  if (!can(viewPermissions[view])) {
+    return;
+  }
+
   state.activeView = view;
   els.viewTitle.textContent = viewTitles[view];
   els.navItems.forEach((item) => {
@@ -608,7 +665,10 @@ function renderProducts() {
                 .map(
                   (sku) => `
                     <form class="sku-row sku-form" data-sku-id="${sku.id}">
-                      <div class="sku-name">${escapeHtml(sku.specName)}</div>
+                      <div class="sku-name">
+                        ${escapeHtml(sku.specName)}
+                        <span class="sku-meta">可售 ${sku.availableStock ?? sku.stock} · 预占 ${sku.reservedStock || 0}</span>
+                      </div>
                       <input name="price" type="number" value="${sku.price}" />
                       <input name="marketPrice" type="number" value="${sku.marketPrice}" />
                       <input name="stock" type="number" value="${sku.stock}" />
@@ -642,6 +702,8 @@ function renderOrders() {
         <th>金额</th>
         <th>状态</th>
         <th>履约</th>
+        <th>收货 / 物流</th>
+        <th>退款</th>
         <th>操作</th>
       </tr>
     </thead>
@@ -655,7 +717,15 @@ function renderOrders() {
               <td>${escapeHtml(order.orderType)}</td>
               <td>¥${order.payAmount}</td>
               <td>${escapeHtml(order.status)}</td>
-              <td>${escapeHtml(order.deliveryStatus)}</td>
+              <td>
+                <div>${escapeHtml(order.deliveryStatus)}</div>
+                <div class="muted-inline">微信发货：${escapeHtml(order.wechatShippingSyncStatus || 'none')}</div>
+              </td>
+              <td>
+                <div>${escapeHtml(order.addressSummary || '-')}</div>
+                <div class="muted-inline">${escapeHtml(order.shippingCompany || '')} ${escapeHtml(order.trackingNo || '')}</div>
+              </td>
+              <td>${escapeHtml(order.refundStatus || (order.refund ? order.refund.status : 'none'))}</td>
               <td>
                 <form class="table-form order-form" data-order-id="${order.id}">
                   <select name="status">
@@ -670,8 +740,19 @@ function renderOrders() {
                       order.deliveryStatus
                     )}
                   </select>
+                  <input name="shippingCompany" placeholder="物流公司" value="${escapeHtml(order.shippingCompany || '')}" />
+                  <input name="trackingNo" placeholder="物流单号" value="${escapeHtml(order.trackingNo || '')}" />
+                  <input name="refundReason" placeholder="退款备注" value="${escapeHtml(order.refund ? order.refund.reason : '')}" />
+                  <label class="inline-check">
+                    <input name="restock" type="checkbox" value="true" />
+                    <span>退款入库</span>
+                  </label>
                   <button type="submit">保存</button>
                 </form>
+                <div class="table-actions">
+                  <button type="button" class="sync-shipping-button" data-order-id="${order.id}">同步微信发货</button>
+                  <button type="button" class="wechat-refund-button" data-order-id="${order.id}">微信退款</button>
+                </div>
               </td>
             </tr>
           `
@@ -1046,6 +1127,43 @@ function bindDynamicEvents() {
     });
   });
 
+  document.querySelectorAll('.sync-shipping-button').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const synced = await runTask(
+        () =>
+          api(`/api/admin/orders/${button.dataset.orderId}/shipping/wechat`, {
+            method: 'POST',
+            body: JSON.stringify({})
+          }),
+        '微信发货同步已提交。'
+      );
+      if (!synced) {
+        return;
+      }
+      await loadData();
+    });
+  });
+
+  document.querySelectorAll('.wechat-refund-button').forEach((button) => {
+    button.addEventListener('click', async () => {
+      if (!window.confirm('确认向微信发起退款？生产环境会调用真实微信退款接口。')) {
+        return;
+      }
+      const refunded = await runTask(
+        () =>
+          api(`/api/admin/orders/${button.dataset.orderId}/refund/wechat`, {
+            method: 'POST',
+            body: JSON.stringify({})
+          }),
+        '微信退款流程已提交。'
+      );
+      if (!refunded) {
+        return;
+      }
+      await loadData();
+    });
+  });
+
   document.querySelectorAll('.grant-membership-form').forEach((form) => {
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -1068,17 +1186,18 @@ function bindDynamicEvents() {
 }
 
 async function loadData() {
+  const maybeApi = (permission, url, fallback) => (can(permission) ? api(url) : Promise.resolve(fallback));
   const [health, dashboard, wines, wineries, tracks, codes, products, orders, members, auditLogs, storeHome] = await Promise.all([
     api('/api/health'),
-    api('/api/admin/dashboard'),
-    api('/api/admin/wines'),
-    api('/api/admin/wineries'),
-    api('/api/admin/tracks'),
-    api('/api/admin/codes'),
-    api('/api/admin/products'),
-    api('/api/admin/orders'),
-    api('/api/admin/memberships'),
-    api('/api/admin/audit-logs'),
+    maybeApi('dashboard.read', '/api/admin/dashboard', null),
+    maybeApi('wines.read', '/api/admin/wines', { items: [] }),
+    maybeApi('wineries.read', '/api/admin/wineries', { items: [] }),
+    maybeApi('tracks.read', '/api/admin/tracks', { items: [] }),
+    maybeApi('codes.read', '/api/admin/codes', { items: [] }),
+    maybeApi('products.read', '/api/admin/products', { items: [] }),
+    maybeApi('orders.read', '/api/admin/orders', { items: [] }),
+    maybeApi('memberships.read', '/api/admin/memberships', { items: [] }),
+    maybeApi('audit.read', '/api/admin/audit-logs', { items: [] }),
     api('/api/store/home')
   ]);
 
@@ -1095,6 +1214,7 @@ async function loadData() {
   state.membershipPlans = storeHome.membershipPlans || [];
 
   updateSessionPill();
+  updatePermissionUi();
 
   renderDashboard();
   renderWines();
@@ -1106,6 +1226,13 @@ async function loadData() {
   renderMembers();
   renderAuditLogs();
   bindDynamicEvents();
+
+  if (!can(viewPermissions[state.activeView])) {
+    const firstAllowed = Object.keys(viewTitles).find((view) => can(viewPermissions[view]));
+    if (firstAllowed) {
+      setView(firstAllowed);
+    }
+  }
 }
 
 async function login(username, password) {
@@ -1214,6 +1341,41 @@ els.fixedQrcodeButton.addEventListener('click', async () => {
 
 els.exportCodesButton.addEventListener('click', () => {
   window.open('/api/admin/codes/export', '_blank');
+});
+
+els.exportOrdersButton.addEventListener('click', () => {
+  window.open('/api/admin/orders/export', '_blank');
+});
+
+els.reconciliationButton.addEventListener('click', async () => {
+  const payload = await runTask(() => api('/api/admin/reports/reconciliation'), null);
+
+  if (!payload) {
+    return;
+  }
+
+  const summary = (payload.report && payload.report.summary) || {};
+  showStatus(
+    `对账完成：${summary.paidOrders || 0} 笔已支付，${summary.pendingRefunds || 0} 笔退款处理中，${summary.anomalies || 0} 个异常。`,
+    summary.anomalies ? 'error' : 'success'
+  );
+});
+
+els.closeExpiredOrdersButton.addEventListener('click', async () => {
+  const payload = await runTask(
+    () =>
+      api('/api/admin/orders/close-expired', {
+        method: 'POST',
+        body: JSON.stringify({})
+      }),
+    '超时订单已检查。'
+  );
+
+  if (!payload) {
+    return;
+  }
+
+  await loadData();
 });
 
 (async function init() {

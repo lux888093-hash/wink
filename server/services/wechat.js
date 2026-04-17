@@ -86,7 +86,38 @@ async function generateMiniProgramCode({ scene, token, page }) {
   };
 }
 
+async function callMiniProgramApi(apiPath, body) {
+  const accessToken = await getAccessToken();
+  const separator = apiPath.includes('?') ? '&' : '?';
+  const response = await fetch(
+    `https://api.weixin.qq.com${apiPath}${separator}access_token=${accessToken}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body || {})
+    }
+  );
+  const payload = await response.json();
+
+  if (!response.ok || payload.errcode) {
+    const error = new Error(payload.errmsg || 'WECHAT_MINIAPP_API_FAILED');
+    error.meta = payload;
+    throw error;
+  }
+
+  return payload;
+}
+
+async function uploadShippingInfo(payload) {
+  return callMiniProgramApi('/wxa/sec/order/upload_shipping_info', payload);
+}
+
 module.exports = {
+  callMiniProgramApi,
+  getAccessToken,
   hasWechatCredentials,
-  generateMiniProgramCode
+  generateMiniProgramCode,
+  uploadShippingInfo
 };

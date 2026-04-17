@@ -6,13 +6,16 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "test": "node tests/stage0-stage1.test.js"
+    "test": "node tests/stage0-stage1.test.js && node tests/stage2-stage3.test.js && node tests/stage4.test.js && node tests/stage5.test.js && node tests/stage6-production.test.js",
+    "backup": "node tools/backup-store.js",
+    "check": "node --check index.js && node --check services/store.js && node --check services/config.js && node --check services/db-postgres-worker.js && node --check services/redis-client.js && node --check services/wechat-pay.js && node --check services/wechat.js && node --check tools/backup-store.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^4.21.2",
     "pg": "^8.20.0",
-    "pg-mem": "^3.0.14"
+    "pg-mem": "^3.0.14",
+    "redis": "^4.7.1"
   }
 }

@@ -1,4 +1,5 @@
 const { request } = require('../../utils/api');
+const { isPaymentCancelled, payPendingOrder, randomKey } = require('../../utils/payment');
 
 Page({
   data: {
@@ -63,17 +64,25 @@ Page({
     }
   },
 
+  async payRightsOrder(order, idempotencyKey) {
+    const result = await payPendingOrder(order, { idempotencyKey });
+    return result.order;
+  },
+
   async purchasePlan(event) {
     const { planId } = event.currentTarget.dataset;
+    const idempotencyKey = randomKey('membership');
 
     try {
-      await request({
+      const created = await request({
         url: '/api/member/purchase',
         method: 'POST',
         data: {
-          planId
+          planId,
+          clientRequestId: idempotencyKey
         }
       });
+      await this.payRightsOrder(created.order, idempotencyKey);
       wx.showToast({
         title: '会员已开通',
         icon: 'none'
@@ -81,7 +90,7 @@ Page({
       this.loadPage();
     } catch (error) {
       wx.showToast({
-        title: '开通失败',
+        title: isPaymentCancelled(error) ? '已取消支付' : '开通失败',
         icon: 'none'
       });
     }
@@ -89,15 +98,20 @@ Page({
 
   async unlockTrack(event) {
     const { trackId } = event.currentTarget.dataset;
+    const idempotencyKey = randomKey('track');
 
     try {
-      await request({
+      const created = await request({
         url: `/api/tracks/${trackId}/unlock`,
         method: 'POST',
         data: {
-          action: 'purchase'
+          action: 'purchase',
+          clientRequestId: idempotencyKey
         }
       });
+      if (created.paymentRequired && created.order) {
+        await this.payRightsOrder(created.order, idempotencyKey);
+      }
       wx.showToast({
         title: '已解锁下载权益',
         icon: 'none'
@@ -105,7 +119,7 @@ Page({
       this.loadPage();
     } catch (error) {
       wx.showToast({
-        title: '解锁失败',
+        title: isPaymentCancelled(error) ? '已取消支付' : '解锁失败',
         icon: 'none'
       });
     }

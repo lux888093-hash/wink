@@ -108,6 +108,21 @@ create index if not exists idx_users_status on users(status);
 create index if not exists idx_users_ref1 on users(ref1);
 create index if not exists idx_users_ref2 on users(ref2);
 
+create table if not exists user_addresses (
+  id text primary key,
+  label text,
+  status text,
+  ref1 text,
+  ref2 text,
+  sort_order numeric,
+  time1 timestamptz,
+  time2 timestamptz,
+  payload jsonb not null
+);
+create index if not exists idx_user_addresses_status on user_addresses(status);
+create index if not exists idx_user_addresses_ref1 on user_addresses(ref1);
+create index if not exists idx_user_addresses_ref2 on user_addresses(ref2);
+
 create table if not exists membership_plans (
   id text primary key,
   label text,
@@ -288,6 +303,21 @@ create index if not exists idx_payments_status on payments(status);
 create index if not exists idx_payments_ref1 on payments(ref1);
 create index if not exists idx_payments_ref2 on payments(ref2);
 
+create table if not exists refunds (
+  id text primary key,
+  label text,
+  status text,
+  ref1 text,
+  ref2 text,
+  sort_order numeric,
+  time1 timestamptz,
+  time2 timestamptz,
+  payload jsonb not null
+);
+create index if not exists idx_refunds_status on refunds(status);
+create index if not exists idx_refunds_ref1 on refunds(ref1);
+create index if not exists idx_refunds_ref2 on refunds(ref2);
+
 create table if not exists admin_roles (
   id text primary key,
   label text,
@@ -347,3 +377,6 @@ create table if not exists audit_logs (
 create index if not exists idx_audit_logs_status on audit_logs(status);
 create index if not exists idx_audit_logs_ref1 on audit_logs(ref1);
 create index if not exists idx_audit_logs_ref2 on audit_logs(ref2);
+
+create unique index if not exists idx_scan_codes_redeem_code_unique on scan_codes(ref1);
+create unique index if not exists idx_orders_order_no_unique on orders(label);

@@ -7,6 +7,7 @@ Page({
     product: null,
     selectedSkuId: '',
     selectedSku: null,
+    canBuy: false,
     cartCount: 0,
     errorTitle: '',
     errorMessage: ''
@@ -48,6 +49,7 @@ Page({
         product: productPayload.product,
         selectedSkuId: selectedSku ? selectedSku.id : '',
         selectedSku,
+        canBuy: Boolean(selectedSku && selectedSku.availableStock > 0),
         cartCount: cartPayload.cart.totalCount || 0
       });
     } catch (error) {
@@ -71,12 +73,17 @@ Page({
 
     this.setData({
       selectedSkuId: sku.id,
-      selectedSku: sku
+      selectedSku: sku,
+      canBuy: sku.availableStock > 0
     });
   },
 
   async addToCart() {
-    if (!this.data.selectedSkuId) {
+    if (!this.data.selectedSkuId || !this.data.canBuy) {
+      wx.showToast({
+        title: '当前规格暂无库存',
+        icon: 'none'
+      });
       return;
     }
 

@@ -1,18 +1,5 @@
 const { request } = require('../../utils/api');
-
-function randomKey(prefix) {
-  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
-}
-
-function requestPayment(paymentParams) {
-  return new Promise((resolve, reject) => {
-    wx.requestPayment({
-      ...paymentParams,
-      success: resolve,
-      fail: reject
-    });
-  });
-}
+const { isPaymentCancelled, payPendingOrder, randomKey } = require('../../utils/payment');
 
 function mapDeliveryStatus(status) {
   return (
@@ -43,6 +30,14 @@ Page({
     loading: true,
     ready: false,
     cart: null,
+    address: {
+      contactName: '',
+      mobile: '',
+      provinceCity: '',
+      detail: '',
+      deliveryNote: ''
+    },
+    saveAddress: true,
     submitting: false,
     successOrder: null,
     errorTitle: '',
@@ -57,11 +52,32 @@ Page({
     this.setData({ loading: true, errorTitle: '', errorMessage: '' });
 
     try {
-      const payload = await request({ url: '/api/cart' });
+      const [payload, addressesPayload] = await Promise.all([
+        request({ url: '/api/cart' }),
+        request({ url: '/api/addresses' })
+      ]);
+      const defaultAddress =
+        (addressesPayload.items || []).find((item) => item.isDefault) ||
+        (addressesPayload.items || [])[0] ||
+        {
+          contactName: '',
+          mobile: '',
+          provinceCity: '上海市静安区',
+          detail: '',
+          deliveryNote: ''
+        };
+
       this.setData({
         loading: false,
         ready: true,
-        cart: payload.cart
+        cart: payload.cart,
+        address: {
+          contactName: defaultAddress.contactName || '',
+          mobile: defaultAddress.mobile || '',
+          provinceCity: defaultAddress.provinceCity || '',
+          detail: defaultAddress.detail || '',
+          deliveryNote: defaultAddress.deliveryNote || ''
+        }
       });
     } catch (error) {
       this.setData({
@@ -73,24 +89,36 @@ Page({
     }
   },
 
-  async pollPaymentStatus(orderId, maxAttempts = 8) {
-    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
-      const payload = await request({
-        url: `/api/payments/orders/${orderId}/status?refresh=1`
-      });
-
-      if (payload.paid) {
-        return payload.order;
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+  bindAddressInput(event) {
+    const field = event.currentTarget.dataset.field;
+    if (!field) {
+      return;
     }
 
-    throw new Error('PAYMENT_STATUS_TIMEOUT');
+    this.setData({
+      [`address.${field}`]: event.detail.value
+    });
+  },
+
+  validateAddress() {
+    const address = this.data.address || {};
+    if (!address.contactName || !address.mobile || !address.provinceCity || !address.detail) {
+      wx.showToast({
+        title: '请补全收货信息',
+        icon: 'none'
+      });
+      return false;
+    }
+
+    return true;
   },
 
   async submitOrder() {
     if (!this.data.cart || !this.data.cart.items.length || this.data.submitting) {
+      return;
+    }
+
+    if (!this.validateAddress()) {
       return;
     }
 
@@ -102,54 +130,28 @@ Page({
         url: '/api/orders',
         method: 'POST',
         data: {
-          addressSummary: '上海市静安区 · 演示收货地址',
+          address: this.data.address,
+          saveAddress: this.data.saveAddress,
           clientRequestId: idempotencyKey
         }
       });
       getApp().setCartCount(created.cart.totalCount || 0);
 
-      const launched = await request({
-        url: `/api/payments/orders/${created.order.id}/jsapi`,
-        method: 'POST',
-        data: {
-          idempotencyKey
-        }
-      });
-
-      if (launched.mode === 'mock') {
-        getApp().setCartCount(launched.cart.totalCount || 0);
-        this.setData({
-          successOrder: normalizeOrder(launched.order),
-          cart: launched.cart,
-          submitting: false
-        });
-        return;
-      }
-
-      if (launched.mode === 'paid') {
-        getApp().setCartCount(0);
-        this.setData({
-          successOrder: normalizeOrder(launched.order),
-          cart: { items: [], totalCount: 0, totalAmount: 0 },
-          submitting: false
-        });
-        return;
-      }
-
-      await requestPayment(launched.paymentParams);
-      const paidOrder = await this.pollPaymentStatus(created.order.id);
-      getApp().setCartCount(0);
+      const paidPayload = await payPendingOrder(created.order, { idempotencyKey });
+      const paidOrder = paidPayload.order;
+      const nextCart = paidPayload.cart || { items: [], totalCount: 0, totalAmount: 0 };
+      getApp().setCartCount(nextCart.totalCount || 0);
 
       this.setData({
         successOrder: normalizeOrder(paidOrder),
-        cart: { items: [], totalCount: 0, totalAmount: 0 },
+        cart: nextCart,
         submitting: false
       });
     } catch (error) {
       this.setData({ submitting: false });
       wx.showToast({
         title:
-          error.message === 'requestPayment:fail cancel'
+          isPaymentCancelled(error)
             ? '已取消支付'
             : error.message === 'SKU_STOCK_NOT_ENOUGH'
               ? '库存不足'

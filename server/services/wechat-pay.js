@@ -165,9 +165,37 @@ async function createJsapiTransaction(input) {
   };
 }
 
+async function createRefund(input) {
+  const body = {
+    out_trade_no: input.outTradeNo,
+    out_refund_no: input.outRefundNo,
+    reason: input.reason || '',
+    notify_url: input.notifyUrl || runtimeConfig.wechatPayRefundNotifyUrl,
+    amount: {
+      refund: input.refundFen,
+      total: input.totalFen,
+      currency: 'CNY'
+    }
+  };
+
+  if (input.transactionId) {
+    body.transaction_id = input.transactionId;
+  }
+
+  if (!body.notify_url) {
+    throw new Error('WECHATPAY_REFUND_NOTIFY_URL_REQUIRED');
+  }
+
+  return wechatPayRequest('POST', '/v3/refund/domestic/refunds', body);
+}
+
 async function queryTransactionByOutTradeNo(outTradeNo) {
   const requestPath = `/v3/pay/transactions/out-trade-no/${encodeURIComponent(outTradeNo)}?mchid=${encodeURIComponent(runtimeConfig.wechatPayMerchantId)}`;
   return wechatPayRequest('GET', requestPath);
+}
+
+async function queryRefundByOutRefundNo(outRefundNo) {
+  return wechatPayRequest('GET', `/v3/refund/domestic/refunds/${encodeURIComponent(outRefundNo)}`);
 }
 
 function verifyWechatpaySignature(headers, rawBody) {
@@ -226,8 +254,10 @@ function decryptWechatpayResource(resource) {
 module.exports = {
   createMiniProgramPaymentParams,
   createJsapiTransaction,
+  createRefund,
   decryptWechatpayResource,
   hasWechatPayCredentials,
+  queryRefundByOutRefundNo,
   queryTransactionByOutTradeNo,
   verifyWechatpaySignature
 };

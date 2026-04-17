@@ -117,6 +117,7 @@ const runtimeConfig = {
   wechatPayMerchantSerialNo: process.env.WECHATPAY_MCH_SERIAL_NO || '',
   wechatPayPrivateKeyPath: parsePath(process.env.WECHATPAY_PRIVATE_KEY_PATH),
   wechatPayNotifyUrl: process.env.WECHATPAY_NOTIFY_URL || '',
+  wechatPayRefundNotifyUrl: process.env.WECHATPAY_REFUND_NOTIFY_URL || '',
   wechatPayApiV3Key: process.env.WECHATPAY_API_V3_KEY || '',
   wechatPayCallbackToleranceSeconds: parseInteger(
     process.env.WECHATPAY_CALLBACK_TOLERANCE_SECONDS,
@@ -127,7 +128,18 @@ const runtimeConfig = {
     }
   ),
   wechatPayPlatformPublicKeyPath: parsePath(process.env.WECHATPAY_PLATFORM_PUBLIC_KEY_PATH),
-  wechatPayPlatformCertPath: parsePath(process.env.WECHATPAY_PLATFORM_CERT_PATH)
+  wechatPayPlatformCertPath: parsePath(process.env.WECHATPAY_PLATFORM_CERT_PATH),
+  redisUrl: process.env.REDIS_URL || '',
+  objectStorageBaseUrl: process.env.OBJECT_STORAGE_BASE_URL || '',
+  cdnBaseUrl: process.env.CDN_BASE_URL || '',
+  cdnSigningSecret: process.env.CDN_SIGNING_SECRET || '',
+  cdnSignedUrlTtlSeconds: parseInteger(process.env.CDN_SIGNED_URL_TTL_SECONDS, 15 * 60, {
+    min: 60,
+    max: 24 * 60 * 60
+  }),
+  mediaDeliveryMode: String(process.env.MEDIA_DELIVERY_MODE || 'local').toLowerCase(),
+  backupDir: parsePath(process.env.BACKUP_DIR, 'data/backups'),
+  logDir: parsePath(process.env.LOG_DIR, 'logs')
 };
 
 function getRuntimeWarnings() {
@@ -167,6 +179,7 @@ function getRuntimeWarnings() {
       !runtimeConfig.wechatPayMerchantSerialNo ||
       !runtimeConfig.wechatPayPrivateKeyPath ||
       !runtimeConfig.wechatPayNotifyUrl ||
+      !runtimeConfig.wechatPayRefundNotifyUrl ||
       !runtimeConfig.wechatPayApiV3Key ||
       (!runtimeConfig.wechatPayPlatformPublicKeyPath && !runtimeConfig.wechatPayPlatformCertPath))
   ) {
@@ -183,7 +196,107 @@ function getRuntimeWarnings() {
   return warnings;
 }
 
+function getReadinessChecks(extra = {}) {
+  const checks = [
+    {
+      key: 'app_env',
+      ok: runtimeConfig.isProduction,
+      severity: 'required',
+      message: runtimeConfig.isProduction ? 'APP_ENV is production.' : 'APP_ENV is not production.'
+    },
+    {
+      key: 'https_base_url',
+      ok: /^https:\/\//i.test(runtimeConfig.miniprogramBaseUrl),
+      severity: 'required',
+      message: 'MINIPROGRAM_BASE_URL must be an HTTPS production domain.'
+    },
+    {
+      key: 'cors',
+      ok: runtimeConfig.corsAllowedOrigins.length > 0 && !runtimeConfig.corsAllowedOrigins.includes('*'),
+      severity: 'required',
+      message: 'CORS_ALLOWED_ORIGINS must list explicit production origins.'
+    },
+    {
+      key: 'database',
+      ok: Boolean(
+        runtimeConfig.databaseUrl ||
+          (runtimeConfig.postgresHost && runtimeConfig.postgresDatabase && runtimeConfig.postgresUser)
+      ),
+      severity: 'required',
+      message: 'Real PostgreSQL connection must be configured.'
+    },
+    {
+      key: 'admin_secret',
+      ok:
+        runtimeConfig.adminSessionPepper !== 'replace-this-pepper-in-production' &&
+        Boolean(runtimeConfig.adminBootstrapPassword),
+      severity: 'required',
+      message: 'Admin session pepper and bootstrap password must be configured.'
+    },
+    {
+      key: 'miniapp_login',
+      ok:
+        runtimeConfig.miniappSessionSecret !== 'replace-this-miniapp-secret' &&
+        Boolean(runtimeConfig.wechatAppId && runtimeConfig.wechatAppSecret),
+      severity: 'required',
+      message: 'Mini-program login secrets must be configured.'
+    },
+    {
+      key: 'wechat_pay',
+      ok: Boolean(
+        runtimeConfig.wechatPayMerchantId &&
+          runtimeConfig.wechatPayMerchantSerialNo &&
+          runtimeConfig.wechatPayPrivateKeyPath &&
+          runtimeConfig.wechatPayNotifyUrl &&
+          runtimeConfig.wechatPayRefundNotifyUrl &&
+          runtimeConfig.wechatPayApiV3Key &&
+          (runtimeConfig.wechatPayPlatformPublicKeyPath || runtimeConfig.wechatPayPlatformCertPath)
+      ),
+      severity: 'required',
+      message: 'WeChat Pay merchant configuration must be complete.'
+    },
+    {
+      key: 'dev_reset',
+      ok: !runtimeConfig.enableDevReset,
+      severity: 'required',
+      message: 'ENABLE_DEV_RESET must be false in production.'
+    },
+    {
+      key: 'redis',
+      ok: Boolean(runtimeConfig.redisUrl),
+      severity: 'recommended',
+      message: 'REDIS_URL is recommended for distributed rate limits and short-lived tickets.'
+    },
+    {
+      key: 'object_storage',
+      ok: Boolean(runtimeConfig.objectStorageBaseUrl && runtimeConfig.cdnBaseUrl),
+      severity: 'recommended',
+      message: 'Object storage and CDN are recommended for production media delivery.'
+    },
+    {
+      key: 'cdn_signed_url',
+      ok: Boolean(runtimeConfig.mediaDeliveryMode !== 'cdn' || runtimeConfig.cdnSigningSecret),
+      severity: 'recommended',
+      message: 'CDN signing secret is recommended when MEDIA_DELIVERY_MODE=cdn.'
+    },
+    {
+      key: 'backup_dir',
+      ok: Boolean(runtimeConfig.backupDir),
+      severity: 'required',
+      message: 'BACKUP_DIR must be configured for snapshot backups.'
+    },
+    ...((extra && extra.checks) || [])
+  ];
+  const required = checks.filter((item) => item.severity === 'required');
+
+  return {
+    ready: required.every((item) => item.ok),
+    checks
+  };
+}
+
 module.exports = {
+  getReadinessChecks,
   getRuntimeWarnings,
   runtimeConfig
 };

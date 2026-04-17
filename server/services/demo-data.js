@@ -635,6 +635,32 @@ function createSeedStore() {
         preferredTheme: 'reserve'
       }
     ],
+    userAddresses: [
+      {
+        id: 'addr_demo_guest_default',
+        userId: guestId,
+        contactName: '月光访客',
+        mobile: '13800000000',
+        provinceCity: '上海市静安区',
+        detail: '鸿玖会所演示地址',
+        deliveryNote: '工作日 18:00 后配送',
+        isDefault: true,
+        createdAt: shiftDays(-1),
+        updatedAt: shiftDays(-1)
+      },
+      {
+        id: 'addr_demo_member_default',
+        userId: memberId,
+        contactName: '藏香会员',
+        mobile: '13800000088',
+        provinceCity: '上海市静安区',
+        detail: '会员会所专送地址',
+        deliveryNote: '提前电话确认',
+        isDefault: true,
+        createdAt: shiftDays(-15),
+        updatedAt: shiftDays(-15)
+      }
+    ],
     membershipPlans: [
       {
         id: 'plan_quarter',
@@ -795,8 +821,22 @@ function createSeedStore() {
         status: 'paid',
         paidAt: shiftDays(-3),
         createdAt: shiftDays(-3),
+        expiresAt: shiftDays(-3),
         deliveryStatus: 'delivering',
-        addressSummary: '上海市静安区 · 会所专送'
+        addressSummary: '上海市静安区 · 会所专送',
+        address: {
+          contactName: '藏香会员',
+          mobile: '13800000088',
+          provinceCity: '上海市静安区',
+          detail: '会员会所专送地址',
+          deliveryNote: '提前电话确认'
+        },
+        stockReserved: false,
+        shippingCompany: '顺丰速运',
+        trackingNo: 'SF20260410001',
+        shippedAt: shiftDays(-2),
+        completedAt: null,
+        refundStatus: 'none'
       },
       {
         id: 'order_seed_music_01',
@@ -808,8 +848,11 @@ function createSeedStore() {
         status: 'completed',
         paidAt: shiftDays(-4),
         createdAt: shiftDays(-4),
+        expiresAt: shiftDays(-4),
         deliveryStatus: 'downloaded',
-        addressSummary: '数字权益发放'
+        addressSummary: '数字权益发放',
+        stockReserved: false,
+        refundStatus: 'none'
       }
     ],
     orderItems: [
@@ -851,6 +894,7 @@ function createSeedStore() {
         callbackPayload: { note: 'seed payment' }
       }
     ],
+    refunds: [],
     adminRoles: [
       {
         id: 'role_super_admin',
@@ -860,7 +904,43 @@ function createSeedStore() {
       {
         id: 'role_ops',
         name: '运营管理员',
-        permissions: ['dashboard.read', 'wines.read', 'wines.write', 'codes.read', 'codes.write']
+        permissions: [
+          'dashboard.read',
+          'wines.read',
+          'wines.write',
+          'wineries.read',
+          'wineries.write',
+          'tracks.read',
+          'tracks.write',
+          'codes.read',
+          'codes.write',
+          'audit.read'
+        ]
+      },
+      {
+        id: 'role_product',
+        name: '商品管理员',
+        permissions: [
+          'dashboard.read',
+          'products.read',
+          'products.write',
+          'orders.read',
+          'orders.write',
+          'orders.refund'
+        ]
+      },
+      {
+        id: 'role_support',
+        name: '客服管理员',
+        permissions: [
+          'dashboard.read',
+          'codes.read',
+          'orders.read',
+          'orders.write',
+          'memberships.read',
+          'memberships.grant',
+          'audit.read'
+        ]
       }
     ],
     adminUsers: [

@@ -1,7 +1,10 @@
 /server/node_modules/
 /server/logs/
 /server/runtime-logs/
+/server/*.log
+/server/data/backups/
 /downloads/
+/sam音乐.zip
 /server/.env
 /server/data/db-snapshot.json
 /miniprogram/project.private.config.json

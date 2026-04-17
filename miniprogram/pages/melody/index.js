@@ -1,6 +1,7 @@
 const { getBaseUrl, request } = require('../../utils/api');
 const { getCurrentExperience } = require('../../utils/session');
 const { formatSeconds } = require('../../utils/format');
+const { isPaymentCancelled, payPendingOrder, randomKey } = require('../../utils/payment');
 
 let audioContext = null;
 const DEFAULT_FEATURED_TRACK_ID = 'track_quiet_world';
@@ -302,14 +303,22 @@ Page({
       return;
     }
 
+    const idempotencyKey = randomKey('track');
+
     try {
-      await request({
+      const created = await request({
         url: `/api/tracks/${this.data.currentTrack.id}/unlock`,
         method: 'POST',
         data: {
-          action: 'purchase'
+          action: 'purchase',
+          clientRequestId: idempotencyKey
         }
       });
+
+      if (created.paymentRequired && created.order) {
+        await payPendingOrder(created.order, { idempotencyKey });
+      }
+
       wx.showToast({
         title: '已解锁完整播放与下载',
         icon: 'none'
@@ -317,7 +326,7 @@ Page({
       this.loadContext();
     } catch (error) {
       wx.showToast({
-        title: '解锁失败',
+        title: isPaymentCancelled(error) ? '已取消支付' : '解锁失败',
         icon: 'none'
       });
     }

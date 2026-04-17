@@ -11,8 +11,44 @@
           <text class="eyebrow">DELIVERY</text>
           <text class="order-delivery-tag">会所专送</text>
         </view>
-        <text class="section-title">上海静安 · 预约送达</text>
-        <text class="micro-copy">地址簿与配送时段接入后，这里保持同样的轻量布局。</text>
+        <text class="section-title">收货信息</text>
+        <view class="address-form">
+          <input
+            class="address-input"
+            placeholder="收货人"
+            value="{{address.contactName}}"
+            data-field="contactName"
+            bindinput="bindAddressInput"
+          />
+          <input
+            class="address-input"
+            placeholder="手机号"
+            value="{{address.mobile}}"
+            data-field="mobile"
+            bindinput="bindAddressInput"
+          />
+          <input
+            class="address-input full-row"
+            placeholder="省市区"
+            value="{{address.provinceCity}}"
+            data-field="provinceCity"
+            bindinput="bindAddressInput"
+          />
+          <input
+            class="address-input full-row"
+            placeholder="详细地址"
+            value="{{address.detail}}"
+            data-field="detail"
+            bindinput="bindAddressInput"
+          />
+          <input
+            class="address-input full-row"
+            placeholder="配送备注，可选"
+            value="{{address.deliveryNote}}"
+            data-field="deliveryNote"
+            bindinput="bindAddressInput"
+          />
+        </view>
       </view>
 
       <view class="section-panel order-list">
@@ -56,6 +92,10 @@
         <view class="success-meta-row">
           <text class="success-meta-label">履约状态</text>
           <text class="success-meta-value">{{successOrder.deliveryStatusLabel}}</text>
+        </view>
+        <view class="success-meta-row">
+          <text class="success-meta-label">收货地址</text>
+          <text class="success-meta-value">{{successOrder.addressSummary}}</text>
         </view>
       </view>
 

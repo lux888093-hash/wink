@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const { AsyncLocalStorage } = require('async_hooks');
 const {
   DEFAULT_ADMIN_PASSWORD,
   DEFAULT_USER_ID,
@@ -20,6 +21,57 @@ const {
   verifyPasswordHash
 } = require('./security');
 
+const auditContext = new AsyncLocalStorage();
+
+const DEFAULT_ADMIN_ROLES = [
+  {
+    id: 'role_super_admin',
+    name: '超级管理员',
+    permissions: ['*']
+  },
+  {
+    id: 'role_ops',
+    name: '运营管理员',
+    permissions: [
+      'dashboard.read',
+      'wines.read',
+      'wines.write',
+      'wineries.read',
+      'wineries.write',
+      'tracks.read',
+      'tracks.write',
+      'codes.read',
+      'codes.write',
+      'audit.read'
+    ]
+  },
+  {
+    id: 'role_product',
+    name: '商品管理员',
+    permissions: [
+      'dashboard.read',
+      'products.read',
+      'products.write',
+      'orders.read',
+      'orders.write',
+      'orders.refund'
+    ]
+  },
+  {
+    id: 'role_support',
+    name: '客服管理员',
+    permissions: [
+      'dashboard.read',
+      'codes.read',
+      'orders.read',
+      'orders.write',
+      'memberships.read',
+      'memberships.grant',
+      'audit.read'
+    ]
+  }
+];
+
 function createAppError(code, statusCode = 400, meta = null) {
   const error = new Error(code);
   error.statusCode = statusCode;
@@ -37,6 +89,12 @@ function plusDays(days) {
   return value.toISOString();
 }
 
+function plusDaysFrom(baseIso, days) {
+  const value = new Date(baseIso || Date.now());
+  value.setDate(value.getDate() + days);
+  return value.toISOString();
+}
+
 function plusMinutes(minutes) {
   const value = new Date();
   value.setMinutes(value.getMinutes() + minutes);
@@ -45,6 +103,42 @@ function plusMinutes(minutes) {
 
 function randomId(prefix) {
   return `${prefix}_${crypto.randomBytes(6).toString('base64url')}`;
+}
+
+function withAuditContext(context, handler) {
+  return auditContext.run(context || {}, handler);
+}
+
+function ensureAdminRoles(store) {
+  let changed = false;
+
+  if (!Array.isArray(store.adminRoles)) {
+    store.adminRoles = [];
+    changed = true;
+  }
+
+  DEFAULT_ADMIN_ROLES.forEach((defaultRole) => {
+    const existing = store.adminRoles.find((role) => role.id === defaultRole.id);
+
+    if (!existing) {
+      store.adminRoles.push({ ...defaultRole });
+      changed = true;
+      return;
+    }
+
+    const permissions = new Set([...(existing.permissions || []), ...defaultRole.permissions]);
+    if (permissions.size !== (existing.permissions || []).length) {
+      existing.permissions = [...permissions];
+      changed = true;
+    }
+
+    if (!existing.name) {
+      existing.name = defaultRole.name;
+      changed = true;
+    }
+  });
+
+  return changed;
 }
 
 function ensureStoreFile() {
@@ -240,6 +334,7 @@ function cleanupAdminSessions(store) {
 
 function applyRuntimeSecurityPolicies(store) {
   let changed = cleanupAdminSessions(store);
+  changed = ensureAdminRoles(store) || changed;
   const primaryAdmin = store.adminUsers.find((item) => item.username === DEFAULT_ADMIN_USERNAME);
 
   if (
@@ -362,6 +457,10 @@ function getOrderById(store, orderId) {
   return store.orders.find((order) => order.id === orderId);
 }
 
+function getOrderItems(store, orderId) {
+  return store.orderItems.filter((item) => item.orderId === orderId);
+}
+
 function getScanSessionById(store, sessionId) {
   return store.scanSessions.find((session) => session.id === sessionId);
 }
@@ -403,6 +502,81 @@ function buildUserSummary(store, userId) {
     memberExpireAt: membership && membership.isActive ? membership.expireAt : null,
     tierLabel: membership && membership.isActive ? membership.plan.name : '普通用户'
   };
+}
+
+function getReservedStock(sku) {
+  return Math.max(0, Number(sku && sku.reservedStock) || 0);
+}
+
+function getAvailableStock(sku) {
+  return Math.max(0, (Number(sku && sku.stock) || 0) - getReservedStock(sku));
+}
+
+function buildAddressSummary(address) {
+  if (!address) {
+    return '';
+  }
+
+  return [address.provinceCity, address.detail]
+    .filter(Boolean)
+    .join(' · ')
+    .slice(0, 200);
+}
+
+function normalizeAddressInput(payload = {}, options = {}) {
+  const contactName = ensureText(payload.contactName, {
+    field: 'contactName',
+    required: options.required,
+    min: 2,
+    max: 40,
+    defaultValue: ''
+  });
+  const mobile = ensureText(payload.mobile, {
+    field: 'mobile',
+    required: options.required,
+    min: 6,
+    max: 30,
+    defaultValue: ''
+  });
+  const provinceCity = ensureText(payload.provinceCity, {
+    field: 'provinceCity',
+    required: options.required,
+    min: 2,
+    max: 80,
+    defaultValue: ''
+  });
+  const detail = ensureText(payload.detail, {
+    field: 'detail',
+    required: options.required,
+    min: 4,
+    max: 160,
+    defaultValue: ''
+  });
+
+  if (mobile && !/^[0-9+\-\s]{6,30}$/.test(mobile)) {
+    throw createValidationError('mobile', 'invalid_mobile');
+  }
+
+  return {
+    contactName,
+    mobile,
+    provinceCity,
+    detail,
+    deliveryNote: ensureText(payload.deliveryNote, {
+      field: 'deliveryNote',
+      min: 0,
+      max: 120,
+      defaultValue: ''
+    })
+  };
+}
+
+function getDefaultAddress(store, userId) {
+  return (
+    store.userAddresses.find((item) => item.userId === userId && item.isDefault) ||
+    store.userAddresses.find((item) => item.userId === userId) ||
+    null
+  );
 }
 
 function upsertMiniappUser(payload = {}) {
@@ -594,6 +768,9 @@ function buildCartSummary(store, userId) {
         specName: sku.specName,
         price: sku.price,
         marketPrice: sku.marketPrice,
+        stock: sku.stock,
+        reservedStock: getReservedStock(sku),
+        availableStock: getAvailableStock(sku),
         lineAmount: sku.price * item.quantity
       };
     })
@@ -619,7 +796,12 @@ function buildProductCard(store, productId) {
   const wine = getWineById(store, product.wineId);
   const skus = store.productSkus
     .filter((sku) => sku.productId === product.id && sku.status === 'published')
-    .sort((left, right) => left.price - right.price);
+    .sort((left, right) => left.price - right.price)
+    .map((sku) => ({
+      ...sku,
+      reservedStock: getReservedStock(sku),
+      availableStock: getAvailableStock(sku)
+    }));
   const lowestPrice = skus.length ? skus[0].price : 0;
 
   return {
@@ -681,13 +863,29 @@ function slugifyId(value, fallbackPrefix) {
   return randomId(fallbackPrefix || 'item');
 }
 
-function writeAudit(store, action, target, actor = 'system') {
+function writeAudit(store, action, target, actor = 'system', meta = null) {
+  const context = auditContext.getStore() || {};
+  const resolvedActor =
+    actor === DEFAULT_ADMIN_USERNAME && context.adminUsername
+      ? context.adminUsername
+      : actor;
+
   store.auditLogs.unshift({
     id: randomId('audit'),
-    actor,
+    actor: resolvedActor,
     action,
     target,
-    createdAt: nowIso()
+    createdAt: nowIso(),
+    ...(context.requestId || context.ip || context.userAgent || meta
+      ? {
+          meta: {
+            ...(meta || {}),
+            ...(context.requestId ? { requestId: context.requestId } : {}),
+            ...(context.ip ? { ip: context.ip } : {}),
+            ...(context.userAgent ? { userAgent: context.userAgent } : {})
+          }
+        }
+      : {})
   });
 }
 
@@ -1048,6 +1246,86 @@ function getProductDetail(productId, userId) {
   };
 }
 
+function listUserAddresses(userId) {
+  const store = readStore();
+  const user = getUserById(store, userId);
+  return {
+    items: store.userAddresses
+      .filter((item) => item.userId === user.id)
+      .sort((left, right) => Number(Boolean(right.isDefault)) - Number(Boolean(left.isDefault)))
+  };
+}
+
+function saveUserAddress(userId, payload = {}) {
+  const store = readStore();
+  const user = getUserById(store, userId);
+  const address = normalizeAddressInput(payload, { required: true });
+  const isDefault = payload.isDefault !== false;
+  let item = null;
+
+  if (payload.id) {
+    item = store.userAddresses.find((entry) => entry.id === payload.id && entry.userId === user.id);
+
+    if (!item) {
+      throw createAppError('ADDRESS_NOT_FOUND', 404);
+    }
+
+    Object.assign(item, address, {
+      isDefault,
+      updatedAt: nowIso()
+    });
+  } else {
+    item = {
+      id: randomId('addr'),
+      userId: user.id,
+      ...address,
+      isDefault,
+      createdAt: nowIso(),
+      updatedAt: nowIso()
+    };
+    store.userAddresses.unshift(item);
+  }
+
+  if (item.isDefault) {
+    store.userAddresses.forEach((entry) => {
+      if (entry.userId === user.id && entry.id !== item.id) {
+        entry.isDefault = false;
+      }
+    });
+  }
+
+  writeAudit(store, 'address.saved', item.id, user.id);
+  writeStore(store);
+
+  return {
+    item,
+    items: listUserAddresses(user.id).items
+  };
+}
+
+function deleteUserAddress(userId, addressId) {
+  const store = readStore();
+  const user = getUserById(store, userId);
+  const item = store.userAddresses.find((entry) => entry.id === addressId && entry.userId === user.id);
+
+  if (!item) {
+    throw createAppError('ADDRESS_NOT_FOUND', 404);
+  }
+
+  store.userAddresses = store.userAddresses.filter((entry) => entry.id !== item.id);
+  if (item.isDefault) {
+    const next = store.userAddresses.find((entry) => entry.userId === user.id);
+    if (next) {
+      next.isDefault = true;
+    }
+  }
+
+  writeAudit(store, 'address.deleted', item.id, user.id);
+  writeStore(store);
+
+  return listUserAddresses(user.id);
+}
+
 function getCart(userId) {
   const store = readStore();
   return {
@@ -1072,9 +1350,17 @@ function addCartItem(userId, payload = {}) {
     defaultValue: 1
   });
   const existing = store.cartItems.find((item) => item.userId === user.id && item.skuId === sku.id);
+  const nextQuantity = (existing ? existing.quantity : 0) + quantity;
+
+  if (getAvailableStock(sku) < nextQuantity) {
+    throw createAppError('SKU_STOCK_NOT_ENOUGH', 409, {
+      skuId: sku.id,
+      stock: getAvailableStock(sku)
+    });
+  }
 
   if (existing) {
-    existing.quantity = ensureInteger(existing.quantity + quantity, {
+    existing.quantity = ensureInteger(nextQuantity, {
       field: 'quantity',
       min: 1,
       max: 99,
@@ -1114,6 +1400,13 @@ function updateCartItem(userId, itemId, payload = {}) {
   if (quantity === 0) {
     store.cartItems = store.cartItems.filter((cartItem) => cartItem.id !== item.id);
   } else {
+    const sku = getSkuById(store, item.skuId);
+    if (!sku || getAvailableStock(sku) < quantity) {
+      throw createAppError('SKU_STOCK_NOT_ENOUGH', 409, {
+        skuId: item.skuId,
+        stock: sku ? getAvailableStock(sku) : 0
+      });
+    }
     item.quantity = quantity;
   }
 
@@ -1139,6 +1432,9 @@ function removeCartItem(userId, itemId) {
 
 function createOrder(userId, payload = {}) {
   const store = readStore();
+  if (closeExpiredOrders(store)) {
+    writeStore(store);
+  }
   const user = getUserById(store, userId);
   const clientRequestId = ensureText(payload.clientRequestId, {
     field: 'clientRequestId',
@@ -1195,10 +1491,10 @@ function createOrder(userId, payload = {}) {
       defaultValue: 1
     });
 
-    if (sku.stock < quantity) {
+    if (getAvailableStock(sku) < quantity) {
       throw createAppError('SKU_STOCK_NOT_ENOUGH', 409, {
         skuId: sku.id,
-        stock: sku.stock
+        stock: getAvailableStock(sku)
       });
     }
 
@@ -1210,6 +1506,39 @@ function createOrder(userId, payload = {}) {
   });
 
   const amount = normalizedItems.reduce((sum, item) => sum + item.sku.price * item.quantity, 0);
+  const submittedAddress =
+    payload.address && typeof payload.address === 'object'
+      ? normalizeAddressInput(payload.address, { required: true })
+      : null;
+  const defaultAddress = getDefaultAddress(store, user.id);
+  const address =
+    submittedAddress ||
+    (defaultAddress
+      ? normalizeAddressInput(defaultAddress, { required: true })
+      : {
+          contactName: user.nickname || '收货人',
+          mobile: user.mobile || '13800000000',
+          provinceCity: '上海市静安区',
+          detail: '演示收货地址',
+          deliveryNote: ''
+        });
+
+  if (payload.saveAddress && submittedAddress) {
+    store.userAddresses.forEach((item) => {
+      if (item.userId === user.id) {
+        item.isDefault = false;
+      }
+    });
+    store.userAddresses.unshift({
+      id: randomId('addr'),
+      userId: user.id,
+      ...address,
+      isDefault: true,
+      createdAt: nowIso(),
+      updatedAt: nowIso()
+    });
+  }
+
   const order = {
     id: randomId('order'),
     userId: user.id,
@@ -1220,14 +1549,20 @@ function createOrder(userId, payload = {}) {
     status: 'pending_payment',
     paidAt: null,
     createdAt: nowIso(),
+    expiresAt: plusMinutes(30),
     deliveryStatus: 'pending',
     clientRequestId: clientRequestId || null,
-    addressSummary: ensureText(payload.addressSummary, {
-      field: 'addressSummary',
-      min: 6,
-      max: 200,
-      defaultValue: '上海市静安区 · 演示收货地址'
-    })
+    address,
+    addressSummary:
+      ensureText(payload.addressSummary, {
+        field: 'addressSummary',
+        min: 0,
+        max: 200,
+        defaultValue: ''
+      }) || buildAddressSummary(address),
+    stockReserved: true,
+    reservationReleasedAt: null,
+    refundStatus: 'none'
   };
 
   store.orders.unshift(order);
@@ -1240,6 +1575,7 @@ function createOrder(userId, payload = {}) {
       quantity: item.quantity,
       price: item.sku.price
     });
+    item.sku.reservedStock = getReservedStock(item.sku) + item.quantity;
   });
   store.cartItems = store.cartItems.filter(
     (item) => !normalizedItems.some((entry) => entry.cartItemId && entry.cartItemId === item.id)
@@ -1254,6 +1590,46 @@ function createOrder(userId, payload = {}) {
   };
 }
 
+function releaseOrderReservation(store, order) {
+  if (!order || order.orderType !== 'physical' || !order.stockReserved) {
+    return false;
+  }
+
+  getOrderItems(store, order.id).forEach((item) => {
+    const sku = getSkuById(store, item.skuId);
+    if (sku) {
+      sku.reservedStock = Math.max(0, getReservedStock(sku) - item.quantity);
+    }
+  });
+  order.stockReserved = false;
+  order.reservationReleasedAt = nowIso();
+  return true;
+}
+
+function closeExpiredOrders(store) {
+  let changed = false;
+
+  store.orders.forEach((order) => {
+    if (order.status !== 'pending_payment' || !order.expiresAt || !isExpired(order.expiresAt)) {
+      return;
+    }
+
+    releaseOrderReservation(store, order);
+    order.status = 'closed';
+    order.deliveryStatus = 'closed';
+    order.closedAt = nowIso();
+    const payment = findLatestPayment(store, order.id);
+    if (payment && ['created', 'pending'].includes(payment.status)) {
+      payment.status = 'cancelled';
+      payment.updatedAt = nowIso();
+    }
+    writeAudit(store, 'order.closed.expired', order.id, 'system');
+    changed = true;
+  });
+
+  return changed;
+}
+
 function applyOrderPaidEffects(store, order) {
   if (order.orderType === 'physical') {
     store.orderItems
@@ -1261,9 +1637,14 @@ function applyOrderPaidEffects(store, order) {
       .forEach((item) => {
         const sku = getSkuById(store, item.skuId);
         if (sku) {
+          if (order.stockReserved) {
+            sku.reservedStock = Math.max(0, getReservedStock(sku) - item.quantity);
+          }
           sku.stock = Math.max(0, sku.stock - item.quantity);
         }
       });
+    order.stockReserved = false;
+    order.reservationReleasedAt = nowIso();
     order.deliveryStatus = 'delivering';
     return;
   }
@@ -1272,14 +1653,36 @@ function applyOrderPaidEffects(store, order) {
     const planId = order.planId;
     const plan = store.membershipPlans.find((item) => item.id === planId);
     if (plan) {
-      store.memberships.unshift({
-        id: randomId('membership'),
-        userId: order.userId,
-        planId: plan.id,
-        status: 'active',
-        startAt: nowIso(),
-        expireAt: plusDays(plan.durationDays)
-      });
+      const now = nowIso();
+      const latestMembership = [...store.memberships]
+        .filter((item) => item.userId === order.userId)
+        .sort((left, right) => new Date(right.expireAt).getTime() - new Date(left.expireAt).getTime())[0];
+      const baseDate =
+        latestMembership && latestMembership.status === 'active' && !isExpired(latestMembership.expireAt)
+          ? latestMembership.expireAt
+          : now;
+      const expireAt = plusDaysFrom(baseDate, plan.durationDays);
+
+      if (latestMembership) {
+        latestMembership.planId = plan.id;
+        latestMembership.status = 'active';
+        latestMembership.startAt = latestMembership.startAt || now;
+        latestMembership.expireAt = expireAt;
+        latestMembership.sourceOrderIds = [
+          ...new Set([...(latestMembership.sourceOrderIds || []), order.id])
+        ];
+        latestMembership.updatedAt = now;
+      } else {
+        store.memberships.unshift({
+          id: randomId('membership'),
+          userId: order.userId,
+          planId: plan.id,
+          status: 'active',
+          startAt: now,
+          expireAt,
+          sourceOrderIds: [order.id]
+        });
+      }
 
       const welcomeTrackIds = ['track_quiet_world', 'track_amber_salon', 'track_copper_dawn'].slice(
         0,
@@ -1287,15 +1690,22 @@ function applyOrderPaidEffects(store, order) {
       );
 
       welcomeTrackIds.forEach((trackId) => {
-        if (!getTrackEntitlement(store, order.userId, trackId)) {
+        const existingEntitlement = getTrackEntitlement(store, order.userId, trackId);
+        if (existingEntitlement && !isExpired(existingEntitlement.expiredAt)) {
+          existingEntitlement.expiredAt = plusDaysFrom(existingEntitlement.expiredAt, plan.durationDays);
+          existingEntitlement.sourceOrderIds = [
+            ...new Set([...(existingEntitlement.sourceOrderIds || []), existingEntitlement.sourceOrderId, order.id].filter(Boolean))
+          ];
+        } else {
           store.downloadEntitlements.unshift({
             id: randomId('entitlement'),
             userId: order.userId,
             trackId,
             sourceOrderId: order.id,
+            sourceOrderIds: [order.id],
             maxDownloads: 3,
             usedDownloads: 0,
-            expiredAt: plusDays(plan.durationDays)
+            expiredAt: expireAt
           });
         }
       });
@@ -1307,12 +1717,16 @@ function applyOrderPaidEffects(store, order) {
   }
 
   if (order.orderType === 'digital_track') {
-    if (order.trackId && !getTrackEntitlement(store, order.userId, order.trackId)) {
+    const existingEntitlement = order.trackId
+      ? getTrackEntitlement(store, order.userId, order.trackId)
+      : null;
+    if (order.trackId && (!existingEntitlement || isExpired(existingEntitlement.expiredAt))) {
       store.downloadEntitlements.unshift({
         id: randomId('entitlement'),
         userId: order.userId,
         trackId: order.trackId,
         sourceOrderId: order.id,
+        sourceOrderIds: [order.id],
         maxDownloads: 3,
         usedDownloads: 0,
         expiredAt: plusDays(365)
@@ -1350,6 +1764,9 @@ function buildOrderPaymentStatus(store, order) {
 
 function prepareWechatJsapiPayment(userId, orderId, payload = {}) {
   const store = readStore();
+  if (closeExpiredOrders(store)) {
+    writeStore(store);
+  }
   const user = getUserById(store, userId);
   const order = store.orders.find((item) => item.id === orderId && item.userId === user.id);
 
@@ -1451,6 +1868,9 @@ function saveWechatPrepay(orderId, paymentId, payload = {}) {
 
 function markOrderPaidByWechat(payload = {}) {
   const store = readStore();
+  if (closeExpiredOrders(store)) {
+    writeStore(store);
+  }
   const outTradeNo = ensureText(payload.outTradeNo, {
     field: 'outTradeNo',
     required: true,
@@ -1507,6 +1927,9 @@ function markOrderPaidByWechat(payload = {}) {
 
 function getOrderPaymentStatus(userId, orderId) {
   const store = readStore();
+  if (closeExpiredOrders(store)) {
+    writeStore(store);
+  }
   const user = getUserById(store, userId);
   const order = store.orders.find((item) => item.id === orderId && item.userId === user.id);
 
@@ -1519,6 +1942,9 @@ function getOrderPaymentStatus(userId, orderId) {
 
 function payOrder(userId, orderId) {
   const store = readStore();
+  if (closeExpiredOrders(store)) {
+    writeStore(store);
+  }
   const user = getUserById(store, userId);
   const order = store.orders.find((item) => item.id === orderId && item.userId === user.id);
 
@@ -1536,6 +1962,8 @@ function payOrder(userId, orderId) {
     id: randomId('payment'),
     orderId: order.id,
     channel: 'wechat_pay_mock',
+    outTradeNo: order.orderNo,
+    totalFen: toFen(order.payAmount),
     transactionId: randomId('wx'),
     status: 'paid',
     paidAt: order.paidAt,
@@ -1551,12 +1979,18 @@ function payOrder(userId, orderId) {
   return {
     order: buildOrderView(store, order),
     member: buildMembershipView(store, user.id),
+    ...(order.orderType === 'membership' || order.orderType === 'digital_track'
+      ? { profile: getMemberProfile(user.id) }
+      : {}),
     cart: buildCartSummary(store, user.id)
   };
 }
 
 function listOrders(userId) {
   const store = readStore();
+  if (closeExpiredOrders(store)) {
+    writeStore(store);
+  }
   const user = getUserById(store, userId);
 
   return {
@@ -1567,7 +2001,523 @@ function listOrders(userId) {
   };
 }
 
-function createPaidVirtualOrder(store, userId, config) {
+function generateRefundNo(store) {
+  const date = new Date();
+  const prefix = `RF${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(
+    date.getDate()
+  ).padStart(2, '0')}`;
+  const sameDayCount =
+    store.refunds.filter((refund) => String(refund.refundNo || '').startsWith(prefix)).length + 1;
+  return `${prefix}${String(sameDayCount).padStart(4, '0')}`;
+}
+
+function findOrderRefund(store, orderId) {
+  return store.refunds.find((refund) => refund.orderId === orderId && refund.status !== 'cancelled') || null;
+}
+
+function requestOrderRefund(userId, orderId, payload = {}) {
+  const store = readStore();
+  const user = getUserById(store, userId);
+  const order = store.orders.find((item) => item.id === orderId && item.userId === user.id);
+
+  if (!order) {
+    throw createAppError('ORDER_NOT_FOUND', 404);
+  }
+
+  if (!['paid', 'completed'].includes(order.status)) {
+    throw createAppError('ORDER_NOT_REFUNDABLE', 409);
+  }
+
+  const existing = findOrderRefund(store, order.id);
+  if (existing) {
+    return {
+      order: buildOrderView(store, order),
+      refund: existing
+    };
+  }
+
+  const refund = {
+    id: randomId('refund'),
+    refundNo: generateRefundNo(store),
+    orderId: order.id,
+    userId: user.id,
+    amount: order.payAmount,
+    status: 'pending',
+    reason: ensureText(payload.reason, {
+      field: 'reason',
+      min: 0,
+      max: 200,
+      defaultValue: '用户申请售后退款'
+    }),
+    requestedAt: nowIso(),
+    reviewedAt: null,
+    refundedAt: null,
+    operator: null,
+    restock: false
+  };
+
+  store.refunds.unshift(refund);
+  order.status = 'refund_pending';
+  order.refundStatus = 'pending';
+  order.refundRequestedAt = refund.requestedAt;
+  writeAudit(store, 'order.refund.requested', order.id, user.id);
+  writeStore(store);
+
+  return {
+    order: buildOrderView(store, order),
+    refund
+  };
+}
+
+function markOrderRefunded(store, order, payload = {}) {
+  if (!order) {
+    throw createAppError('ORDER_NOT_FOUND', 404);
+  }
+
+  const refund = findOrderRefund(store, order.id) || {
+    id: randomId('refund'),
+    refundNo: generateRefundNo(store),
+    orderId: order.id,
+    userId: order.userId,
+    amount: order.payAmount,
+    status: 'pending',
+    reason: ensureText(payload.refundReason, {
+      field: 'refundReason',
+      min: 0,
+      max: 200,
+      defaultValue: '后台退款处理'
+    }),
+    requestedAt: nowIso(),
+    reviewedAt: null,
+    refundedAt: null,
+    operator: null,
+    restock: false
+  };
+
+  if (!store.refunds.some((item) => item.id === refund.id)) {
+    store.refunds.unshift(refund);
+  }
+
+  const restock = payload.restock === true || payload.restock === 'true';
+  if (restock && order.orderType === 'physical' && !refund.restock) {
+    getOrderItems(store, order.id).forEach((item) => {
+      const sku = getSkuById(store, item.skuId);
+      if (sku) {
+        sku.stock = (Number(sku.stock) || 0) + item.quantity;
+      }
+    });
+    refund.restock = true;
+  }
+
+  refund.status = 'refunded';
+  refund.reviewedAt = nowIso();
+  refund.refundedAt = nowIso();
+  refund.operator = (auditContext.getStore() || {}).adminUsername || DEFAULT_ADMIN_USERNAME;
+  order.status = 'refunded';
+  order.refundStatus = 'refunded';
+  order.refundedAt = refund.refundedAt;
+  order.deliveryStatus = 'closed';
+
+  const payment = findLatestPayment(store, order.id);
+  if (payment) {
+    payment.status = 'refunded';
+    payment.refundedAt = refund.refundedAt;
+    payment.refundAmount = refund.amount;
+    payment.updatedAt = nowIso();
+  }
+
+  writeAudit(store, 'order.refunded', order.id, DEFAULT_ADMIN_USERNAME, {
+    refundNo: refund.refundNo
+  });
+
+  return refund;
+}
+
+function getRefundOperator() {
+  return (auditContext.getStore() || {}).adminUsername || DEFAULT_ADMIN_USERNAME;
+}
+
+function prepareWechatRefund(orderId, payload = {}) {
+  const store = readStore();
+  const order = getOrderById(store, orderId);
+
+  if (!order) {
+    throw createAppError('ORDER_NOT_FOUND', 404);
+  }
+
+  if (!['paid', 'completed', 'refund_pending'].includes(order.status)) {
+    throw createAppError('ORDER_NOT_REFUNDABLE', 409);
+  }
+
+  const payment = findLatestPayment(store, order.id);
+  if (!payment || payment.status !== 'paid') {
+    throw createAppError('PAYMENT_NOT_PAID', 409);
+  }
+
+  const totalFen = toFen(order.payAmount);
+  const refundFen = ensureInteger(payload.refundFen || payload.amountFen || totalFen, {
+    field: 'refundFen',
+    min: 1,
+    max: totalFen,
+    defaultValue: totalFen
+  });
+  const reason = ensureText(payload.reason || payload.refundReason, {
+    field: 'reason',
+    min: 0,
+    max: 80,
+    defaultValue: '用户申请售后退款'
+  });
+  let refund = findOrderRefund(store, order.id);
+
+  if (!refund) {
+    refund = {
+      id: randomId('refund'),
+      refundNo: generateRefundNo(store),
+      orderId: order.id,
+      userId: order.userId,
+      amount: refundFen / 100,
+      status: 'pending',
+      reason,
+      requestedAt: nowIso(),
+      reviewedAt: null,
+      refundedAt: null,
+      operator: null,
+      restock: false
+    };
+    store.refunds.unshift(refund);
+  }
+
+  refund.amount = refundFen / 100;
+  refund.amountFen = refundFen;
+  refund.totalFen = totalFen;
+  refund.reason = reason;
+  refund.status = 'processing';
+  refund.channel = 'wechat_pay';
+  refund.outRefundNo = refund.outRefundNo || refund.refundNo;
+  refund.reviewedAt = nowIso();
+  refund.operator = getRefundOperator();
+  refund.updatedAt = nowIso();
+  refund.requestPayload = {
+    outTradeNo: payment.outTradeNo || order.orderNo,
+    transactionId: payment.transactionId || '',
+    outRefundNo: refund.outRefundNo,
+    refundFen,
+    totalFen,
+    reason
+  };
+  order.status = 'refund_pending';
+  order.refundStatus = 'processing';
+  order.refundRequestedAt = order.refundRequestedAt || refund.requestedAt;
+  writeAudit(store, 'order.refund.wechat.requested', order.id, getRefundOperator(), {
+    refundNo: refund.refundNo,
+    outRefundNo: refund.outRefundNo
+  });
+  writeStore(store);
+
+  return {
+    order: buildOrderView(store, order),
+    refund,
+    payment,
+    wechat: {
+      outTradeNo: payment.outTradeNo || order.orderNo,
+      transactionId: payment.transactionId || '',
+      outRefundNo: refund.outRefundNo,
+      refundFen,
+      totalFen,
+      reason
+    }
+  };
+}
+
+function markWechatRefundAccepted(refundId, payload = {}) {
+  const store = readStore();
+  const refund = store.refunds.find((item) => item.id === refundId);
+
+  if (!refund) {
+    throw createAppError('REFUND_NOT_FOUND', 404);
+  }
+
+  const order = getOrderById(store, refund.orderId);
+
+  refund.status = 'processing';
+  refund.wechatRefundId = payload.refund_id || payload.refundId || refund.wechatRefundId || null;
+  refund.wechatStatus = payload.status || payload.refund_status || refund.wechatStatus || 'PROCESSING';
+  refund.responsePayload = payload;
+  refund.updatedAt = nowIso();
+
+  if (order) {
+    order.status = 'refund_pending';
+    order.refundStatus = 'processing';
+  }
+
+  writeAudit(store, 'order.refund.wechat.accepted', refund.orderId, getRefundOperator(), {
+    refundNo: refund.refundNo,
+    wechatRefundId: refund.wechatRefundId
+  });
+  writeStore(store);
+
+  return {
+    order: order ? buildOrderView(store, order) : null,
+    refund
+  };
+}
+
+function markWechatRefundResult(payload = {}) {
+  const store = readStore();
+  const outRefundNo = ensureText(payload.outRefundNo || payload.out_refund_no, {
+    field: 'outRefundNo',
+    required: true,
+    min: 2,
+    max: 80
+  });
+  const refund = store.refunds.find(
+    (item) => item.outRefundNo === outRefundNo || item.refundNo === outRefundNo
+  );
+
+  if (!refund) {
+    throw createAppError('REFUND_NOT_FOUND', 404);
+  }
+
+  const order = getOrderById(store, refund.orderId);
+  if (!order) {
+    throw createAppError('ORDER_NOT_FOUND', 404);
+  }
+
+  const refundStatus = ensureText(payload.refundStatus || payload.refund_status || payload.status, {
+    field: 'refundStatus',
+    min: 0,
+    max: 40,
+    defaultValue: 'PROCESSING'
+  });
+  refund.wechatStatus = refundStatus;
+  refund.wechatRefundId = payload.refundId || payload.refund_id || refund.wechatRefundId || null;
+  refund.callbackPayload = payload.rawPayload || payload;
+  refund.updatedAt = nowIso();
+
+  if (refundStatus === 'SUCCESS') {
+    markOrderRefunded(store, order, {
+      refundReason: refund.reason,
+      restock: refund.restock === true
+    });
+    refund.status = 'refunded';
+    refund.refundedAt = ensureIsoDate(payload.successTime || payload.success_time, {
+      field: 'successTime',
+      defaultValue: refund.refundedAt || nowIso()
+    });
+  } else if (['CLOSED', 'ABNORMAL'].includes(refundStatus)) {
+    refund.status = 'failed';
+    refund.failedAt = nowIso();
+    refund.failReason = ensureText(payload.failReason || payload.statusMessage || payload.status_message, {
+      field: 'failReason',
+      min: 0,
+      max: 200,
+      defaultValue: refundStatus
+    });
+    order.refundStatus = 'failed';
+    if (order.status === 'refund_pending') {
+      order.status = order.deliveryStatus === 'completed' ? 'completed' : 'paid';
+    }
+  } else {
+    refund.status = 'processing';
+    order.refundStatus = 'processing';
+    order.status = 'refund_pending';
+  }
+
+  writeAudit(store, 'order.refund.wechat.callback', order.id, 'wechat', {
+    refundNo: refund.refundNo,
+    status: refundStatus
+  });
+  writeStore(store);
+
+  return {
+    order: buildOrderView(store, order),
+    refund
+  };
+}
+
+function buildOrderItemDescription(store, order) {
+  return getOrderItems(store, order.id)
+    .map((item) => {
+      const product = item.productId ? getProductById(store, item.productId) : null;
+      const sku = item.skuId ? getSkuById(store, item.skuId) : null;
+      const track = item.trackId ? getTrackById(store, item.trackId) : null;
+      const name = product ? product.name : track ? track.cnTitle || track.title : order.orderNo;
+      return sku ? `${name} ${sku.specName}` : name;
+    })
+    .filter(Boolean)
+    .join('、')
+    .slice(0, 120);
+}
+
+function prepareWechatShippingSync(orderId, payload = {}) {
+  const store = readStore();
+  const order = getOrderById(store, orderId);
+
+  if (!order) {
+    throw createAppError('ORDER_NOT_FOUND', 404);
+  }
+
+  if (order.orderType !== 'physical') {
+    throw createAppError('ORDER_NOT_PHYSICAL', 409);
+  }
+
+  if (!['paid', 'completed'].includes(order.status)) {
+    throw createAppError('ORDER_NOT_SHIPPABLE', 409);
+  }
+
+  const user = getUserById(store, order.userId);
+  if (!user.openid) {
+    throw createAppError('WECHAT_OPENID_REQUIRED', 409);
+  }
+
+  const payment = findLatestPayment(store, order.id);
+  const transactionId = ensureText(payload.transactionId || (payment && payment.transactionId), {
+    field: 'transactionId',
+    required: true,
+    min: 6,
+    max: 80
+  });
+  const shippingCompany = ensureText(payload.shippingCompany || payload.deliveryCompany || order.shippingCompany, {
+    field: 'shippingCompany',
+    required: true,
+    min: 1,
+    max: 80
+  });
+  const trackingNo = ensureText(payload.trackingNo || order.trackingNo, {
+    field: 'trackingNo',
+    required: true,
+    min: 1,
+    max: 80
+  });
+  const itemDesc = ensureText(payload.itemDesc || buildOrderItemDescription(store, order), {
+    field: 'itemDesc',
+    required: true,
+    min: 1,
+    max: 120
+  });
+  const uploadTime = nowIso();
+
+  order.shippingCompany = shippingCompany;
+  order.trackingNo = trackingNo;
+  order.deliveryStatus = 'delivering';
+  order.shippedAt = order.shippedAt || uploadTime;
+  order.wechatShippingSyncStatus = 'pending';
+  order.wechatShippingLastAttemptAt = uploadTime;
+  writeAudit(store, 'order.shipping.wechat.requested', order.id, getRefundOperator(), {
+    transactionId,
+    trackingNo
+  });
+  writeStore(store);
+
+  return {
+    order: buildOrderView(store, order),
+    user,
+    wechat: {
+      order_key: {
+        order_number_type: 2,
+        transaction_id: transactionId
+      },
+      logistics_type: 1,
+      delivery_mode: 1,
+      shipping_list: [
+        {
+          tracking_no: trackingNo,
+          express_company: shippingCompany,
+          item_desc: itemDesc
+        }
+      ],
+      upload_time: uploadTime,
+      payer: {
+        openid: user.openid
+      },
+      is_all_delivered: true
+    }
+  };
+}
+
+function markWechatShippingSynced(orderId, payload = {}) {
+  const store = readStore();
+  const order = getOrderById(store, orderId);
+
+  if (!order) {
+    throw createAppError('ORDER_NOT_FOUND', 404);
+  }
+
+  order.wechatShippingSyncStatus = 'synced';
+  order.wechatShippingSyncedAt = nowIso();
+  order.wechatShippingResponse = payload;
+  writeAudit(store, 'order.shipping.wechat.synced', order.id, getRefundOperator(), payload);
+  writeStore(store);
+
+  return {
+    ...buildOrderView(store, order),
+    user: buildUserSummary(store, order.userId),
+    refund: findOrderRefund(store, order.id)
+  };
+}
+
+function markWechatShippingFailed(orderId, error) {
+  const store = readStore();
+  const order = getOrderById(store, orderId);
+
+  if (!order) {
+    throw createAppError('ORDER_NOT_FOUND', 404);
+  }
+
+  order.wechatShippingSyncStatus = 'failed';
+  order.wechatShippingError = error && error.message ? error.message : String(error || 'WECHAT_SHIPPING_FAILED');
+  order.wechatShippingFailedAt = nowIso();
+  writeAudit(store, 'order.shipping.wechat.failed', order.id, getRefundOperator(), {
+    error: order.wechatShippingError,
+    meta: error && error.meta ? error.meta : null
+  });
+  writeStore(store);
+
+  return {
+    ...buildOrderView(store, order),
+    user: buildUserSummary(store, order.userId),
+    refund: findOrderRefund(store, order.id)
+  };
+}
+
+function adminCloseExpiredOrders() {
+  const store = readStore();
+  const changed = closeExpiredOrders(store);
+
+  if (changed) {
+    writeStore(store);
+  }
+
+  return {
+    closed: changed
+  };
+}
+
+function createPendingVirtualOrder(store, userId, config) {
+  const clientRequestId = ensureText(config.clientRequestId, {
+    field: 'clientRequestId',
+    min: 8,
+    max: 80,
+    defaultValue: ''
+  });
+
+  if (clientRequestId) {
+    const existingOrder = store.orders.find(
+      (item) =>
+        item.userId === userId &&
+        item.clientRequestId === clientRequestId &&
+        item.orderType === config.orderType &&
+        ['pending_payment', 'paid', 'completed'].includes(item.status)
+    );
+
+    if (existingOrder) {
+      return {
+        order: existingOrder,
+        created: false
+      };
+    }
+  }
+
   const order = {
     id: randomId('order'),
     userId,
@@ -1575,27 +2525,20 @@ function createPaidVirtualOrder(store, userId, config) {
     orderType: config.orderType,
     amount: config.amount,
     payAmount: config.amount,
-    status: 'paid',
-    paidAt: nowIso(),
+    status: 'pending_payment',
+    paidAt: null,
     createdAt: nowIso(),
-    deliveryStatus: 'rights_issued',
+    expiresAt: plusMinutes(30),
+    deliveryStatus: 'pending',
     addressSummary: '数字权益发放',
+    clientRequestId: clientRequestId || null,
+    stockReserved: false,
+    refundStatus: 'none',
     planId: config.planId || null,
     trackId: config.trackId || null
   };
 
   store.orders.unshift(order);
-  store.payments.unshift({
-    id: randomId('payment'),
-    orderId: order.id,
-    channel: 'wechat_pay_mock',
-    transactionId: randomId('wx'),
-    status: 'paid',
-    paidAt: order.paidAt,
-    callbackPayload: {
-      mode: 'instant'
-    }
-  });
 
   if (config.trackId) {
     store.orderItems.push({
@@ -1609,8 +2552,10 @@ function createPaidVirtualOrder(store, userId, config) {
     });
   }
 
-  applyOrderPaidEffects(store, order);
-  return order;
+  return {
+    order,
+    created: true
+  };
 }
 
 function getMemberProfile(userId) {
@@ -1645,10 +2590,17 @@ function getMemberProfile(userId) {
   };
 }
 
-function purchaseMembership(userId, planId) {
+function purchaseMembership(userId, payloadOrPlanId) {
   const store = readStore();
+  if (closeExpiredOrders(store)) {
+    writeStore(store);
+  }
   const user = getUserById(store, userId);
-  const normalizedPlanId = ensureText(planId, {
+  const payload =
+    payloadOrPlanId && typeof payloadOrPlanId === 'object'
+      ? payloadOrPlanId
+      : { planId: payloadOrPlanId };
+  const normalizedPlanId = ensureText(payload.planId, {
     field: 'planId',
     required: true,
     min: 2,
@@ -1660,23 +2612,29 @@ function purchaseMembership(userId, planId) {
     throw createAppError('PLAN_NOT_FOUND', 404);
   }
 
-  const order = createPaidVirtualOrder(store, user.id, {
+  const result = createPendingVirtualOrder(store, user.id, {
     orderType: 'membership',
     amount: plan.price,
-    planId: plan.id
+    planId: plan.id,
+    clientRequestId: payload.clientRequestId || payload.idempotencyKey || ''
   });
+  const order = result.order;
 
-  writeAudit(store, 'membership.purchased', order.id, user.id);
+  writeAudit(store, result.created ? 'membership.order.created' : 'membership.order.reused', order.id, user.id);
   writeStore(store);
 
   return {
     order: buildOrderView(store, order),
+    paymentRequired: order.status === 'pending_payment',
     profile: getMemberProfile(user.id)
   };
 }
 
 function unlockTrack(userId, trackId, payload = {}) {
   const store = readStore();
+  if (closeExpiredOrders(store)) {
+    writeStore(store);
+  }
   const user = getUserById(store, userId);
   const normalizedTrackId = ensureText(trackId, {
     field: 'trackId',
@@ -1693,39 +2651,42 @@ function unlockTrack(userId, trackId, payload = {}) {
   const membership = buildMembershipView(store, user.id);
   const entitlement = getTrackEntitlement(store, user.id, track.id);
 
-  if ((membership && membership.isActive) || (entitlement && !isExpired(entitlement.expiredAt))) {
+  const action = ensureEnum(payload.action, ['purchase', 'preview'], {
+    field: 'action',
+    defaultValue: 'purchase'
+  });
+
+  if (entitlement && !isExpired(entitlement.expiredAt)) {
     return {
       unlocked: true,
-      reason: membership && membership.isActive ? 'membership' : 'existing_entitlement',
+      reason: 'existing_entitlement',
       profile: getMemberProfile(user.id)
     };
   }
 
-  if (
-    ensureEnum(payload.action, ['purchase', 'preview'], {
-      field: 'action',
-      defaultValue: 'purchase'
-    }) !== 'purchase'
-  ) {
+  if (action !== 'purchase') {
     return {
-      unlocked: false,
-      reason: 'preview_only',
+      unlocked: Boolean(membership && membership.isActive),
+      reason: membership && membership.isActive ? 'membership_play_only' : 'preview_only',
       track: buildTrackCard(store, user.id, track)
     };
   }
 
-  const order = createPaidVirtualOrder(store, user.id, {
+  const result = createPendingVirtualOrder(store, user.id, {
     orderType: 'digital_track',
     amount: track.unlockPrice || 29,
-    trackId: track.id
+    trackId: track.id,
+    clientRequestId: payload.clientRequestId || payload.idempotencyKey || ''
   });
+  const order = result.order;
 
-  writeAudit(store, 'track.unlocked', track.id, user.id);
+  writeAudit(store, result.created ? 'track.unlock.order.created' : 'track.unlock.order.reused', track.id, user.id);
   writeStore(store);
 
   return {
-    unlocked: true,
-    reason: 'purchased',
+    unlocked: false,
+    reason: order.status === 'pending_payment' ? 'payment_required' : 'purchased',
+    paymentRequired: order.status === 'pending_payment',
     order: buildOrderView(store, order),
     profile: getMemberProfile(user.id)
   };
@@ -1866,13 +2827,17 @@ function adminLogin(payload = {}) {
   writeAudit(store, 'admin.login', admin.id, admin.username);
   writeStore(store);
 
+  const role = getAdminRole(store, admin);
+
   return {
     token,
     user: {
       id: admin.id,
       username: admin.username,
       displayName: admin.displayName,
-      roleId: admin.roleId
+      roleId: admin.roleId,
+      roleName: role ? role.name : '',
+      permissions: getAdminPermissions(store, admin)
     }
   };
 }
@@ -1904,6 +2869,48 @@ function assertAdmin(store, token) {
   }
 
   return admin;
+}
+
+function getAdminRole(store, admin) {
+  ensureAdminRoles(store);
+  return store.adminRoles.find((role) => role.id === admin.roleId) || null;
+}
+
+function getAdminPermissions(store, admin) {
+  const role = getAdminRole(store, admin);
+  return role && Array.isArray(role.permissions) ? role.permissions : [];
+}
+
+function permissionMatches(allowedPermission, requiredPermission) {
+  if (allowedPermission === '*') {
+    return true;
+  }
+
+  if (allowedPermission === requiredPermission) {
+    return true;
+  }
+
+  if (allowedPermission.endsWith('.*')) {
+    const prefix = allowedPermission.slice(0, -2);
+    return requiredPermission === prefix || requiredPermission.startsWith(`${prefix}.`);
+  }
+
+  return false;
+}
+
+function assertAdminPermission(store, admin, permission) {
+  if (!permission) {
+    return true;
+  }
+
+  const permissions = getAdminPermissions(store, admin);
+  if (permissions.some((allowed) => permissionMatches(allowed, permission))) {
+    return true;
+  }
+
+  throw createAppError('ADMIN_FORBIDDEN', 403, {
+    permission
+  });
 }
 
 function adminLogout(token) {
@@ -1979,6 +2986,9 @@ function adminChangePassword(token, payload = {}) {
 
 function adminDashboard() {
   const store = readStore();
+  if (closeExpiredOrders(store)) {
+    writeStore(store);
+  }
   const paidOrders = store.orders.filter((order) => ['paid', 'completed'].includes(order.status));
   const revenue = paidOrders.reduce((sum, order) => sum + (order.payAmount || 0), 0);
   const claimedCodes = store.scanCodes.filter((code) => code.status === 'claimed').length;
@@ -2042,6 +3052,156 @@ function adminDashboard() {
       disabled: disabledCodes
     }
   };
+}
+
+function adminReconciliationReport() {
+  const store = readStore();
+  if (closeExpiredOrders(store)) {
+    writeStore(store);
+  }
+
+  const paidOrders = store.orders.filter((order) => ['paid', 'completed'].includes(order.status));
+  const paidPayments = store.payments.filter((payment) => payment.status === 'paid');
+  const pendingRefunds = store.refunds.filter((refund) => ['pending', 'processing'].includes(refund.status));
+  const unsettledPhysicalOrders = store.orders.filter(
+    (order) =>
+      order.orderType === 'physical' &&
+      ['paid', 'completed'].includes(order.status) &&
+      !['completed', 'closed'].includes(order.deliveryStatus)
+  );
+  const anomalies = [];
+
+  paidOrders.forEach((order) => {
+    const payment = findLatestPayment(store, order.id);
+    if (!payment || payment.status !== 'paid') {
+      anomalies.push({
+        level: 'high',
+        type: 'paid_order_without_paid_payment',
+        orderId: order.id,
+        orderNo: order.orderNo,
+        message: '订单已支付，但没有 paid 状态支付流水。'
+      });
+    }
+  });
+
+  paidPayments.forEach((payment) => {
+    const order = getOrderById(store, payment.orderId);
+    if (!order || !['paid', 'completed', 'refunded'].includes(order.status)) {
+      anomalies.push({
+        level: 'high',
+        type: 'paid_payment_without_paid_order',
+        orderId: payment.orderId,
+        paymentId: payment.id,
+        message: '支付流水已成功，但订单未进入已支付/完成/退款状态。'
+      });
+    }
+  });
+
+  store.productSkus.forEach((sku) => {
+    if (Number(sku.stock || 0) < 0 || Number(sku.reservedStock || 0) < 0) {
+      anomalies.push({
+        level: 'medium',
+        type: 'negative_stock',
+        skuId: sku.id,
+        message: 'SKU 库存或预占库存出现负数。'
+      });
+    }
+  });
+
+  unsettledPhysicalOrders
+    .filter((order) => order.deliveryStatus === 'delivering' && order.wechatShippingSyncStatus !== 'synced')
+    .forEach((order) => {
+      anomalies.push({
+        level: 'medium',
+        type: 'shipping_not_synced',
+        orderId: order.id,
+        orderNo: order.orderNo,
+        message: '实物订单已进入发货流程，但未完成微信发货同步。'
+      });
+    });
+
+  pendingRefunds.forEach((refund) => {
+    const ageMs = Date.now() - new Date(refund.requestedAt || refund.reviewedAt || Date.now()).getTime();
+    if (ageMs > 24 * 60 * 60 * 1000) {
+      anomalies.push({
+        level: 'medium',
+        type: 'refund_pending_over_24h',
+        refundId: refund.id,
+        orderId: refund.orderId,
+        message: '退款超过 24 小时仍未结束。'
+      });
+    }
+  });
+
+  return {
+    generatedAt: nowIso(),
+    summary: {
+      orders: store.orders.length,
+      paidOrders: paidOrders.length,
+      paidAmount: paidOrders.reduce((sum, order) => sum + Number(order.payAmount || 0), 0),
+      paidPayments: paidPayments.length,
+      paidPaymentAmount: paidPayments.reduce((sum, payment) => sum + Number(payment.totalFen || 0) / 100, 0),
+      refunds: store.refunds.length,
+      pendingRefunds: pendingRefunds.length,
+      unsettledPhysicalOrders: unsettledPhysicalOrders.length,
+      anomalies: anomalies.length
+    },
+    pendingRefunds,
+    unsettledPhysicalOrders: unsettledPhysicalOrders.map((order) => buildOrderView(store, order)),
+    anomalies
+  };
+}
+
+function escapeCsv(value) {
+  const text = String(value === undefined || value === null ? '' : value);
+  if (/[",\r\n]/.test(text)) {
+    return `"${text.replace(/"/g, '""')}"`;
+  }
+  return text;
+}
+
+function adminExportOrdersCsv() {
+  const store = readStore();
+  const header = [
+    '订单号',
+    '用户',
+    '类型',
+    '金额',
+    '状态',
+    '履约状态',
+    '支付渠道',
+    '微信交易号',
+    '退款状态',
+    '微信发货同步',
+    '物流公司',
+    '物流单号',
+    '创建时间',
+    '支付时间'
+  ];
+  const rows = store.orders
+    .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())
+    .map((order) => {
+      const user = getUserById(store, order.userId);
+      const payment = findLatestPayment(store, order.id) || {};
+      return [
+        order.orderNo,
+        user.nickname || user.id,
+        order.orderType,
+        order.payAmount,
+        order.status,
+        order.deliveryStatus,
+        payment.channel || '',
+        payment.transactionId || '',
+        order.refundStatus || '',
+        order.wechatShippingSyncStatus || '',
+        order.shippingCompany || '',
+        order.trackingNo || '',
+        order.createdAt || '',
+        order.paidAt || ''
+      ];
+    });
+
+  return [header, ...rows].map((row) => row.map(escapeCsv).join(',')).join('\n');
 }
 
 function adminListWines() {
@@ -2854,12 +4014,16 @@ function adminCreateSku(productId, payload = {}) {
 
 function adminListOrders() {
   const store = readStore();
+  if (closeExpiredOrders(store)) {
+    writeStore(store);
+  }
 
   return store.orders
     .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())
     .map((order) => ({
       ...buildOrderView(store, order),
-      user: buildUserSummary(store, order.userId)
+      user: buildUserSummary(store, order.userId),
+      refund: findOrderRefund(store, order.id)
     }));
 }
 
@@ -2872,11 +4036,53 @@ function adminUpdateOrder(orderId, payload = {}) {
   }
 
   if (payload.status !== undefined) {
-    order.status = ensureEnum(
+    const nextStatus = ensureEnum(
       payload.status,
       ['pending_payment', 'paid', 'completed', 'closed', 'refund_pending', 'refunded'],
       { field: 'status' }
     );
+
+    if (nextStatus === 'closed' && order.status === 'pending_payment') {
+      releaseOrderReservation(store, order);
+      order.closedAt = nowIso();
+      const payment = findLatestPayment(store, order.id);
+      if (payment && ['created', 'pending'].includes(payment.status)) {
+        payment.status = 'cancelled';
+        payment.updatedAt = nowIso();
+      }
+    }
+
+    if (nextStatus === 'refund_pending') {
+      order.refundStatus = 'pending';
+      order.refundRequestedAt = order.refundRequestedAt || nowIso();
+      if (!findOrderRefund(store, order.id)) {
+        store.refunds.unshift({
+          id: randomId('refund'),
+          refundNo: generateRefundNo(store),
+          orderId: order.id,
+          userId: order.userId,
+          amount: order.payAmount,
+          status: 'pending',
+          reason: ensureText(payload.refundReason, {
+            field: 'refundReason',
+            min: 0,
+            max: 200,
+            defaultValue: '后台登记退款申请'
+          }),
+          requestedAt: order.refundRequestedAt,
+          reviewedAt: null,
+          refundedAt: null,
+          operator: null,
+          restock: false
+        });
+      }
+    }
+
+    if (nextStatus === 'refunded') {
+      markOrderRefunded(store, order, payload);
+    } else {
+      order.status = nextStatus;
+    }
   }
 
   if (payload.deliveryStatus !== undefined) {
@@ -2885,13 +4091,49 @@ function adminUpdateOrder(orderId, payload = {}) {
       ['pending', 'delivering', 'completed', 'rights_issued', 'downloaded', 'closed'],
       { field: 'deliveryStatus' }
     );
+
+    if (order.deliveryStatus === 'delivering') {
+      order.shippedAt = ensureIsoDate(payload.shippedAt, {
+        field: 'shippedAt',
+        defaultValue: order.shippedAt || nowIso()
+      });
+    }
+
+    if (order.deliveryStatus === 'completed') {
+      order.completedAt = ensureIsoDate(payload.completedAt, {
+        field: 'completedAt',
+        defaultValue: order.completedAt || nowIso()
+      });
+      if (order.orderType === 'physical' && order.status === 'paid') {
+        order.status = 'completed';
+      }
+    }
+  }
+
+  if (payload.shippingCompany !== undefined || payload.deliveryCompany !== undefined) {
+    order.shippingCompany = ensureText(payload.shippingCompany || payload.deliveryCompany, {
+      field: 'shippingCompany',
+      min: 0,
+      max: 80,
+      defaultValue: order.shippingCompany || ''
+    });
+  }
+
+  if (payload.trackingNo !== undefined) {
+    order.trackingNo = ensureText(payload.trackingNo, {
+      field: 'trackingNo',
+      min: 0,
+      max: 80,
+      defaultValue: order.trackingNo || ''
+    });
   }
 
   writeAudit(store, 'order.updated', order.id, DEFAULT_ADMIN_USERNAME);
   writeStore(store);
   return {
     ...buildOrderView(store, order),
-    user: buildUserSummary(store, order.userId)
+    user: buildUserSummary(store, order.userId),
+    refund: findOrderRefund(store, order.id)
   };
 }
 
@@ -3018,6 +4260,7 @@ function adminSetCodeStatus(codeId, status) {
 
 module.exports = {
   adminChangePassword,
+  adminCloseExpiredOrders,
   adminDashboard,
   adminCreateProduct,
   adminCreateSku,
@@ -3039,6 +4282,7 @@ module.exports = {
   adminListOrders,
   adminListProducts,
   adminListWines,
+  adminReconciliationReport,
   adminLogin,
   adminLogout,
   adminSaveWine,
@@ -3046,8 +4290,10 @@ module.exports = {
   adminUpdateOrder,
   adminUpdateProduct,
   adminUpdateSkuPrice,
+  adminExportOrdersCsv,
   addCartItem,
   assertAdmin,
+  assertAdminPermission,
   consumeDownloadTicket,
   consumeOneTimeCode,
   createCodeBatch,
@@ -3065,18 +4311,29 @@ module.exports = {
   getSessionExperience,
   getStoreHome,
   getWineExperience,
+  listUserAddresses,
   listOrders,
   listProducts,
+  markWechatRefundAccepted,
+  markWechatRefundResult,
+  markWechatShippingFailed,
+  markWechatShippingSynced,
   markOrderPaidByWechat,
   payOrder,
+  prepareWechatRefund,
   prepareWechatJsapiPayment,
+  prepareWechatShippingSync,
   purchaseMembership,
   readStore,
   removeCartItem,
+  requestOrderRefund,
   saveWechatPrepay,
+  saveUserAddress,
   seedDemoData,
   signDownload,
   upsertMiniappUser,
   unlockTrack,
-  updateCartItem
+  updateCartItem,
+  deleteUserAddress,
+  withAuditContext
 };

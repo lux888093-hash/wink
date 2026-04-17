@@ -64,6 +64,9 @@ phone/ phone2/ phone3/      视觉参考稿
 - 微信支付回调增加 RSA 验签、时间窗校验与 `AEAD_AES_256_GCM` 解密
 - `admin/dev/reset` 与单码生成接口已经收口到后台鉴权之内
 - `/api/health` 会返回当前环境、持久化模式和运行告警，方便部署巡检
+- `/api/health/readiness` 会返回生产上线就绪检查，缺少正式域名、数据库、微信登录、微信支付等配置时会返回 503
+- `/api/health/metrics` 会返回基础请求计数，便于灰度期间巡检
+- `npm run backup` 可将当前运行时 store 快照备份到 `BACKUP_DIR`
 
 ### 后台管理页
 
@@ -92,6 +95,8 @@ npm run dev
 - API: `http://127.0.0.1:3100/api`
 - 后台: `http://127.0.0.1:3100/admin/`
 - 健康检查: `http://127.0.0.1:3100/api/health`
+- 上线就绪检查: `http://127.0.0.1:3100/api/health/readiness`
+- 基础指标: `http://127.0.0.1:3100/api/health/metrics`
 
 ### 2. 打开微信开发者工具
 
@@ -173,6 +178,13 @@ Invoke-RestMethod -Method Post `
   -Headers @{ 'x-admin-token' = '你的后台 token' }
 ```
 
+- 备份当前数据快照:
+
+```powershell
+cd D:\AI\hongjiu\server
+npm run backup
+```
+
 - 生成单个扫码码:
 
 ```powershell
@@ -207,6 +219,8 @@ Invoke-RestMethod -Method Put `
 
 ```powershell
 Invoke-RestMethod http://127.0.0.1:3100/api/health
+Invoke-RestMethod http://127.0.0.1:3100/api/health/readiness
+Invoke-RestMethod http://127.0.0.1:3100/api/health/metrics
 ```
 
 ## 当前边界

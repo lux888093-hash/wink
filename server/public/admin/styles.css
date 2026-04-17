@@ -479,13 +479,32 @@ select:focus,
 .table-form {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
 .table-form select,
+.table-form input,
 .table-form button {
   min-height: 38px;
   border-radius: 999px;
+}
+
+.table-form input {
+  width: 132px;
+}
+
+.inline-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-faint);
+  font-size: 12px;
+}
+
+.inline-check input {
+  width: auto;
+  min-height: auto;
 }
 
 .table-form button {
@@ -495,6 +514,23 @@ select:focus,
   background: transparent;
   cursor: pointer;
   transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.table-actions button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--gold);
+  background: transparent;
+  cursor: pointer;
 }
 
 .sku-list {
@@ -512,6 +548,14 @@ select:focus,
 
 .sku-name {
   color: var(--ink);
+}
+
+.sku-meta,
+.muted-inline {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink-faint);
+  font-size: 12px;
 }
 
 .sku-row button {

@@ -40,7 +40,7 @@
           bindtap="selectSku"
         >
           <text class="sku-name">{{item.specName}}</text>
-          <text class="sku-meta">库存 {{item.stock}}</text>
+          <text class="sku-meta">可售 {{item.availableStock}}</text>
         </button>
       </view>
     </view>
@@ -81,8 +81,8 @@
     </view>
 
     <view class="sticky-action section-panel">
-      <button class="ghost-button sticky-button" bindtap="addToCart">加入购物袋</button>
-      <button class="primary-button sticky-button" bindtap="buyNow">立即结算</button>
+      <button class="ghost-button sticky-button" bindtap="addToCart" disabled="{{!canBuy}}">加入购物袋</button>
+      <button class="primary-button sticky-button" bindtap="buyNow" disabled="{{!canBuy}}">立即结算</button>
     </view>
   </view>
 

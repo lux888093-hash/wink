@@ -1,11 +1,13 @@
 require('dotenv').config();
 
 const fs = require('fs');
+const crypto = require('crypto');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const {
   adminChangePassword,
+  adminCloseExpiredOrders,
   adminDashboard,
   adminCreateProduct,
   adminCreateSku,
@@ -27,6 +29,7 @@ const {
   adminListOrders,
   adminListProducts,
   adminListWines,
+  adminReconciliationReport,
   adminLogin,
   adminLogout,
   adminSaveWine,
@@ -34,8 +37,10 @@ const {
   adminUpdateOrder,
   adminUpdateProduct,
   adminUpdateSkuPrice,
+  adminExportOrdersCsv,
   addCartItem,
   assertAdmin,
+  assertAdminPermission,
   consumeDownloadTicket,
   consumeOneTimeCode,
   createCodeBatch,
@@ -53,21 +58,33 @@ const {
   getSessionExperience,
   getStoreHome,
   getWineExperience,
+  listUserAddresses,
   listOrders,
   listProducts,
+  markWechatRefundAccepted,
+  markWechatRefundResult,
+  markWechatShippingFailed,
+  markWechatShippingSynced,
   payOrder,
+  prepareWechatRefund,
   prepareWechatJsapiPayment,
+  prepareWechatShippingSync,
   purchaseMembership,
   removeCartItem,
+  requestOrderRefund,
   saveWechatPrepay,
+  saveUserAddress,
   seedDemoData,
   signDownload,
   upsertMiniappUser,
   unlockTrack,
   markOrderPaidByWechat,
-  updateCartItem
+  updateCartItem,
+  deleteUserAddress,
+  withAuditContext
 } = require('./services/store');
-const { runtimeConfig } = require('./services/config');
+const { getReadinessChecks, runtimeConfig } = require('./services/config');
+const { getRedisHealth, incrementWindow } = require('./services/redis-client');
 const { createRequestId } = require('./services/security');
 const {
   exchangeMiniappCode,
@@ -79,16 +96,25 @@ const {
 const {
   createJsapiTransaction,
   createMiniProgramPaymentParams,
+  createRefund,
   decryptWechatpayResource,
   hasWechatPayCredentials,
+  queryRefundByOutRefundNo,
   queryTransactionByOutTradeNo,
   verifyWechatpaySignature
 } = require('./services/wechat-pay');
-const { hasWechatCredentials, generateMiniProgramCode } = require('./services/wechat');
+const { hasWechatCredentials, generateMiniProgramCode, uploadShippingInfo } = require('./services/wechat');
 
 const app = express();
 const port = runtimeConfig.port;
 const pagePath = 'pages/redeem/index';
+const metrics = {
+  startedAt: new Date().toISOString(),
+  requests: 0,
+  responses2xx: 0,
+  responses4xx: 0,
+  responses5xx: 0
+};
 const audioStaticDirs = [
   path.join(__dirname, '..', 'miniprogram', 'assets', 'audio'),
   path.join(__dirname, '..', 'music')
@@ -122,6 +148,49 @@ function resolveAudioFilePath(fileUrl = '') {
   return '';
 }
 
+function resolveAssetUrlPath(asset) {
+  const source = String((asset && (asset.cdnPath || asset.objectKey || asset.fileUrl)) || '');
+
+  if (!source) {
+    return '';
+  }
+
+  if (/^https?:\/\//i.test(source)) {
+    try {
+      return new URL(source).pathname;
+    } catch (error) {
+      return source;
+    }
+  }
+
+  return source.startsWith('/') ? source : `/${source}`;
+}
+
+function buildCdnDownloadUrl(asset) {
+  if (!runtimeConfig.cdnBaseUrl) {
+    return '';
+  }
+
+  const pathname = resolveAssetUrlPath(asset);
+  if (!pathname) {
+    return '';
+  }
+
+  const url = new URL(pathname, runtimeConfig.cdnBaseUrl.endsWith('/') ? runtimeConfig.cdnBaseUrl : `${runtimeConfig.cdnBaseUrl}/`);
+
+  if (runtimeConfig.cdnSigningSecret) {
+    const expires = Math.floor(Date.now() / 1000) + runtimeConfig.cdnSignedUrlTtlSeconds;
+    const signature = crypto
+      .createHmac('sha256', runtimeConfig.cdnSigningSecret)
+      .update(`${url.pathname}\n${expires}`)
+      .digest('hex');
+    url.searchParams.set('expires', String(expires));
+    url.searchParams.set('signature', signature);
+  }
+
+  return url.toString();
+}
+
 function clientIp(req) {
   const forwarded = req.headers['x-forwarded-for'];
 
@@ -135,29 +204,35 @@ function clientIp(req) {
 function createRateLimiter(options) {
   const buckets = new Map();
 
-  return (req, res, next) => {
+  return async (req, res, next) => {
     const key = options.key(req);
     const now = Date.now();
+    const redisBucket = await incrementWindow(`rate:${key}`, options.windowMs);
 
-    if (buckets.size > 5000) {
-      for (const [bucketKey, bucketValue] of buckets.entries()) {
-        if (bucketValue.resetAt <= now) {
-          buckets.delete(bucketKey);
-        }
-      }
-    }
-
-    const current = buckets.get(key);
     const bucket =
-      current && current.resetAt > now
-        ? current
-        : {
-            count: 0,
-            resetAt: now + options.windowMs
-          };
+      redisBucket ||
+      (() => {
+        if (buckets.size > 5000) {
+          for (const [bucketKey, bucketValue] of buckets.entries()) {
+            if (bucketValue.resetAt <= now) {
+              buckets.delete(bucketKey);
+            }
+          }
+        }
 
-    bucket.count += 1;
-    buckets.set(key, bucket);
+        const current = buckets.get(key);
+        const localBucket =
+          current && current.resetAt > now
+            ? current
+            : {
+                count: 0,
+                resetAt: now + options.windowMs
+              };
+
+        localBucket.count += 1;
+        buckets.set(key, localBucket);
+        return localBucket;
+      })();
 
     if (bucket.count > options.max) {
       res.setHeader('retry-after', String(Math.max(1, Math.ceil((bucket.resetAt - now) / 1000))));
@@ -218,12 +293,22 @@ function corsOriginHandler(origin, callback) {
 app.use((req, res, next) => {
   const requestId = createRequestId();
   req.requestId = requestId;
+  metrics.requests += 1;
   res.setHeader('x-request-id', requestId);
   res.setHeader('x-content-type-options', 'nosniff');
   res.setHeader('x-frame-options', 'DENY');
   res.setHeader('referrer-policy', 'same-origin');
   res.setHeader('permissions-policy', 'camera=(), microphone=(), geolocation=()');
   res.setHeader('cross-origin-opener-policy', 'same-origin');
+  res.on('finish', () => {
+    if (res.statusCode >= 500) {
+      metrics.responses5xx += 1;
+    } else if (res.statusCode >= 400) {
+      metrics.responses4xx += 1;
+    } else if (res.statusCode >= 200 && res.statusCode < 300) {
+      metrics.responses2xx += 1;
+    }
+  });
   next();
 });
 
@@ -257,7 +342,7 @@ app.use('/api', (req, res, next) => {
     return next();
   }
 
-  if (req.path === '/payments/wechat/callback') {
+  if (req.path === '/payments/wechat/callback' || req.path === '/payments/wechat/refund-callback') {
     return next();
   }
 
@@ -324,6 +409,10 @@ function resolveUserId(req) {
     return authSession.userId;
   }
 
+  if (runtimeConfig.isProduction) {
+    return '';
+  }
+
   return (
     req.headers['x-demo-user-id'] ||
     req.query.userId ||
@@ -332,19 +421,44 @@ function resolveUserId(req) {
   );
 }
 
+function requireUserId(req) {
+  const userId = resolveUserId(req);
+
+  if (!userId) {
+    throw appError('MINIAPP_AUTH_REQUIRED', 401);
+  }
+
+  return userId;
+}
+
 function resolveAdminToken(req) {
   return String(req.headers['x-admin-token'] || '').trim();
 }
 
-function withAdmin(handler) {
+function withAdmin(permissionOrHandler, maybeHandler) {
+  const permission = typeof permissionOrHandler === 'string' ? permissionOrHandler : '';
+  const handler = typeof permissionOrHandler === 'function' ? permissionOrHandler : maybeHandler;
+
   return (req, res) => {
     try {
       const { readStore } = require('./services/store');
       const store = readStore();
       const admin = assertAdmin(store, resolveAdminToken(req));
-      Promise.resolve(handler(req, res, admin)).catch((error) => {
-        respondError(res, error);
-      });
+      assertAdminPermission(store, admin, permission);
+      withAuditContext(
+        {
+          adminId: admin.id,
+          adminUsername: admin.username,
+          requestId: req.requestId,
+          ip: clientIp(req),
+          userAgent: req.headers['user-agent'] || ''
+        },
+        () => {
+          Promise.resolve(handler(req, res, admin)).catch((error) => {
+            respondError(res, error);
+          });
+        }
+      );
     } catch (error) {
       respondError(res, error);
     }
@@ -361,8 +475,50 @@ app.get('/api/health', (_req, res) => {
     warnings: getSecurityWarnings(),
     capabilities: {
       wechatLogin: hasWechatLoginCredentials(),
-      wechatPay: hasWechatPayCredentials()
+      wechatPay: hasWechatPayCredentials(),
+      redis: getRedisHealth(),
+      cdnDelivery: runtimeConfig.mediaDeliveryMode === 'cdn' && Boolean(runtimeConfig.cdnBaseUrl)
     }
+  });
+});
+
+app.get('/api/health/readiness', (_req, res) => {
+  const report = getReadinessChecks({
+    checks: [
+      {
+        key: 'wechat_login_runtime',
+        ok: hasWechatLoginCredentials(),
+        severity: 'required',
+        message: 'WeChat mini-program login runtime credentials are available.'
+      },
+      {
+        key: 'wechat_pay_runtime',
+        ok: hasWechatPayCredentials(),
+        severity: 'required',
+        message: 'WeChat Pay runtime credentials are available.'
+      }
+    ]
+  });
+
+  res.status(report.ready ? 200 : 503).json({
+    ok: report.ready,
+    ...report,
+    warnings: getSecurityWarnings(),
+    persistence: getPersistenceMeta()
+  });
+});
+
+app.get('/api/health/metrics', (_req, res) => {
+  const uptimeSeconds = Math.round(process.uptime());
+
+  res.json({
+    ok: true,
+    uptimeSeconds,
+    startedAt: metrics.startedAt,
+    requests: metrics.requests,
+    responses2xx: metrics.responses2xx,
+    responses4xx: metrics.responses4xx,
+    responses5xx: metrics.responses5xx
   });
 });
 
@@ -402,7 +558,7 @@ app.post('/api/auth/wechat/login', async (req, res) => {
 
 app.get('/api/auth/me', (req, res) => {
   try {
-    const userId = resolveUserId(req);
+    const userId = requireUserId(req);
     const payload = getUserSummaryById(userId);
     res.json({
       ok: true,
@@ -416,7 +572,7 @@ app.get('/api/auth/me', (req, res) => {
   }
 });
 
-app.post('/api/admin/dev/reset', withAdmin((_req, res) => {
+app.post('/api/admin/dev/reset', withAdmin('dashboard.write', (_req, res) => {
   if (!runtimeConfig.enableDevReset) {
     res.status(403).json({
       ok: false,
@@ -441,7 +597,7 @@ app.post('/api/admin/dev/reset', withAdmin((_req, res) => {
 app.post('/api/redeem/consume', redeemLimiter, (req, res) => {
   try {
     const code = (req.body && (req.body.code || req.body.redeemCode)) || '';
-    const requestMeta = { ip: clientIp(req), userId: resolveUserId(req) };
+    const requestMeta = { ip: clientIp(req), userId: requireUserId(req) };
     const payload = consumeOneTimeCode(code, requestMeta.userId, requestMeta);
     res.json({
       ok: true,
@@ -506,11 +662,58 @@ app.get('/api/products/:productId', (req, res) => {
   }
 });
 
+app.get('/api/addresses', (req, res) => {
+  try {
+    res.json({
+      ok: true,
+      ...listUserAddresses(requireUserId(req))
+    });
+  } catch (error) {
+    respondError(res, error);
+  }
+});
+
+app.post('/api/addresses', (req, res) => {
+  try {
+    res.json({
+      ok: true,
+      ...saveUserAddress(requireUserId(req), req.body || {})
+    });
+  } catch (error) {
+    respondError(res, error);
+  }
+});
+
+app.put('/api/addresses/:addressId', (req, res) => {
+  try {
+    res.json({
+      ok: true,
+      ...saveUserAddress(requireUserId(req), {
+        ...(req.body || {}),
+        id: req.params.addressId
+      })
+    });
+  } catch (error) {
+    respondError(res, error);
+  }
+});
+
+app.delete('/api/addresses/:addressId', (req, res) => {
+  try {
+    res.json({
+      ok: true,
+      ...deleteUserAddress(requireUserId(req), req.params.addressId)
+    });
+  } catch (error) {
+    respondError(res, error);
+  }
+});
+
 app.get('/api/cart', (req, res) => {
   try {
     res.json({
       ok: true,
-      ...getCart(resolveUserId(req))
+      ...getCart(requireUserId(req))
     });
   } catch (error) {
     respondError(res, error);
@@ -521,7 +724,7 @@ app.post('/api/cart/items', (req, res) => {
   try {
     res.json({
       ok: true,
-      ...addCartItem(resolveUserId(req), req.body || {})
+      ...addCartItem(requireUserId(req), req.body || {})
     });
   } catch (error) {
     respondError(res, error);
@@ -532,7 +735,7 @@ app.put('/api/cart/items/:itemId', (req, res) => {
   try {
     res.json({
       ok: true,
-      ...updateCartItem(resolveUserId(req), req.params.itemId, req.body || {})
+      ...updateCartItem(requireUserId(req), req.params.itemId, req.body || {})
     });
   } catch (error) {
     respondError(res, error);
@@ -543,7 +746,7 @@ app.delete('/api/cart/items/:itemId', (req, res) => {
   try {
     res.json({
       ok: true,
-      ...removeCartItem(resolveUserId(req), req.params.itemId)
+      ...removeCartItem(requireUserId(req), req.params.itemId)
     });
   } catch (error) {
     respondError(res, error);
@@ -554,7 +757,7 @@ app.post('/api/orders', (req, res) => {
   try {
     res.json({
       ok: true,
-      ...createOrder(resolveUserId(req), req.body || {})
+      ...createOrder(requireUserId(req), req.body || {})
     });
   } catch (error) {
     respondError(res, error);
@@ -565,7 +768,18 @@ app.get('/api/orders', (req, res) => {
   try {
     res.json({
       ok: true,
-      ...listOrders(resolveUserId(req))
+      ...listOrders(requireUserId(req))
+    });
+  } catch (error) {
+    respondError(res, error);
+  }
+});
+
+app.post('/api/orders/:orderId/refund', (req, res) => {
+  try {
+    res.json({
+      ok: true,
+      ...requestOrderRefund(requireUserId(req), req.params.orderId, req.body || {})
     });
   } catch (error) {
     respondError(res, error);
@@ -576,7 +790,7 @@ app.post('/api/orders/:orderId/pay', (req, res) => {
   try {
     res.json({
       ok: true,
-      ...payOrder(resolveUserId(req), req.params.orderId)
+      ...payOrder(requireUserId(req), req.params.orderId)
     });
   } catch (error) {
     respondError(res, error);
@@ -585,7 +799,7 @@ app.post('/api/orders/:orderId/pay', (req, res) => {
 
 app.post('/api/payments/orders/:orderId/jsapi', async (req, res) => {
   try {
-    const userId = resolveUserId(req);
+    const userId = requireUserId(req);
     const prepared = prepareWechatJsapiPayment(userId, req.params.orderId, req.body || {});
 
     if (!hasWechatPayCredentials()) {
@@ -650,7 +864,7 @@ app.post('/api/payments/orders/:orderId/jsapi', async (req, res) => {
 
 app.get('/api/payments/orders/:orderId/status', async (req, res) => {
   try {
-    const userId = resolveUserId(req);
+    const userId = requireUserId(req);
     let statusPayload = getOrderPaymentStatus(userId, req.params.orderId);
 
     if (
@@ -723,11 +937,52 @@ app.post('/api/payments/wechat/callback', async (req, res) => {
   }
 });
 
+app.post('/api/payments/wechat/refund-callback', async (req, res) => {
+  const rawBody = req.rawBody || JSON.stringify(req.body || {});
+
+  try {
+    if (!verifyWechatpaySignature(req.headers, rawBody)) {
+      res.status(401).json({
+        code: 'FAIL',
+        message: 'invalid wechatpay signature'
+      });
+      return;
+    }
+
+    const notification = req.body || {};
+
+    if (notification.event_type && !String(notification.event_type).startsWith('REFUND.')) {
+      res.status(204).end();
+      return;
+    }
+
+    const resource = decryptWechatpayResource(notification.resource || {});
+    markWechatRefundResult({
+      outRefundNo: resource.out_refund_no,
+      refundId: resource.refund_id,
+      refundStatus: resource.refund_status,
+      successTime: resource.success_time,
+      rawPayload: {
+        notification,
+        resource
+      }
+    });
+
+    res.status(204).end();
+  } catch (error) {
+    console.error(`[${req.requestId || 'wechat-refund-callback'}]`, error.message || 'WECHAT_REFUND_CALLBACK_FAILED');
+    res.status(500).json({
+      code: 'FAIL',
+      message: 'refund callback handling failed'
+    });
+  }
+});
+
 app.get('/api/member/profile', (req, res) => {
   try {
     res.json({
       ok: true,
-      ...getMemberProfile(resolveUserId(req))
+      ...getMemberProfile(requireUserId(req))
     });
   } catch (error) {
     respondError(res, error);
@@ -738,7 +993,7 @@ app.post('/api/member/purchase', (req, res) => {
   try {
     res.json({
       ok: true,
-      ...purchaseMembership(resolveUserId(req), req.body && req.body.planId)
+      ...purchaseMembership(requireUserId(req), req.body || {})
     });
   } catch (error) {
     respondError(res, error);
@@ -749,7 +1004,7 @@ app.post('/api/tracks/:trackId/unlock', (req, res) => {
   try {
     res.json({
       ok: true,
-      ...unlockTrack(resolveUserId(req), req.params.trackId, req.body || {})
+      ...unlockTrack(requireUserId(req), req.params.trackId, req.body || {})
     });
   } catch (error) {
     respondError(res, error);
@@ -762,7 +1017,7 @@ app.post('/api/downloads/:trackId/sign', (req, res) => {
       ip: clientIp(req),
       deviceInfo: req.headers['user-agent'] || 'unknown'
     };
-    const payload = signDownload(resolveUserId(req), req.params.trackId, requestMeta);
+    const payload = signDownload(requireUserId(req), req.params.trackId, requestMeta);
     res.json({
       ok: true,
       ...payload,
@@ -777,7 +1032,7 @@ app.get('/api/downloads/logs', (req, res) => {
   try {
     res.json({
       ok: true,
-      items: getDownloadLogs(resolveUserId(req))
+      items: getDownloadLogs(requireUserId(req))
     });
   } catch (error) {
     respondError(res, error);
@@ -791,6 +1046,16 @@ app.get('/api/downloads/file', (req, res) => {
       deviceInfo: req.headers['user-agent'] || 'unknown'
     };
     const payload = consumeDownloadTicket(req.query.token, requestMeta);
+    const cdnUrl =
+      runtimeConfig.mediaDeliveryMode === 'cdn' || !resolveAudioFilePath(payload.asset.fileUrl)
+        ? buildCdnDownloadUrl(payload.asset)
+        : '';
+
+    if (cdnUrl) {
+      res.redirect(302, cdnUrl);
+      return;
+    }
+
     const localPath = resolveAudioFilePath(payload.asset.fileUrl);
 
     if (!localPath) {
@@ -828,14 +1093,14 @@ app.put('/api/admin/account/password', withAdmin((req, res) => {
   });
 }));
 
-app.get('/api/admin/dashboard', withAdmin((_req, res) => {
+app.get('/api/admin/dashboard', withAdmin('dashboard.read', (_req, res) => {
   res.json({
     ok: true,
     ...adminDashboard()
   });
 }));
 
-app.post('/api/admin/qrcode/fixed-redeem', withAdmin(async (_req, res) => {
+app.post('/api/admin/qrcode/fixed-redeem', withAdmin('codes.write', async (_req, res) => {
   if (!hasWechatCredentials()) {
     throw appError('WECHAT_CREDENTIALS_REQUIRED', 400);
   }
@@ -856,21 +1121,21 @@ app.post('/api/admin/qrcode/fixed-redeem', withAdmin(async (_req, res) => {
   });
 }));
 
-app.get('/api/admin/wines', withAdmin((_req, res) => {
+app.get('/api/admin/wines', withAdmin('wines.read', (_req, res) => {
   res.json({
     ok: true,
     items: adminListWines()
   });
 }));
 
-app.post('/api/admin/wines', withAdmin((req, res) => {
+app.post('/api/admin/wines', withAdmin('wines.write', (req, res) => {
   res.json({
     ok: true,
     item: adminCreateWine(req.body || {})
   });
 }));
 
-app.put('/api/admin/wines/:wineId', withAdmin((req, res) => {
+app.put('/api/admin/wines/:wineId', withAdmin('wines.write', (req, res) => {
   res.json({
     ok: true,
     item: adminSaveWine({
@@ -880,28 +1145,28 @@ app.put('/api/admin/wines/:wineId', withAdmin((req, res) => {
   });
 }));
 
-app.delete('/api/admin/wines/:wineId', withAdmin((req, res) => {
+app.delete('/api/admin/wines/:wineId', withAdmin('wines.write', (req, res) => {
   res.json({
     ok: true,
     result: adminDeleteWine(req.params.wineId)
   });
 }));
 
-app.get('/api/admin/wineries', withAdmin((_req, res) => {
+app.get('/api/admin/wineries', withAdmin('wineries.read', (_req, res) => {
   res.json({
     ok: true,
     items: adminListWineries()
   });
 }));
 
-app.post('/api/admin/wineries', withAdmin((req, res) => {
+app.post('/api/admin/wineries', withAdmin('wineries.write', (req, res) => {
   res.json({
     ok: true,
     item: adminCreateWinery(req.body || {})
   });
 }));
 
-app.put('/api/admin/wineries/:wineryId', withAdmin((req, res) => {
+app.put('/api/admin/wineries/:wineryId', withAdmin('wineries.write', (req, res) => {
   res.json({
     ok: true,
     item: adminSaveWinery({
@@ -911,21 +1176,21 @@ app.put('/api/admin/wineries/:wineryId', withAdmin((req, res) => {
   });
 }));
 
-app.get('/api/admin/tracks', withAdmin((_req, res) => {
+app.get('/api/admin/tracks', withAdmin('tracks.read', (_req, res) => {
   res.json({
     ok: true,
     items: adminListTracks()
   });
 }));
 
-app.post('/api/admin/tracks', withAdmin((req, res) => {
+app.post('/api/admin/tracks', withAdmin('tracks.write', (req, res) => {
   res.json({
     ok: true,
     item: adminCreateTrack(req.body || {})
   });
 }));
 
-app.put('/api/admin/tracks/:trackId', withAdmin((req, res) => {
+app.put('/api/admin/tracks/:trackId', withAdmin('tracks.write', (req, res) => {
   res.json({
     ok: true,
     item: adminSaveTrack({
@@ -935,119 +1200,260 @@ app.put('/api/admin/tracks/:trackId', withAdmin((req, res) => {
   });
 }));
 
-app.post('/api/admin/code-batches', withAdmin((req, res) => {
+app.post('/api/admin/code-batches', withAdmin('codes.write', (req, res) => {
   res.json({
     ok: true,
     ...createCodeBatch(req.body || {})
   });
 }));
 
-app.get('/api/admin/codes', withAdmin((_req, res) => {
+app.get('/api/admin/codes', withAdmin('codes.read', (_req, res) => {
   res.json({
     ok: true,
     items: adminListCodes()
   });
 }));
 
-app.put('/api/admin/codes/:codeId/status', withAdmin((req, res) => {
+app.put('/api/admin/codes/:codeId/status', withAdmin('codes.write', (req, res) => {
   res.json({
     ok: true,
     item: adminSetCodeStatus(req.params.codeId, req.body && req.body.status)
   });
 }));
 
-app.get('/api/admin/codes/export', withAdmin((_req, res) => {
+app.get('/api/admin/codes/export', withAdmin('codes.read', (_req, res) => {
   const csv = adminExportCodesCsv();
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', 'attachment; filename=redeem-codes.csv');
   res.send('\uFEFF' + csv);
 }));
 
-app.get('/api/admin/products', withAdmin((_req, res) => {
+app.get('/api/admin/products', withAdmin('products.read', (_req, res) => {
   res.json({
     ok: true,
     items: adminListProducts()
   });
 }));
 
-app.post('/api/admin/products', withAdmin((req, res) => {
+app.post('/api/admin/products', withAdmin('products.write', (req, res) => {
   res.json({
     ok: true,
     item: adminCreateProduct(req.body || {})
   });
 }));
 
-app.put('/api/admin/products/:productId', withAdmin((req, res) => {
+app.put('/api/admin/products/:productId', withAdmin('products.write', (req, res) => {
   res.json({
     ok: true,
     item: adminUpdateProduct(req.params.productId, req.body || {})
   });
 }));
 
-app.delete('/api/admin/products/:productId', withAdmin((req, res) => {
+app.delete('/api/admin/products/:productId', withAdmin('products.write', (req, res) => {
   res.json({
     ok: true,
     result: adminDeleteProduct(req.params.productId)
   });
 }));
 
-app.post('/api/admin/products/:productId/skus', withAdmin((req, res) => {
+app.post('/api/admin/products/:productId/skus', withAdmin('products.write', (req, res) => {
   res.json({
     ok: true,
     item: adminCreateSku(req.params.productId, req.body || {})
   });
 }));
 
-app.put('/api/admin/skus/:skuId/price', withAdmin((req, res) => {
+app.put('/api/admin/skus/:skuId/price', withAdmin('products.write', (req, res) => {
   res.json({
     ok: true,
     item: adminUpdateSkuPrice(req.params.skuId, req.body || {})
   });
 }));
 
-app.get('/api/admin/orders', withAdmin((_req, res) => {
+app.get('/api/admin/orders', withAdmin('orders.read', (_req, res) => {
   res.json({
     ok: true,
     items: adminListOrders()
   });
 }));
 
-app.put('/api/admin/orders/:orderId', withAdmin((req, res) => {
+app.get('/api/admin/orders/export', withAdmin('orders.read', (_req, res) => {
+  const csv = adminExportOrdersCsv();
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename=orders.csv');
+  res.send('\uFEFF' + csv);
+}));
+
+app.post('/api/admin/orders/close-expired', withAdmin('orders.write', (_req, res) => {
+  res.json({
+    ok: true,
+    ...adminCloseExpiredOrders()
+  });
+}));
+
+app.post('/api/admin/orders/:orderId/shipping/wechat', withAdmin('orders.write', async (req, res) => {
+  let prepared = null;
+
+  try {
+    prepared = prepareWechatShippingSync(req.params.orderId, req.body || {});
+
+    if (!hasWechatCredentials()) {
+      if (runtimeConfig.isProduction) {
+        throw appError('WECHAT_CREDENTIALS_REQUIRED', 400);
+      }
+
+      res.json({
+        ok: true,
+        mode: 'mock',
+        item: markWechatShippingSynced(req.params.orderId, {
+          mode: 'mock',
+          payload: prepared.wechat
+        })
+      });
+      return;
+    }
+
+    const response = await uploadShippingInfo(prepared.wechat);
+    res.json({
+      ok: true,
+      mode: 'wechat',
+      item: markWechatShippingSynced(req.params.orderId, response)
+    });
+  } catch (error) {
+    if (prepared) {
+      markWechatShippingFailed(req.params.orderId, error);
+    }
+    throw error;
+  }
+}));
+
+app.post('/api/admin/orders/:orderId/refund/wechat', withAdmin('orders.refund', async (req, res) => {
+  let prepared = null;
+
+  try {
+    prepared = prepareWechatRefund(req.params.orderId, req.body || {});
+
+    if (!hasWechatPayCredentials()) {
+      if (runtimeConfig.isProduction) {
+        throw appError('WECHAT_PAY_DISABLED', 400);
+      }
+
+      const result = markWechatRefundResult({
+        outRefundNo: prepared.refund.outRefundNo,
+        refundId: `mock_${prepared.refund.refundNo}`,
+        refundStatus: 'SUCCESS',
+        successTime: new Date().toISOString(),
+        rawPayload: {
+          mode: 'mock'
+        }
+      });
+
+      res.json({
+        ok: true,
+        mode: 'mock',
+        item: result.order,
+        refund: result.refund
+      });
+      return;
+    }
+
+    const wxRefund = await createRefund({
+      ...prepared.wechat,
+      notifyUrl: runtimeConfig.wechatPayRefundNotifyUrl
+    });
+    const accepted = markWechatRefundAccepted(prepared.refund.id, wxRefund);
+
+    res.json({
+      ok: true,
+      mode: 'wechat',
+      item: accepted.order,
+      refund: accepted.refund,
+      wechat: wxRefund
+    });
+  } catch (error) {
+    if (prepared) {
+      markWechatRefundResult({
+        outRefundNo: prepared.refund.outRefundNo,
+        refundStatus: 'ABNORMAL',
+        failReason: error.message,
+        rawPayload: {
+          meta: error.meta || null
+        }
+      });
+    }
+    throw error;
+  }
+}));
+
+app.post('/api/admin/refunds/:outRefundNo/refresh-wechat', withAdmin('orders.refund', async (req, res) => {
+  if (!hasWechatPayCredentials()) {
+    if (runtimeConfig.isProduction) {
+      throw appError('WECHAT_PAY_DISABLED', 400);
+    }
+
+    throw appError('WECHAT_PAY_DISABLED_IN_DEVELOPMENT', 400);
+  }
+
+  const wxRefund = await queryRefundByOutRefundNo(req.params.outRefundNo);
+  const result = markWechatRefundResult({
+    outRefundNo: wxRefund.out_refund_no || req.params.outRefundNo,
+    refundId: wxRefund.refund_id,
+    refundStatus: wxRefund.status || wxRefund.refund_status,
+    successTime: wxRefund.success_time,
+    rawPayload: wxRefund
+  });
+
+  res.json({
+    ok: true,
+    item: result.order,
+    refund: result.refund,
+    wechat: wxRefund
+  });
+}));
+
+app.get('/api/admin/reports/reconciliation', withAdmin('dashboard.read', (_req, res) => {
+  res.json({
+    ok: true,
+    report: adminReconciliationReport()
+  });
+}));
+
+app.put('/api/admin/orders/:orderId', withAdmin('orders.write', (req, res) => {
   res.json({
     ok: true,
     item: adminUpdateOrder(req.params.orderId, req.body || {})
   });
 }));
 
-app.get('/api/admin/memberships', withAdmin((_req, res) => {
+app.get('/api/admin/memberships', withAdmin('memberships.read', (_req, res) => {
   res.json({
     ok: true,
     items: adminListMemberships()
   });
 }));
 
-app.post('/api/admin/memberships/grant', withAdmin((req, res) => {
+app.post('/api/admin/memberships/grant', withAdmin('memberships.grant', (req, res) => {
   res.json({
     ok: true,
     item: adminGrantMembership(req.body || {})
   });
 }));
 
-app.get('/api/admin/audit-logs', withAdmin((req, res) => {
+app.get('/api/admin/audit-logs', withAdmin('audit.read', (req, res) => {
   res.json({
     ok: true,
     items: adminListAuditLogs(req.query.limit)
   });
 }));
 
-app.get('/api/admin/redeem-fail-logs', withAdmin((req, res) => {
+app.get('/api/admin/redeem-fail-logs', withAdmin('codes.read', (req, res) => {
   res.json({
     ok: true,
     items: adminListRedeemFailLogs(req.query.limit)
   });
 }));
 
-app.post('/api/admin/codes', withAdmin(async (req, res) => {
+app.post('/api/admin/codes', withAdmin('codes.write', async (req, res) => {
   try {
     const { code, wine } = createOneTimeCode(req.body || {});
 
