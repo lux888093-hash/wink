@@ -51,26 +51,37 @@
         <view class="track-copy">
           <text class="track-title line-clamp-1">{{item.cnTitle}}</text>
           <text class="micro-copy line-clamp-2">{{item.description}}</text>
-          <view class="track-actions">
-            <button class="soft-inline" data-track-id="{{item.id}}" bindtap="openTrack">
-              {{item.access.canPlayFull ? '播放' : '试听'}}
-            </button>
-            <button
-              wx:if="{{item.access.canDownload}}"
-              class="soft-inline"
-              data-track-id="{{item.id}}"
-              bindtap="downloadTrack"
-            >
-              下载
-            </button>
-            <button
-              wx:else
-              class="ghost-inline"
-              data-track-id="{{item.id}}"
-              bindtap="unlockTrack"
-            >
-              解锁 ¥{{item.access.unlockPrice}}
-            </button>
+        </view>
+        <view class="track-actions">
+          <view
+            class="track-icon-button"
+            data-track-id="{{item.id}}"
+            bindtap="openTrack"
+            hover-class="track-icon-active"
+          >
+            <view class="track-play-icon"></view>
+          </view>
+          <view
+            wx:if="{{item.access.canDownload}}"
+            class="track-icon-button"
+            data-track-id="{{item.id}}"
+            bindtap="downloadTrack"
+            hover-class="track-icon-active"
+          >
+            <view class="track-download-icon">
+              <view class="track-download-stem"></view>
+              <view class="track-download-arrow"></view>
+              <view class="track-download-tray"></view>
+            </view>
+          </view>
+          <view
+            wx:else
+            class="track-unlock-button"
+            data-track-id="{{item.id}}"
+            bindtap="unlockTrack"
+            hover-class="track-icon-active"
+          >
+            解锁
           </view>
         </view>
       </view>
