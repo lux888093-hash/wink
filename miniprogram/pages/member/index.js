@@ -43,7 +43,7 @@ Page({
           })),
           hasDownloads: Boolean(downloads.length),
           hasActiveMembership,
-          membershipStateLabel: hasActiveMembership ? 'ON' : 'OFF',
+          membershipStateLabel: hasActiveMembership ? '已开通' : '未开通',
           membershipExpireAt:
             profilePayload.membership && profilePayload.membership.expireAt
               ? profilePayload.membership.expireAt

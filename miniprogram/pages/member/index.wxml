@@ -18,23 +18,11 @@
           <text class="member-metric-label">下载</text>
         </view>
         <view class="member-metric">
-          <text class="member-metric-value">{{profile.membershipStateLabel}}</text>
+          <view class="member-state {{profile.hasActiveMembership ? 'is-active' : 'is-inactive'}}">
+            <text>{{profile.membershipStateLabel}}</text>
+          </view>
           <text class="member-metric-label">会籍</text>
         </view>
-      </view>
-    </view>
-
-    <view wx:if="{{!profile.hasActiveMembership}}" class="plan-list">
-      <view class="paper-panel plan-card" wx:for="{{profile.plans}}" wx:key="id">
-        <view class="plan-head">
-          <view>
-            <text class="plan-name">{{item.name}}</text>
-            <text class="plan-badge">{{item.badge}}</text>
-          </view>
-          <text class="plan-price">¥{{item.price}}</text>
-        </view>
-        <text class="muted-copy line-clamp-2">{{item.benefitsLabel}}</text>
-        <button class="primary-button full-width plan-button" data-plan-id="{{item.id}}" bindtap="purchasePlan">立即开通</button>
       </view>
     </view>
 
