@@ -17,7 +17,6 @@
     <view class="melody-stage">
       <view class="cover-shell">
         <image class="cover-image" src="{{currentTrack.cover || wine.posterImage || '/assets/images/melody-phone-cover.jpg'}}" mode="aspectFill"></image>
-        <view class="cover-core"></view>
       </view>
 
       <text class="eyebrow melody-kicker">{{currentTrack.mood || 'AMBIENT PAIRING'}}</text>

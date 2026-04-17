@@ -98,20 +98,6 @@
   transform: scale(1.04);
 }
 
-.cover-core {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 66rpx;
-  height: 66rpx;
-  margin-left: -33rpx;
-  margin-top: -33rpx;
-  border-radius: 16rpx;
-  background: rgba(12, 8, 8, 0.84);
-  border: 1rpx solid rgba(59, 47, 44, 0.5);
-  backdrop-filter: blur(10rpx);
-}
-
 .melody-kicker {
   margin-top: 98rpx;
   margin-bottom: 14rpx;
