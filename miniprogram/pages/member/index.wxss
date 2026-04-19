@@ -1,43 +1,149 @@
 .member-page {
   display: flex;
   flex-direction: column;
-  gap: 18rpx;
+  gap: 22rpx;
+  font-family: "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
 }
 
 .member-hero {
-  padding: 28rpx 24rpx 22rpx;
+  position: relative;
+  overflow: hidden;
+  padding: 28rpx 24rpx 24rpx;
+  border-radius: 36rpx;
+  border: 1rpx solid rgba(226, 199, 159, 0.1);
+  background:
+    radial-gradient(circle at 88% 12%, rgba(231, 200, 150, 0.13), transparent 28%),
+    linear-gradient(180deg, rgba(33, 25, 23, 0.9), rgba(16, 12, 11, 0.96)),
+    rgba(16, 12, 11, 0.96);
+  box-shadow: 0 20rpx 38rpx rgba(0, 0, 0, 0.14);
+}
+
+.member-hero-glow {
+  position: absolute;
+  top: -52rpx;
+  right: -36rpx;
+  width: 250rpx;
+  height: 250rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(231, 200, 150, 0.16), rgba(231, 200, 150, 0));
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+.member-hero-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.member-kicker {
+  display: block;
+  color: rgba(231, 200, 150, 0.84);
+  font-size: 12rpx;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+}
+
+.member-tier-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.member-tier {
+  flex: 1;
+  min-width: 0;
+  color: var(--ink);
+  font-family: "SF Pro Display", "SF Pro Text", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  font-size: 34rpx;
+  font-weight: 600;
+  line-height: 1.14;
+  letter-spacing: 0.01em;
+}
+
+.member-status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  min-height: 42rpx;
+  padding: 0 18rpx;
+  border-radius: 999rpx;
+  font-size: 16rpx;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border: 1rpx solid rgba(226, 199, 159, 0.12);
+  background: rgba(244, 235, 225, 0.05);
+}
+
+.member-status-pill.is-active {
+  color: var(--gold-strong);
+  background: rgba(214, 177, 124, 0.1);
+}
+
+.member-status-pill.is-inactive {
+  color: rgba(246, 239, 231, 0.76);
+}
+
+.member-summary {
+  display: block;
+  color: var(--ink-soft);
+  font-size: 18rpx;
+  line-height: 1.64;
+}
+
+.member-expire-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  min-height: 30rpx;
+}
+
+.member-expire-label,
+.member-expire-value {
+  color: var(--ink-faint);
+  font-size: 16rpx;
+  line-height: 1.4;
+}
+
+.member-expire-value {
+  color: var(--ink-soft);
 }
 
 .member-metrics {
   display: flex;
-  gap: 8rpx;
-  margin-top: 14rpx;
+  gap: 10rpx;
+  margin-top: 4rpx;
 }
 
 .member-metric {
   flex: 1;
   min-width: 0;
-  min-height: 76rpx;
-  padding: 10rpx 8rpx;
-  border-radius: 14rpx;
+  min-height: 96rpx;
+  padding: 16rpx 10rpx 14rpx;
+  border-radius: 24rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  background: rgba(244, 235, 225, 0.035);
-  border: 1rpx solid rgba(214, 177, 124, 0.1);
+  background: rgba(244, 235, 225, 0.038);
+  border: 1rpx solid rgba(214, 177, 124, 0.08);
 }
 
 .member-metric-value {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 6rpx;
+  margin-bottom: 8rpx;
   color: var(--gold-strong);
-  font-family: Baskerville, Georgia, "Times New Roman", serif;
-  font-size: 28rpx;
-  line-height: 1;
+  font-family: "SF Pro Display", "SF Pro Text", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  font-size: 30rpx;
+  font-weight: 600;
+  line-height: 1.06;
   text-align: center;
   font-variant-numeric: lining-nums;
 }
@@ -47,13 +153,12 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 30rpx;
-  margin-bottom: 6rpx;
-  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  font-size: 20rpx;
+  min-height: 32rpx;
+  margin-bottom: 8rpx;
+  font-size: 24rpx;
   font-weight: 600;
-  line-height: 1;
-  letter-spacing: 0;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
   white-space: nowrap;
 }
 
@@ -70,59 +175,93 @@
   align-items: center;
   justify-content: center;
   color: var(--ink-faint);
-  font-size: 14rpx;
-  line-height: 1;
-  letter-spacing: 0;
+  font-size: 15rpx;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
   text-align: center;
+}
+
+.member-section-head {
+  display: flex;
+  align-items: center;
+  min-height: 34rpx;
+  padding: 0 4rpx;
+}
+
+.member-section-title {
+  display: block;
+  color: var(--ink);
+  font-family: "SF Pro Display", "SF Pro Text", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  font-size: 24rpx;
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: 0.01em;
 }
 
 .track-list {
   display: flex;
   flex-direction: column;
-  gap: 14rpx;
+  gap: 16rpx;
 }
 
 .track-card {
   display: flex;
-  align-items: center;
-  width: 100%;
+  align-items: stretch;
+  gap: 16rpx;
   min-width: 0;
-  gap: 14rpx;
-  padding: 16rpx;
+  padding: 18rpx;
+  border-radius: 32rpx;
+  border: 1rpx solid rgba(226, 199, 159, 0.08);
+  background:
+    linear-gradient(180deg, rgba(24, 19, 17, 0.76), rgba(15, 11, 10, 0.9)),
+    rgba(15, 11, 10, 0.88);
+  box-shadow: 0 16rpx 30rpx rgba(0, 0, 0, 0.1);
 }
 
 .track-cover {
-  width: 148rpx;
-  height: 168rpx;
-  border-radius: 22rpx;
+  width: 136rpx;
+  height: 156rpx;
+  border-radius: 24rpx;
   flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.04);
 }
 
-.track-copy {
+.track-main {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.track-copy {
+  display: flex;
+  flex-direction: column;
   gap: 10rpx;
 }
 
 .track-title {
   color: var(--ink);
-  font-family: Baskerville, Georgia, "Times New Roman", serif;
-  font-size: 27rpx;
+  font-family: "SF Pro Display", "SF Pro Text", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  font-size: 24rpx;
+  font-weight: 600;
+  line-height: 1.28;
+  letter-spacing: 0.01em;
+}
+
+.track-description {
+  display: block;
+  color: var(--ink-faint);
+  font-size: 17rpx;
+  line-height: 1.6;
 }
 
 .track-actions {
-  flex: none;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8rpx;
-  width: 112rpx;
-  min-width: 112rpx;
-  max-width: 112rpx;
-  overflow: hidden;
+  justify-content: flex-end;
+  gap: 10rpx;
 }
 
 .track-icon-button,
@@ -131,21 +270,23 @@
   align-items: center;
   justify-content: center;
   flex: none;
-  border-radius: 8rpx;
+  border-radius: 999rpx;
+  border: 1rpx solid rgba(214, 177, 124, 0.12);
+  background: rgba(244, 235, 225, 0.05);
 }
 
 .track-icon-button {
-  width: 48rpx;
-  height: 48rpx;
+  width: 58rpx;
+  height: 58rpx;
 }
 
 .track-unlock-button {
-  width: 52rpx;
-  height: 48rpx;
-  border: 1rpx solid rgba(214, 177, 124, 0.18);
-  background: rgba(244, 235, 225, 0.07);
+  min-width: 92rpx;
+  height: 58rpx;
+  padding: 0 18rpx;
   color: var(--gold);
   font-size: 18rpx;
+  font-weight: 600;
 }
 
 .track-icon-active {
@@ -159,7 +300,7 @@
   margin-left: 4rpx;
   border-top: 12rpx solid transparent;
   border-bottom: 12rpx solid transparent;
-  border-left: 18rpx solid rgba(246, 239, 231, 0.78);
+  border-left: 18rpx solid rgba(246, 239, 231, 0.82);
 }
 
 .track-download-icon {
@@ -205,32 +346,64 @@
 }
 
 .download-panel {
-  padding: 20rpx 22rpx;
+  padding: 6rpx 22rpx;
+  border-radius: 32rpx;
+  border: 1rpx solid rgba(226, 199, 159, 0.08);
+  background:
+    linear-gradient(180deg, rgba(24, 19, 17, 0.72), rgba(15, 11, 10, 0.88)),
+    rgba(15, 11, 10, 0.86);
+  box-shadow: 0 16rpx 30rpx rgba(0, 0, 0, 0.08);
 }
 
 .download-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 18rpx;
-  padding: 12rpx 0 14rpx;
+  gap: 16rpx;
+  padding: 18rpx 0;
   border-bottom: 1rpx solid rgba(214, 177, 124, 0.08);
 }
 
-.download-item:first-child {
-  padding-top: 0;
+.download-item:last-child {
+  border-bottom: 0;
+}
+
+.download-copy {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
 }
 
 .download-name {
   color: var(--ink);
-  font-size: 20rpx;
+  font-size: 18rpx;
+  line-height: 1.45;
 }
 
 .download-time {
   color: var(--ink-faint);
-  font-size: 16rpx;
+  font-size: 15rpx;
+  line-height: 1.4;
+}
+
+.download-mark {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: rgba(231, 200, 150, 0.74);
+  box-shadow: 0 0 16rpx rgba(231, 200, 150, 0.28);
 }
 
 .empty-inline {
-  padding: 22rpx;
+  padding: 28rpx 24rpx;
+  border-radius: 32rpx;
+  border: 1rpx solid rgba(226, 199, 159, 0.08);
+  background: rgba(244, 235, 225, 0.03);
+}
+
+.empty-inline .muted-copy {
+  font-size: 17rpx;
+  line-height: 1.6;
 }

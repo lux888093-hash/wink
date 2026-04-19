@@ -1,95 +1,102 @@
 <view class="shell">
   <view wx:if="{{pageReady}}" class="page-scroll member-page">
-    <view class="section-panel member-hero">
-      <text class="eyebrow">PRIVATE CLUB</text>
-      <text class="display-title line-clamp-1">{{profile.user.tierLabel}}</text>
-      <text class="micro-copy line-clamp-2">{{profile.membershipSummary}}</text>
-      <text wx:if="{{profile.membershipExpireAt}}" class="micro-copy">
-        有效期至 {{profile.membershipExpireAt}}
-      </text>
-
-      <view class="member-metrics">
-        <view class="member-metric">
-          <text class="member-metric-value">{{profile.library.length}}</text>
-          <text class="member-metric-label">曲目</text>
-        </view>
-        <view class="member-metric">
-          <text class="member-metric-value">{{profile.downloads.length}}</text>
-          <text class="member-metric-label">下载</text>
-        </view>
-        <view class="member-metric">
-          <view class="member-state {{profile.hasActiveMembership ? 'is-active' : 'is-inactive'}}">
+    <view class="member-hero">
+      <view class="member-hero-glow"></view>
+      <view class="member-hero-body">
+        <text class="member-kicker">MEMBER CENTER</text>
+        <view class="member-tier-row">
+          <text class="member-tier line-clamp-1">{{profile.user.tierLabel}}</text>
+          <view class="member-status-pill {{profile.hasActiveMembership ? 'is-active' : 'is-inactive'}}">
             <text>{{profile.membershipStateLabel}}</text>
           </view>
-          <text class="member-metric-label">会籍</text>
+        </view>
+        <text class="member-summary line-clamp-2">{{profile.membershipSummary}}</text>
+        <view wx:if="{{profile.membershipExpireAt}}" class="member-expire-row">
+          <text class="member-expire-label">有效期至</text>
+          <text class="member-expire-value">{{profile.membershipExpireAt}}</text>
+        </view>
+        <view class="member-metrics">
+          <view class="member-metric">
+            <text class="member-metric-value">{{profile.library.length}}</text>
+            <text class="member-metric-label">曲库</text>
+          </view>
+          <view class="member-metric">
+            <text class="member-metric-value">{{profile.downloads.length}}</text>
+            <text class="member-metric-label">下载</text>
+          </view>
+          <view class="member-metric">
+            <view class="member-state {{profile.hasActiveMembership ? 'is-active' : 'is-inactive'}}">
+              <text>{{profile.membershipStateLabel}}</text>
+            </view>
+            <text class="member-metric-label">会籍</text>
+          </view>
         </view>
       </view>
     </view>
 
-    <view class="section-head">
-      <view>
-        <text class="eyebrow">音乐权益</text>
-        <text class="section-title">曲库与下载</text>
-      </view>
+    <view class="member-section-head">
+      <text class="member-section-title">曲库</text>
     </view>
 
     <view class="track-list">
-      <view class="section-panel track-card" wx:for="{{profile.library}}" wx:key="id">
+      <view class="track-card" wx:for="{{profile.library}}" wx:key="id">
         <image class="track-cover" src="{{item.cover}}" mode="aspectFill"></image>
-        <view class="track-copy">
-          <text class="track-title line-clamp-1">{{item.cnTitle}}</text>
-          <text class="micro-copy line-clamp-2">{{item.description}}</text>
-        </view>
-        <view class="track-actions">
-          <view
-            class="track-icon-button"
-            data-track-id="{{item.id}}"
-            bindtap="openTrack"
-            hover-class="track-icon-active"
-          >
-            <view class="track-play-icon"></view>
+        <view class="track-main">
+          <view class="track-copy">
+            <text class="track-title line-clamp-1">{{item.cnTitle}}</text>
+            <text class="track-description line-clamp-2">{{item.description}}</text>
           </view>
-          <view
-            wx:if="{{item.access.canDownload}}"
-            class="track-icon-button"
-            data-track-id="{{item.id}}"
-            bindtap="downloadTrack"
-            hover-class="track-icon-active"
-          >
-            <view class="track-download-icon">
-              <view class="track-download-stem"></view>
-              <view class="track-download-arrow"></view>
-              <view class="track-download-tray"></view>
+          <view class="track-actions">
+            <view
+              class="track-icon-button"
+              data-track-id="{{item.id}}"
+              bindtap="openTrack"
+              hover-class="track-icon-active"
+            >
+              <view class="track-play-icon"></view>
+            </view>
+            <view
+              wx:if="{{item.access.canDownload}}"
+              class="track-icon-button"
+              data-track-id="{{item.id}}"
+              bindtap="downloadTrack"
+              hover-class="track-icon-active"
+            >
+              <view class="track-download-icon">
+                <view class="track-download-stem"></view>
+                <view class="track-download-arrow"></view>
+                <view class="track-download-tray"></view>
+              </view>
+            </view>
+            <view
+              wx:else
+              class="track-unlock-button"
+              data-track-id="{{item.id}}"
+              bindtap="unlockTrack"
+              hover-class="track-icon-active"
+            >
+              解锁
             </view>
           </view>
-          <view
-            wx:else
-            class="track-unlock-button"
-            data-track-id="{{item.id}}"
-            bindtap="unlockTrack"
-            hover-class="track-icon-active"
-          >
-            解锁
-          </view>
         </view>
       </view>
     </view>
 
-    <view class="section-head">
-      <view>
-        <text class="eyebrow">下载记录</text>
-        <text class="section-title">最近下载</text>
-      </view>
+    <view class="member-section-head">
+      <text class="member-section-title">下载记录</text>
     </view>
 
-    <view wx:if="{{profile.hasDownloads}}" class="section-panel download-panel">
+    <view wx:if="{{profile.hasDownloads}}" class="download-panel">
       <view class="download-item" wx:for="{{profile.downloads}}" wx:key="id">
-        <text class="download-name">{{item.track.cnTitle}}</text>
-        <text class="download-time">{{item.downloadAt}}</text>
+        <view class="download-copy">
+          <text class="download-name line-clamp-1">{{item.track.cnTitle}}</text>
+          <text class="download-time">{{item.downloadAt}}</text>
+        </view>
+        <view class="download-mark"></view>
       </view>
     </view>
-    <view wx:else class="empty-inline section-panel">
-      <text class="muted-copy">还没有下载记录，解锁曲目后这里会开始保留记录。</text>
+    <view wx:else class="empty-inline">
+      <text class="muted-copy">暂无下载记录</text>
     </view>
 
     <view class="tabbar-gap"></view>
