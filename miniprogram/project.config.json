@@ -34,7 +34,12 @@
   "condition": {},
   "simulatorPluginLibVersion": {},
   "packOptions": {
-    "ignore": [],
+    "ignore": [
+      {
+        "type": "folder",
+        "value": "assets/audio"
+      }
+    ],
     "include": []
   },
   "editorSetting": {}
