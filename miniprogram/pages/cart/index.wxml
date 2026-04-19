@@ -1,61 +1,50 @@
 <view class="shell">
   <view wx:if="{{ready}}" class="page-scroll cart-page">
-
-    <!-- 头部 -->
     <view class="cart-head">
       <view class="cart-head-row">
-        <text class="cart-head-title">购物袋</text>
+        <text class="cart-head-title">购物车</text>
         <text class="cart-head-count" wx:if="{{hasItems}}">{{cart.totalCount}} 件</text>
       </view>
     </view>
 
-    <!-- 商品列表 -->
     <view wx:if="{{hasItems}}" class="cart-list">
-      <view class="cart-item-outer" wx:for="{{cart.items}}" wx:key="id">
-        <!-- 滑动删除区域 -->
-        <view class="swipe-wrapper">
-          <view
-            class="swipe-content"
-            style="transform:translateX({{swipedItemId === item.id ? -160 : 0}}rpx)"
-            bindtouchstart="onSwipeStart"
-            bindtouchmove="onSwipeMove"
-            bindtouchend="onSwipeEnd"
-            data-item-id="{{item.id}}"
-          >
-            <view class="cart-item section-panel">
-              <image class="cart-image" src="{{item.coverImage}}" mode="aspectFill"></image>
-              <view class="cart-info">
+      <view class="cart-board section-panel">
+        <view class="cart-item-outer" wx:for="{{cart.items}}" wx:key="id">
+          <view class="cart-item">
+            <image class="cart-image" src="{{item.coverImage}}" mode="aspectFill"></image>
+            <view class="cart-info">
+              <view class="cart-top-row">
                 <text class="cart-name line-clamp-2">{{item.productName}}</text>
+                <text class="cart-remove" data-item-id="{{item.id}}" bindtap="removeItem">删除</text>
+              </view>
+              <view class="cart-meta-stack">
                 <view class="cart-spec-row">
                   <text class="cart-spec">{{item.specName}}</text>
                 </view>
-                <view class="cart-bottom-row">
-                  <view class="cart-price-group">
-                    <text class="cart-price">¥{{item.lineAmount}}</text>
-                    <text class="cart-price-old" wx:if="{{item.marketPrice}}">¥{{item.marketPrice}}</text>
+                <text class="cart-note" wx:if="{{item.productSubtitle}}">{{item.productSubtitle}}</text>
+              </view>
+              <view class="cart-bottom-row">
+                <view class="cart-price-group">
+                  <text class="cart-price">¥{{item.lineAmount}}</text>
+                  <text class="cart-price-old" wx:if="{{item.marketPrice}}">¥{{item.marketPrice}}</text>
+                </view>
+                <view class="qty-stepper">
+                  <view class="qty-btn" data-item-id="{{item.id}}" data-step="-1" bindtap="changeQuantity">
+                    <text class="qty-btn-text">−</text>
                   </view>
-                  <view class="qty-stepper">
-                    <view class="qty-btn" data-item-id="{{item.id}}" data-step="-1" bindtap="changeQuantity">
-                      <text class="qty-btn-text">−</text>
-                    </view>
-                    <text class="qty-num">{{item.quantity}}</text>
-                    <view class="qty-btn" data-item-id="{{item.id}}" data-step="1" bindtap="changeQuantity">
-                      <text class="qty-btn-text">+</text>
-                    </view>
+                  <text class="qty-num">{{item.quantity}}</text>
+                  <view class="qty-btn qty-btn-plus" data-item-id="{{item.id}}" data-step="1" bindtap="changeQuantity">
+                    <text class="qty-btn-text">+</text>
                   </view>
                 </view>
               </view>
             </view>
           </view>
-          <!-- 删除按钮 -->
-          <view class="swipe-delete" data-item-id="{{item.id}}" bindtap="removeItem">
-            <text class="swipe-delete-text">删除</text>
-          </view>
+          <view class="cart-item-divider" wx:if="{{index !== cart.items.length - 1}}"></view>
         </view>
       </view>
     </view>
 
-    <!-- 空状态 -->
     <view wx:else class="cart-empty">
       <view class="empty-icon-wrap">
         <text class="empty-icon">🛍</text>
@@ -65,13 +54,14 @@
       <navigator class="empty-cta" url="/pages/store/index">去逛逛</navigator>
     </view>
 
-    <!-- 底部结算栏 -->
     <view wx:if="{{hasItems}}" class="checkout-bar">
-      <view class="checkout-left">
-        <text class="checkout-total-label">合计</text>
-        <text class="checkout-total-price">¥{{cart.totalAmount}}</text>
+      <view class="checkout-right">
+        <view class="checkout-summary">
+          <text class="checkout-total-label">合计</text>
+          <text class="checkout-total-price">¥{{cart.totalAmount}}</text>
+        </view>
+        <button class="checkout-btn" bindtap="checkout">结算({{cart.totalCount}})</button>
       </view>
-      <button class="checkout-btn" bindtap="checkout">结算</button>
     </view>
 
     <view class="tabbar-gap"></view>

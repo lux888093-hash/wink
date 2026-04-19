@@ -7,18 +7,11 @@ Page({
     cart: null,
     cartCount: 0,
     errorTitle: '',
-    errorMessage: '',
-    swipedItemId: null,
-    _touchStartX: 0,
-    _touchStartY: 0
+    errorMessage: ''
   },
 
   onShow() {
     this.loadCart();
-  },
-
-  onHide() {
-    this._collapseSwipe();
   },
 
   async loadCart() {
@@ -81,47 +74,10 @@ Page({
       this.setData({
         cart: payload.cart,
         cartCount: payload.cart.totalCount || 0,
-        hasItems: Boolean(payload.cart.items && payload.cart.items.length),
-        swipedItemId: null
+        hasItems: Boolean(payload.cart.items && payload.cart.items.length)
       });
     } catch (error) {
       wx.showToast({ title: '删除失败', icon: 'none' });
-    }
-  },
-
-  /* --- 左滑手势 --- */
-  onSwipeStart(e) {
-    this.setData({
-      _touchStartX: e.touches[0].clientX,
-      _touchStartY: e.touches[0].clientY
-    });
-  },
-
-  onSwipeMove(e) {
-    // 占位，避免事件冒泡被拦截
-  },
-
-  onSwipeEnd(e) {
-    const startX = this.data._touchStartX;
-    const startY = this.data._touchStartY;
-    const endX = e.changedTouches[0].clientX;
-    const endY = e.changedTouches[0].clientY;
-    const deltaX = endX - startX;
-    const deltaY = endY - startY;
-    const itemId = e.currentTarget.dataset.itemId;
-
-    // 水平滑动距离 > 80 且 水平大于垂直
-    if (deltaX < -80 && Math.abs(deltaX) > Math.abs(deltaY)) {
-      this.setData({ swipedItemId: itemId });
-    } else if (deltaX > 60) {
-      // 右滑收回
-      this.setData({ swipedItemId: null });
-    }
-  },
-
-  _collapseSwipe() {
-    if (this.data.swipedItemId) {
-      this.setData({ swipedItemId: null });
     }
   },
 

@@ -1,117 +1,109 @@
-/* ===== 购物袋页面 — Apple / 山姆风格 ===== */
+/* 购物车改版：贴近常见电商购物车结构，但保留项目现有品牌配色 */
 
 .cart-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+  padding-bottom: 220rpx;
+}
+
+.cart-head {
+  padding: 4rpx 4rpx 6rpx;
+}
+
+.cart-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.cart-head-title {
+  color: var(--ink);
+  font-size: 36rpx;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.cart-head-count {
+  flex-shrink: 0;
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  background: rgba(244, 235, 225, 0.06);
+  color: var(--ink-soft);
+  font-size: 18rpx;
+}
+
+.cart-list {
   display: flex;
   flex-direction: column;
   gap: 0;
 }
 
-/* --- 头部 --- */
-.cart-head {
-  padding: 16rpx 4rpx 28rpx;
+.cart-board {
+  overflow: hidden;
 }
 
-.cart-head-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-}
-
-.cart-head-title {
-  color: var(--ink);
-  font-family: Baskerville, Georgia, "Times New Roman", serif;
-  font-size: 52rpx;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  line-height: 1.1;
-}
-
-.cart-head-count {
-  color: var(--ink-faint);
-  font-size: 22rpx;
-  letter-spacing: 0.06em;
-}
-
-/* --- 商品列表 --- */
-.cart-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20rpx;
-}
-
-/* --- 滑动删除容器 --- */
 .cart-item-outer {
   position: relative;
-  overflow: hidden;
-  border-radius: 28rpx;
 }
 
-.swipe-wrapper {
-  position: relative;
-}
-
-.swipe-content {
-  position: relative;
-  z-index: 2;
-  transition: transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.swipe-delete {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 160rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #c0392b, #96281b);
-  border-radius: 0 28rpx 28rpx 0;
-  z-index: 1;
-}
-
-.swipe-delete-text {
-  color: #fff;
-  font-size: 22rpx;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-}
-
-/* --- 商品卡片 --- */
 .cart-item {
   display: flex;
-  gap: 24rpx;
-  padding: 20rpx;
   align-items: flex-start;
+  gap: 20rpx;
+  padding: 24rpx;
 }
 
 .cart-image {
-  width: 200rpx;
-  height: 200rpx;
-  border-radius: 20rpx;
+  width: 148rpx;
+  height: 148rpx;
+  border-radius: 18rpx;
   flex-shrink: 0;
-  background: var(--bg-strong);
+  background: rgba(244, 235, 225, 0.08);
 }
 
 .cart-info {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  min-height: 200rpx;
-  padding: 4rpx 0;
+  min-height: 148rpx;
+}
+
+.cart-top-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12rpx;
+}
+
+.cart-remove {
+  flex-shrink: 0;
+  color: var(--ink-faint);
+  font-size: 18rpx;
+  line-height: 1.4;
 }
 
 .cart-name {
   color: var(--ink);
-  font-size: 28rpx;
-  font-weight: 500;
+  flex: 1;
+  font-size: 24rpx;
+  font-weight: 600;
   line-height: 1.4;
-  letter-spacing: 0.01em;
+}
+
+.cart-meta-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10rpx;
+  margin-top: 12rpx;
 }
 
 .cart-spec-row {
-  margin-top: 8rpx;
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
 }
 
 .cart-spec {
@@ -119,80 +111,92 @@
   align-items: center;
   min-height: 36rpx;
   padding: 0 14rpx;
-  border-radius: 999rpx;
-  background: rgba(244, 235, 225, 0.06);
+  border-radius: 10rpx;
+  background: rgba(244, 235, 225, 0.08);
+  color: var(--ink-soft);
+  font-size: 16rpx;
+}
+
+.cart-note {
   color: var(--ink-faint);
-  font-size: 18rpx;
-  letter-spacing: 0.04em;
+  font-size: 16rpx;
+  line-height: 1.45;
 }
 
 .cart-bottom-row {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
+  gap: 16rpx;
   margin-top: auto;
   padding-top: 14rpx;
 }
 
-/* --- 价格 --- */
 .cart-price-group {
   display: flex;
   align-items: baseline;
+  flex-wrap: wrap;
   gap: 10rpx;
 }
 
 .cart-price {
   color: var(--gold-strong);
-  font-family: Baskerville, Georgia, "Times New Roman", serif;
-  font-size: 28rpx;
-  font-weight: 600;
-  font-variant-numeric: lining-nums;
+  font-size: 34rpx;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
 .cart-price-old {
   color: var(--ink-faint);
-  font-size: 22rpx;
+  font-size: 18rpx;
   text-decoration: line-through;
-  margin-left: 8rpx;
-  font-variant-numeric: lining-nums;
+  font-variant-numeric: tabular-nums;
 }
 
-/* --- 数量步进器 (Apple 风格胶囊) --- */
 .qty-stepper {
   display: flex;
   align-items: center;
-  height: 56rpx;
-  border-radius: 999rpx;
-  background: rgba(244, 235, 225, 0.06);
-  border: 1rpx solid rgba(244, 235, 225, 0.08);
-  overflow: hidden;
+  gap: 4rpx;
+  flex-shrink: 0;
 }
 
 .qty-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 56rpx;
-  height: 56rpx;
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 12rpx;
+  background: rgba(244, 235, 225, 0.06);
+}
+
+.qty-btn-plus {
+  background: rgba(231, 200, 150, 0.16);
 }
 
 .qty-btn-text {
-  color: var(--ink-soft);
+  color: var(--ink);
   font-size: 28rpx;
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1;
 }
 
 .qty-num {
-  min-width: 40rpx;
+  min-width: 48rpx;
   text-align: center;
   color: var(--ink);
-  font-size: 24rpx;
+  font-size: 22rpx;
   font-weight: 600;
-  font-variant-numeric: tabular-nums;
+  line-height: 48rpx;
 }
 
-/* --- 空状态 --- */
+.cart-item-divider {
+  height: 1rpx;
+  margin: 0 24rpx;
+  background: rgba(226, 199, 159, 0.1);
+}
+
 .cart-empty {
   display: flex;
   flex-direction: column;
@@ -244,63 +248,71 @@
   box-shadow: 0 18rpx 34rpx rgba(135, 91, 50, 0.22);
 }
 
-/* --- 底部结算栏 (全宽底栏，浮在 tabbar dock 上方) --- */
 .checkout-bar {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 110rpx;
+  bottom: 118rpx;
   z-index: 99;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 24rpx 32rpx;
+  justify-content: flex-end;
+  gap: 16rpx;
+  padding: 16rpx 20rpx 16rpx 20rpx;
+  border-top: 1rpx solid rgba(226, 199, 159, 0.12);
   background:
-    linear-gradient(180deg, rgba(26, 20, 18, 0.96), rgba(11, 8, 8, 0.98)),
-    rgba(15, 11, 10, 0.94);
-  border-top: 1rpx solid rgba(226, 199, 159, 0.1);
-  backdrop-filter: blur(40rpx);
-  -webkit-backdrop-filter: blur(40rpx);
+    linear-gradient(180deg, rgba(23, 17, 16, 0.96), rgba(13, 10, 9, 0.98)),
+    rgba(13, 10, 9, 0.96);
+  box-shadow: 0 -8rpx 26rpx rgba(0, 0, 0, 0.16);
+  backdrop-filter: blur(28rpx);
+  -webkit-backdrop-filter: blur(28rpx);
 }
 
-.checkout-left {
+.checkout-right {
+  margin-left: auto;
   display: flex;
-  flex-direction: column;
-  gap: 6rpx;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16rpx;
+}
+
+.checkout-summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 10rpx;
 }
 
 .checkout-total-label {
   color: var(--ink-soft);
-  font-size: 20rpx;
-  letter-spacing: 0.06em;
+  font-size: 18rpx;
+  flex-shrink: 0;
 }
 
 .checkout-total-price {
   color: var(--gold-strong);
-  font-family: Baskerville, Georgia, "Times New Roman", serif;
-  font-size: 40rpx;
+  font-size: 34rpx;
   font-weight: 700;
-  font-variant-numeric: lining-nums;
   line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
 .checkout-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 220rpx;
-  min-height: 84rpx;
-  padding: 0 48rpx;
-  border-radius: 999rpx;
+  min-width: 150rpx;
+  min-height: 78rpx;
+  padding: 0 24rpx;
+  border-radius: 20rpx;
   background: linear-gradient(135deg, #f2e0c3 0%, #d5a15a 48%, #704221 100%);
   color: #26150d;
-  font-size: 24rpx;
+  font-size: 22rpx;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  box-shadow: 0 14rpx 28rpx rgba(135, 91, 50, 0.22);
+  letter-spacing: 0.02em;
+  box-shadow: 0 16rpx 32rpx rgba(135, 91, 50, 0.2);
 }
 
-/* --- tabbar gap: 结算栏 + dock 高度 --- */
 .tabbar-gap {
-  height: 280rpx;
+  height: 320rpx;
 }
