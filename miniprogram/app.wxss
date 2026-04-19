@@ -248,12 +248,14 @@ button::after {
   color: var(--gold-strong);
   font-size: 32rpx;
   font-family: Baskerville, Georgia, "Times New Roman", serif;
+  font-variant-numeric: lining-nums;
 }
 
 .price-original {
   color: var(--ink-faint);
   font-size: 17rpx;
   text-decoration: line-through;
+  font-variant-numeric: lining-nums;
 }
 
 .split-line {

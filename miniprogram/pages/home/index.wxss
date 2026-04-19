@@ -162,6 +162,7 @@
   color: var(--gold-strong);
   font-family: Baskerville, Georgia, "Times New Roman", serif;
   font-size: 28rpx;
+  font-variant-numeric: lining-nums;
 }
 
 .product-list,

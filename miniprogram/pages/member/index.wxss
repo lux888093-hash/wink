@@ -39,6 +39,7 @@
   font-size: 28rpx;
   line-height: 1;
   text-align: center;
+  font-variant-numeric: lining-nums;
 }
 
 .member-state {
