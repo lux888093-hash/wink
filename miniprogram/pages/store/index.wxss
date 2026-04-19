@@ -1,111 +1,175 @@
 .store-page {
   display: flex;
   flex-direction: column;
-  gap: 20rpx;
+  gap: 22rpx;
   max-width: 100%;
   overflow-x: hidden;
 }
 
 .store-head {
-  padding: 8rpx 2rpx 4rpx;
+  padding: 6rpx 2rpx 0;
 }
 
 .store-title {
-  margin: 10rpx 0 12rpx;
+  margin: 4rpx 0 0;
 }
 
-.category-scroll {
+.featured-card {
+  position: relative;
+  min-height: 420rpx;
+  overflow: hidden;
+  border-radius: 16rpx;
+  border: 1rpx solid rgba(226, 199, 159, 0.12);
+  background: rgba(17, 13, 12, 0.94);
+}
+
+.featured-image {
+  position: absolute;
+  left: 0;
+  top: 0;
   width: 100%;
-  white-space: nowrap;
+  height: 100%;
 }
 
-.category-row {
-  display: inline-flex;
-  gap: 10rpx;
-  padding: 0 24rpx 0 0;
-}
-
-.category-chip {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 112rpx;
-  min-height: 52rpx;
-  padding: 0 18rpx;
-  border-radius: 999rpx;
-  border: 1rpx solid rgba(214, 177, 124, 0.14);
-  background: rgba(244, 235, 225, 0.04);
-  color: var(--ink-soft);
-  font-size: 17rpx;
-  line-height: 1;
-}
-
-.category-chip.is-active {
+.featured-shade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
   background:
-    linear-gradient(180deg, rgba(214, 177, 124, 0.14), rgba(214, 177, 124, 0.08)),
-    rgba(214, 177, 124, 0.12);
-  color: #f0d4ac;
+    linear-gradient(180deg, rgba(8, 6, 6, 0.08) 0%, rgba(8, 6, 6, 0.28) 38%, rgba(8, 6, 6, 0.84) 100%),
+    linear-gradient(90deg, rgba(8, 6, 6, 0.72), rgba(8, 6, 6, 0.06));
 }
 
-.catalog-list {
+.featured-copy {
+  position: absolute;
+  left: 22rpx;
+  right: 22rpx;
+  bottom: 22rpx;
   display: flex;
   flex-direction: column;
+  gap: 10rpx;
+}
+
+.featured-kicker {
+  display: block;
+  color: var(--gold-strong);
+  font-size: 20rpx;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.featured-title {
+  display: block;
+  color: var(--ink);
+  font-family: Baskerville, Georgia, "Times New Roman", serif;
+  font-size: 34rpx;
+  line-height: 1.12;
+  letter-spacing: 0;
+}
+
+.featured-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 16rpx;
 }
 
+.featured-price {
+  color: var(--gold-strong);
+  font-family: Baskerville, Georgia, "Times New Roman", serif;
+  font-size: 32rpx;
+  line-height: 1;
+  font-variant-numeric: lining-nums;
+}
+
+.featured-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72rpx;
+  min-height: 52rpx;
+  padding: 0 18rpx;
+  border-radius: 12rpx;
+  background: rgba(244, 235, 225, 0.08);
+  color: var(--ink);
+  font-size: 22rpx;
+  letter-spacing: 0;
+}
+
+.catalog-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24rpx 18rpx;
+}
+
 .catalog-card {
-  padding: 14rpx;
+  width: calc((100% - 18rpx) / 2);
+  min-height: 386rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
 }
 
 .catalog-image {
   width: 100%;
-  height: 324rpx;
-  border-radius: 24rpx;
+  height: 238rpx;
+  border-radius: 14rpx;
+  background: rgba(244, 235, 225, 0.04);
 }
 
 .catalog-copy {
   display: flex;
   flex-direction: column;
-  gap: 12rpx;
-  padding: 20rpx 8rpx 8rpx;
+  gap: 8rpx;
+  min-height: 136rpx;
+  padding: 0 2rpx;
+}
+
+.catalog-meta {
+  display: block;
+  color: var(--gold);
+  font-size: 20rpx;
+  line-height: 1.2;
+  letter-spacing: 0;
 }
 
 .catalog-title {
-  margin-top: 2rpx;
-}
-
-.catalog-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8rpx;
-}
-
-.catalog-tag {
-  display: inline-flex;
-  align-items: center;
-  min-height: 34rpx;
-  padding: 0 12rpx;
-  border-radius: 999rpx;
-  background: rgba(244, 235, 225, 0.06);
-  color: var(--ink-faint);
-  font-size: 15rpx;
+  display: block;
+  min-height: 58rpx;
+  color: var(--ink);
+  font-family: Baskerville, Georgia, "Times New Roman", serif;
+  font-size: 26rpx;
+  line-height: 1.16;
+  letter-spacing: 0;
 }
 
 .catalog-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 6rpx;
+  margin-top: auto;
 }
 
-.catalog-cta {
-  display: inline-flex;
+.catalog-price {
+  color: var(--gold-strong);
+  font-family: Baskerville, Georgia, "Times New Roman", serif;
+  font-size: 30rpx;
+  line-height: 1;
+  font-variant-numeric: lining-nums;
+}
+
+.catalog-empty {
+  min-height: 360rpx;
+  display: flex;
   align-items: center;
-  min-height: 42rpx;
-  padding: 0 18rpx;
-  border-radius: 999rpx;
-  border: 1rpx solid rgba(214, 177, 124, 0.14);
-  color: var(--gold);
-  font-size: 16rpx;
-  letter-spacing: 0.14em;
+  justify-content: center;
+}
+
+.catalog-empty-text {
+  color: var(--ink-faint);
+  font-size: 23rpx;
+  line-height: 1.4;
+  letter-spacing: 0;
 }

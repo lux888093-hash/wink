@@ -1,55 +1,48 @@
 <view class="shell">
   <view wx:if="{{pageReady}}" class="page-scroll store-page">
     <view class="store-head">
-      <text class="eyebrow">BOUTIQUE STORE</text>
-      <text class="display-title store-title">酒廊目录</text>
-      <text class="muted-copy line-clamp-2">先陈列少量主推礼盒，再展开完整目录。</text>
+      <text class="eyebrow">CURATED CELLAR</text>
+      <text class="display-title store-title">酒廊</text>
     </view>
 
-    <scroll-view class="category-scroll" scroll-x enable-flex show-scrollbar="{{false}}">
-      <view class="category-row">
-        <button
-          wx:for="{{categories}}"
-          wx:key="*this"
-          class="category-chip {{activeCategory === item ? 'is-active' : ''}}"
-          data-category="{{item}}"
-          bindtap="switchCategory"
-        >
-          {{item}}
-        </button>
+    <view
+      wx:if="{{featuredItem}}"
+      class="featured-card"
+      data-product-id="{{featuredItem.id}}"
+      bindtap="openProduct"
+    >
+      <image class="featured-image" src="{{featuredItem.coverImage}}" mode="aspectFill"></image>
+      <view class="featured-shade"></view>
+      <view class="featured-copy">
+        <text class="featured-kicker">{{featuredItem.badge}}</text>
+        <text class="featured-title line-clamp-1">{{featuredItem.name}}</text>
+        <view class="featured-footer">
+          <text class="featured-price">¥{{featuredItem.lowestPrice}}</text>
+          <text class="featured-link">查看</text>
+        </view>
       </view>
-    </scroll-view>
+    </view>
 
-    <view class="catalog-list">
+    <view wx:if="{{gridItems.length}}" class="catalog-grid">
       <view
-        class="section-panel catalog-card"
-        wx:for="{{items}}"
+        class="catalog-card"
+        wx:for="{{gridItems}}"
         wx:key="id"
         data-product-id="{{item.id}}"
         bindtap="openProduct"
       >
         <image class="catalog-image" src="{{item.coverImage}}" mode="aspectFill"></image>
         <view class="catalog-copy">
-          <view class="chip-row">
-            <text class="chip">{{item.badge}}</text>
-            <text class="chip">{{item.category}}</text>
-          </view>
-          <text class="section-title catalog-title">{{item.name}}</text>
-          <text class="muted-copy line-clamp-2">{{item.story}}</text>
-
-          <view class="catalog-tags">
-            <text class="catalog-tag" wx:for="{{item.tags}}" wx:key="*this">{{item}}</text>
-          </view>
-
+          <text class="catalog-meta">{{item.category}}</text>
+          <text class="catalog-title line-clamp-2">{{item.name}}</text>
           <view class="catalog-footer">
-            <view class="price-row">
-              <text class="price-current">¥{{item.lowestPrice}}</text>
-              <text class="price-original" wx:if="{{item.hasSkus}}">¥{{item.firstMarketPrice}}</text>
-            </view>
-            <text class="catalog-cta">进入</text>
+            <text class="catalog-price">¥{{item.lowestPrice}}</text>
           </view>
         </view>
       </view>
+    </view>
+    <view wx:elif="{{!featuredItem}}" class="catalog-empty">
+      <text class="catalog-empty-text">暂无商品</text>
     </view>
 
     <view class="tabbar-gap"></view>
