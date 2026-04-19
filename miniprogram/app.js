@@ -44,7 +44,7 @@ function authRequest(baseUrl, payload) {
 
 App({
   globalData: {
-    apiBaseUrl: 'http://127.0.0.1:3100',
+    apiBaseUrl: 'http://192.168.1.176:3100',
     currentUserId: 'user_demo_guest',
     userToken: '',
     authMode: 'demo',
