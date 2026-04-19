@@ -26,7 +26,7 @@
       </view>
     </view>
 
-    <view class="section-panel product-summary">
+    <view class="product-summary">
       <text class="product-name">{{product.name}}</text>
       <text wx:if="{{product.subtitle}}" class="product-subtitle">{{product.subtitle}}</text>
       <text wx:if="{{wineMetaLine}}" class="product-wine-line">{{wineMetaLine}}</text>
@@ -72,7 +72,7 @@
       </view>
     </view>
 
-    <view class="section-panel product-content">
+    <view class="product-content">
       <view class="content-block">
         <text class="content-title">商品介绍</text>
         <text class="content-copy">{{product.story}}</text>
