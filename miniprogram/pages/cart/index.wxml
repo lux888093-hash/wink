@@ -71,7 +71,7 @@
         <text class="checkout-total-label">合计</text>
         <text class="checkout-total-price">¥{{cart.totalAmount}}</text>
       </view>
-      <button class="checkout-btn" bindtap="checkout">结算 ({{cart.totalCount}})</button>
+      <button class="checkout-btn" bindtap="checkout">结算</button>
     </view>
 
     <view class="tabbar-gap"></view>

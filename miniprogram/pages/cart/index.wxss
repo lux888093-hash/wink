@@ -244,59 +244,59 @@
   box-shadow: 0 18rpx 34rpx rgba(135, 91, 50, 0.22);
 }
 
-/* --- 底部结算栏 (浮在 tabbar dock 上方) --- */
+/* --- 底部结算栏 (全宽底栏，浮在 tabbar dock 上方) --- */
 .checkout-bar {
   position: fixed;
-  left: 20rpx;
-  right: 20rpx;
+  left: 0;
+  right: 0;
   bottom: 110rpx;
   z-index: 99;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20rpx 28rpx;
-  border-radius: 28rpx;
+  padding: 24rpx 32rpx;
   background:
-    linear-gradient(180deg, rgba(26, 20, 18, 0.94), rgba(11, 8, 8, 0.96)),
-    rgba(15, 11, 10, 0.92);
-  border: 1rpx solid rgba(226, 199, 159, 0.12);
+    linear-gradient(180deg, rgba(26, 20, 18, 0.96), rgba(11, 8, 8, 0.98)),
+    rgba(15, 11, 10, 0.94);
+  border-top: 1rpx solid rgba(226, 199, 159, 0.1);
   backdrop-filter: blur(40rpx);
   -webkit-backdrop-filter: blur(40rpx);
-  box-shadow: 0 18rpx 40rpx rgba(0, 0, 0, 0.32);
 }
 
 .checkout-left {
   display: flex;
   flex-direction: column;
-  gap: 4rpx;
+  gap: 6rpx;
 }
 
 .checkout-total-label {
-  color: var(--ink-faint);
-  font-size: 18rpx;
-  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  font-size: 20rpx;
+  letter-spacing: 0.06em;
 }
 
 .checkout-total-price {
   color: var(--gold-strong);
   font-family: Baskerville, Georgia, "Times New Roman", serif;
-  font-size: 32rpx;
-  font-weight: 600;
+  font-size: 40rpx;
+  font-weight: 700;
   font-variant-numeric: lining-nums;
+  line-height: 1;
 }
 
 .checkout-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 76rpx;
+  min-width: 220rpx;
+  min-height: 84rpx;
   padding: 0 48rpx;
   border-radius: 999rpx;
   background: linear-gradient(135deg, #f2e0c3 0%, #d5a15a 48%, #704221 100%);
   color: #26150d;
-  font-size: 20rpx;
+  font-size: 24rpx;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   box-shadow: 0 14rpx 28rpx rgba(135, 91, 50, 0.22);
 }
 
