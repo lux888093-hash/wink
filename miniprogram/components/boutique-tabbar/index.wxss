@@ -2,10 +2,10 @@
   position: fixed;
   left: 20rpx;
   right: 20rpx;
-  bottom: 16rpx;
+  bottom: 18rpx;
   display: flex;
-  gap: 6rpx;
-  padding: 7rpx;
+  gap: 8rpx;
+  padding: 8rpx;
   border-radius: 30rpx;
   background:
     linear-gradient(180deg, rgba(26, 20, 18, 0.94), rgba(11, 8, 8, 0.96)),
@@ -18,8 +18,8 @@
 .dock-item {
   position: relative;
   flex: 1;
-  min-height: 58rpx;
-  padding: 7rpx 6rpx 8rpx;
+  min-height: 70rpx;
+  padding: 9rpx 8rpx 10rpx;
   border-radius: 20rpx;
   display: flex;
   flex-direction: column;
@@ -31,16 +31,16 @@
 
 .dock-label {
   color: inherit;
-  font-size: 17rpx;
+  font-size: 22rpx;
   line-height: 1;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
 }
 
 .dock-meta {
   color: inherit;
-  font-size: 9rpx;
+  font-size: 14rpx;
   line-height: 1;
-  letter-spacing: 0.24em;
+  letter-spacing: 0;
   opacity: 0.86;
 }
 
@@ -48,16 +48,16 @@
   position: absolute;
   top: 2rpx;
   right: 10rpx;
-  min-width: 26rpx;
-  min-height: 26rpx;
-  padding: 0 7rpx;
+  min-width: 30rpx;
+  min-height: 30rpx;
+  padding: 0 8rpx;
   border-radius: 999rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #f1dfc0 0%, #c48a45 100%);
   color: #2a170f;
-  font-size: 14rpx;
+  font-size: 16rpx;
   font-weight: 700;
 }
 

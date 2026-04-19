@@ -1,8 +1,8 @@
 .tabbar-shell {
   position: fixed;
-  left: 18rpx;
-  right: 18rpx;
-  bottom: 18rpx;
+  left: 20rpx;
+  right: 20rpx;
+  bottom: 20rpx;
   display: flex;
   gap: 8rpx;
   padding: 10rpx;
@@ -17,8 +17,8 @@
 
 .tabbar-item {
   flex: 1;
-  min-height: 76rpx;
-  padding: 12rpx 8rpx 14rpx;
+  min-height: 84rpx;
+  padding: 13rpx 8rpx 15rpx;
   border-radius: 28rpx;
   display: flex;
   flex-direction: column;
@@ -30,14 +30,14 @@
 
 .tabbar-label {
   color: inherit;
-  font-size: 18rpx;
-  letter-spacing: 0.08em;
+  font-size: 22rpx;
+  letter-spacing: 0;
 }
 
 .tabbar-meta {
   color: inherit;
-  font-size: 10rpx;
-  letter-spacing: 0.3em;
+  font-size: 14rpx;
+  letter-spacing: 0;
   opacity: 0.84;
 }
 
