@@ -1,98 +1,581 @@
 .order-page {
-  display: flex;
-  flex-direction: column;
-  gap: 18rpx;
+  padding-top: 12rpx;
+  padding-bottom: 320rpx;
 }
 
-.order-head {
+.order-flow {
   display: flex;
   flex-direction: column;
+  gap: 20rpx;
+}
+
+.order-topbar,
+.address-editor-topbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 88rpx;
+  padding: 0 6rpx;
+}
+
+.order-back,
+.order-topbar-gap {
+  width: 72rpx;
+  flex-shrink: 0;
+}
+
+.order-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  color: var(--ink);
+  font-size: 56rpx;
+  line-height: 1;
+}
+
+.order-topbar-title,
+.address-editor-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--ink);
+  font-size: 30rpx;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.order-card {
+  overflow: hidden;
+  border-radius: 24rpx;
+  background: linear-gradient(180deg, rgba(34, 26, 24, 0.96), rgba(20, 16, 15, 0.98));
+  border: 1rpx solid rgba(226, 199, 159, 0.1);
+  box-shadow: 0 12rpx 24rpx rgba(0, 0, 0, 0.12);
+}
+
+.order-address-card {
+  padding: 24rpx 24rpx 26rpx;
+}
+
+.order-address-region {
+  display: block;
+  color: var(--ink-soft);
+  font-size: 20rpx;
+  line-height: 1.5;
+}
+
+.order-address-main-row {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-top: 10rpx;
+}
+
+.order-address-main {
+  flex: 1;
+  color: var(--ink);
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.order-chevron {
+  color: var(--ink-faint);
+  font-size: 34rpx;
+  line-height: 1;
+}
+
+.order-address-contact {
+  display: block;
+  margin-top: 14rpx;
+  color: var(--ink-soft);
+  font-size: 20rpx;
+}
+
+.order-address-card.is-empty .order-address-main {
+  color: var(--ink-soft);
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.order-delivery-card {
+  padding: 26rpx 28rpx 16rpx;
+}
+
+.order-fee-info {
+  width: 28rpx;
+  height: 28rpx;
+  border-radius: 50%;
+  border: 1rpx solid rgba(246, 239, 231, 0.4);
+  color: var(--ink-soft);
+  font-size: 18rpx;
+  line-height: 26rpx;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.order-product-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 18rpx;
+  padding: 8rpx 0 24rpx;
+}
+
+.order-product-image {
+  width: 110rpx;
+  height: 110rpx;
+  border-radius: 16rpx;
+  flex-shrink: 0;
+  background: rgba(244, 235, 225, 0.08);
+}
+
+.order-product-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.order-product-title {
+  color: var(--ink);
+  font-size: 22rpx;
+  line-height: 1.4;
+}
+
+.order-product-spec {
+  display: block;
+  margin-top: 8rpx;
+  color: var(--ink);
+  font-size: 22rpx;
+  line-height: 1.4;
+}
+
+.order-product-count {
+  flex-shrink: 0;
+  color: var(--ink);
+  font-size: 22rpx;
+  line-height: 1.4;
+  padding-top: 20rpx;
+}
+
+.order-fee-list {
+  border-top: 1rpx solid rgba(226, 199, 159, 0.08);
+}
+
+.order-fee-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18rpx;
+  min-height: 92rpx;
+}
+
+.order-fee-remark-row {
+  border-top: 1rpx solid rgba(226, 199, 159, 0.08);
+}
+
+.order-fee-label-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.order-fee-label,
+.order-fee-value {
+  color: var(--ink);
+  font-size: 22rpx;
+}
+
+.order-fee-placeholder {
+  display: flex;
+  align-items: center;
   gap: 8rpx;
 }
 
-.order-paper {
-  padding: 24rpx;
+.order-fee-placeholder-text {
+  color: var(--ink-faint);
+  font-size: 22rpx;
 }
 
-.order-paper-head {
+.order-subtotal-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 10rpx;
+  padding: 18rpx 0 6rpx;
+  border-top: 1rpx solid rgba(226, 199, 159, 0.08);
+}
+
+.order-subtotal-label {
+  color: var(--ink);
+  font-size: 26rpx;
+}
+
+.order-subtotal-value {
+  color: #ea3b35;
+  font-size: 32rpx;
+  font-weight: 700;
+}
+
+.order-pay-stack {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 110;
+  background:
+    linear-gradient(180deg, rgba(23, 17, 16, 0.96), rgba(13, 10, 9, 0.98)),
+    rgba(13, 10, 9, 0.98);
+  border-top: 1rpx solid rgba(226, 199, 159, 0.1);
+  box-shadow: 0 -10rpx 28rpx rgba(0, 0, 0, 0.18);
+}
+
+.order-pay-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8rpx;
+  justify-content: flex-end;
+  min-height: 104rpx;
+  padding: 0 26rpx 18rpx;
 }
 
-.order-delivery-tag {
+.order-pay-right-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12rpx;
+  margin-left: auto;
+}
+
+.order-pay-summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 8rpx;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.order-pay-summary-text {
+  color: var(--ink-soft);
+  font-size: 18rpx;
+}
+
+.order-pay-summary-value {
+  color: #ea3b35;
+  font-size: 32rpx;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.order-pay-button {
   display: inline-flex;
   align-items: center;
-  min-height: 38rpx;
-  padding: 0 14rpx;
-  border-radius: 999rpx;
-  background: rgba(63, 42, 20, 0.08);
-  color: rgba(63, 42, 20, 0.78);
-  font-size: 15rpx;
-}
-
-.address-form {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12rpx;
-  margin-top: 18rpx;
-}
-
-.address-input {
+  justify-content: center;
+  width: 72rpx;
+  min-width: 72rpx;
   min-height: 72rpx;
-  padding: 0 18rpx;
-  border: 1rpx solid rgba(82, 51, 19, 0.12);
-  border-radius: 14rpx;
-  background: rgba(255, 255, 255, 0.34);
-  color: var(--paper-ink);
-  font-size: 20rpx;
+  padding: 0;
+  border-radius: 20rpx;
+  background: linear-gradient(135deg, #f2e0c3 0%, #d5a15a 48%, #704221 100%);
+  color: #26150d;
+  font-size: 18rpx;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
-.address-input.full-row {
-  grid-column: 1 / -1;
+.address-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 220;
 }
 
-.order-list {
-  padding: 24rpx;
+.address-sheet-shell,
+.address-editor-shell {
+  position: absolute;
+  inset: 0;
 }
 
-.order-list-head {
+.address-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 4, 4, 0.58);
+  backdrop-filter: blur(12rpx);
+  -webkit-backdrop-filter: blur(12rpx);
+}
+
+.address-sheet-panel,
+.address-editor-panel {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 18rpx 20rpx 26rpx;
+  background:
+    linear-gradient(180deg, rgba(18, 14, 13, 0.98), rgba(10, 8, 8, 0.995)),
+    rgba(11, 8, 8, 0.995);
+}
+
+.address-sheet-panel {
+  justify-content: flex-end;
+  padding: 180rpx 0 0;
+  background: transparent;
+}
+
+.address-sheet-surface {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 180rpx);
+  padding: 18rpx 20rpx 26rpx;
+  border-radius: 32rpx 32rpx 0 0;
+  background:
+    linear-gradient(180deg, rgba(21, 16, 15, 0.98), rgba(10, 8, 8, 0.995)),
+    rgba(11, 8, 8, 0.995);
+  box-shadow: 0 -18rpx 36rpx rgba(0, 0, 0, 0.22);
+}
+
+.address-sheet-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10rpx;
+  justify-content: center;
+  min-height: 82rpx;
+  margin-bottom: 12rpx;
+  position: relative;
 }
 
-.order-item {
+.address-sheet-title {
+  color: var(--ink);
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.address-sheet-close {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-soft);
+  font-size: 42rpx;
+  line-height: 1;
+  padding: 10rpx;
+}
+
+.address-sheet-list {
+  flex: 1;
+  min-height: 0;
+}
+
+.address-sheet-card {
+  padding: 22rpx 20rpx 20rpx;
+  border-radius: 22rpx;
+  background: linear-gradient(180deg, rgba(28, 22, 20, 0.95), rgba(16, 12, 11, 0.98));
+  border: 1rpx solid rgba(226, 199, 159, 0.08);
+  box-shadow: 0 10rpx 22rpx rgba(0, 0, 0, 0.08);
+  margin-bottom: 14rpx;
+}
+
+.address-sheet-card.is-active {
+  border-color: rgba(231, 200, 150, 0.22);
+  background: linear-gradient(180deg, rgba(63, 50, 37, 0.96), rgba(24, 18, 15, 0.98));
+  box-shadow: 0 0 0 2rpx rgba(231, 200, 150, 0.06) inset;
+}
+
+.address-sheet-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 10rpx;
+}
+
+.address-sheet-region {
+  flex: 1;
+  color: var(--ink-soft);
+  font-size: 18rpx;
+  line-height: 1.45;
+}
+
+.address-sheet-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34rpx;
+  padding: 0 12rpx;
+  border-radius: 10rpx;
+  background: rgba(84, 160, 255, 0.14);
+  color: #79b7ff;
+  font-size: 16rpx;
+}
+
+.address-sheet-main-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12rpx;
+  margin-top: 10rpx;
+}
+
+.address-sheet-main {
+  flex: 1;
+  color: var(--ink);
+  font-size: 24rpx;
+  font-weight: 700;
+  line-height: 1.42;
+}
+
+.address-sheet-edit {
+  flex-shrink: 0;
+  color: var(--gold-strong);
+  font-size: 18rpx;
+  line-height: 1.4;
+  padding-top: 2rpx;
+}
+
+.address-sheet-contact {
+  display: block;
+  margin-top: 12rpx;
+  color: var(--ink-soft);
+  font-size: 18rpx;
+}
+
+.address-sheet-empty {
+  padding: 72rpx 20rpx;
+  text-align: center;
+}
+
+.address-sheet-empty-title {
+  display: block;
+  color: var(--ink-soft);
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.address-sheet-action,
+.address-editor-save {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 82rpx;
+  margin-top: 16rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(135deg, #f2e0c3 0%, #d5a15a 48%, #704221 100%);
+  color: #26150d;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.address-editor-card {
+  margin-top: 12rpx;
+  padding: 0 20rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(180deg, rgba(28, 22, 20, 0.95), rgba(16, 12, 11, 0.98));
+  border: 1rpx solid rgba(226, 199, 159, 0.08);
+}
+
+.address-editor-row {
+  display: flex;
+  align-items: center;
   gap: 18rpx;
-  padding: 14rpx 0;
+  min-height: 92rpx;
+  border-bottom: 1rpx solid rgba(226, 199, 159, 0.08);
 }
 
-.order-item-name {
+.address-editor-row:last-child {
+  border-bottom: 0;
+}
+
+.address-editor-row-area {
+  align-items: flex-start;
+  padding: 20rpx 0;
+}
+
+.address-editor-label {
+  width: 98rpx;
+  flex-shrink: 0;
   color: var(--ink);
   font-size: 20rpx;
-  line-height: 1.56;
+  line-height: 1.4;
 }
 
-.order-item-price {
-  color: var(--gold-strong);
-  font-size: 20rpx;
+.address-editor-area {
+  flex: 1;
+  min-width: 0;
 }
 
-.order-total {
+.address-editor-phone {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-top: 18rpx;
+  gap: 16rpx;
+  flex: 1;
+  min-width: 0;
 }
 
-.order-total-label {
-  color: var(--ink-faint);
+.address-editor-phone-code {
+  flex-shrink: 0;
+  padding-right: 16rpx;
+  border-right: 1rpx solid rgba(226, 199, 159, 0.12);
+  color: var(--ink);
+  font-size: 20rpx;
+  line-height: 1;
+}
+
+.address-editor-input {
+  width: 100%;
+  min-height: 64rpx;
+  color: var(--ink);
+  font-size: 20rpx;
+  line-height: 64rpx;
+}
+
+.address-editor-placeholder {
+  color: rgba(246, 239, 231, 0.42);
+}
+
+.address-editor-input-detail {
+  margin-top: 4rpx;
+}
+
+.address-editor-current {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  margin-top: 14rpx;
+  padding: 14rpx 16rpx;
+  border-radius: 16rpx;
+  background: rgba(244, 235, 225, 0.06);
+}
+
+.address-editor-current-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.address-editor-current-title {
+  display: block;
+  color: var(--ink);
   font-size: 18rpx;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.address-editor-current-sub {
+  display: block;
+  margin-top: 4rpx;
+  color: var(--ink-soft);
+  font-size: 16rpx;
+  line-height: 1.5;
+}
+
+.address-editor-current-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 86rpx;
+  min-height: 54rpx;
+  padding: 0 16rpx;
+  border-radius: 16rpx;
+  border: 1rpx solid rgba(231, 200, 150, 0.4);
+  color: var(--gold-strong);
+  font-size: 18rpx;
+}
+
+.address-editor-save {
+  margin-top: auto;
 }
 
 .success-panel {

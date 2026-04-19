@@ -1,75 +1,206 @@
 <view class="shell">
   <view wx:if="{{ready}}" class="page-scroll order-page">
-    <view wx:if="{{!successOrder}}">
-      <view class="order-head">
-        <text class="eyebrow">CHECKOUT</text>
-        <text class="display-title">支付确认</text>
+    <view wx:if="{{!successOrder}}" class="order-flow">
+      <view class="order-topbar">
+        <navigator class="order-back" open-type="navigateBack">‹</navigator>
+        <text class="order-topbar-title">确认订单</text>
+        <view class="order-topbar-gap"></view>
       </view>
 
-      <view class="paper-panel order-paper">
-        <view class="order-paper-head">
-          <text class="eyebrow">DELIVERY</text>
-          <text class="order-delivery-tag">会所专送</text>
+      <view class="order-card order-address-card {{!hasRealAddress ? 'is-empty' : ''}}" bindtap="openAddressSheet">
+        <text wx:if="{{hasRealAddress}}" class="order-address-region">{{address.provinceCity}}</text>
+        <view class="order-address-main-row">
+          <text class="order-address-main">{{hasRealAddress ? address.detail : '请填写收货地址'}}</text>
+          <text class="order-chevron">›</text>
         </view>
-        <text class="section-title">收货信息</text>
-        <view class="address-form">
-          <input
-            class="address-input"
-            placeholder="收货人"
-            value="{{address.contactName}}"
-            data-field="contactName"
-            bindinput="bindAddressInput"
-          />
-          <input
-            class="address-input"
-            placeholder="手机号"
-            value="{{address.mobile}}"
-            data-field="mobile"
-            bindinput="bindAddressInput"
-          />
-          <input
-            class="address-input full-row"
-            placeholder="省市区"
-            value="{{address.provinceCity}}"
-            data-field="provinceCity"
-            bindinput="bindAddressInput"
-          />
-          <input
-            class="address-input full-row"
-            placeholder="详细地址"
-            value="{{address.detail}}"
-            data-field="detail"
-            bindinput="bindAddressInput"
-          />
-          <input
-            class="address-input full-row"
-            placeholder="配送备注，可选"
-            value="{{address.deliveryNote}}"
-            data-field="deliveryNote"
-            bindinput="bindAddressInput"
-          />
+        <text wx:if="{{hasRealAddress}}" class="order-address-contact">{{address.contactName}} {{address.mobile}}</text>
+      </view>
+
+      <view class="order-card order-delivery-card">
+        <view class="order-product-row" wx:for="{{cart.items}}" wx:key="id">
+          <image class="order-product-image" src="{{item.coverImage}}" mode="aspectFill"></image>
+          <view class="order-product-info">
+            <view class="order-product-title-row">
+              <text class="order-product-title">{{item.productName}}</text>
+            </view>
+            <text class="order-product-spec">{{item.specName}}</text>
+          </view>
+          <text class="order-product-count">共{{item.quantity}}件</text>
+        </view>
+
+        <view class="order-fee-list">
+          <view class="order-fee-row">
+            <text class="order-fee-label">商品总金额</text>
+            <text class="order-fee-value">¥{{goodsAmountText}}</text>
+          </view>
+          <view class="order-fee-row">
+            <view class="order-fee-label-wrap">
+              <text class="order-fee-label">配送费</text>
+              <text class="order-fee-info">i</text>
+            </view>
+            <text class="order-fee-value">¥{{shippingFeeText}}</text>
+          </view>
+          <view class="order-fee-row">
+            <view class="order-fee-label-wrap">
+              <text class="order-fee-label">包装费</text>
+              <text class="order-fee-info">i</text>
+            </view>
+            <text class="order-fee-value">¥{{packageFeeText}}</text>
+          </view>
+          <view class="order-fee-row">
+            <text class="order-fee-label">优惠券</text>
+            <view class="order-fee-placeholder">
+              <text class="order-fee-placeholder-text">暂无优惠券</text>
+              <text class="order-chevron">›</text>
+            </view>
+          </view>
+          <view class="order-fee-row order-fee-remark-row">
+            <text class="order-fee-label">订单备注</text>
+            <view class="order-fee-placeholder">
+              <text class="order-fee-placeholder-text">{{remarkText}}</text>
+              <text class="order-chevron">›</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="order-subtotal-row">
+          <text class="order-subtotal-label">小计：</text>
+          <text class="order-subtotal-value">¥{{payAmountText}}</text>
         </view>
       </view>
 
-      <view class="section-panel order-list">
-        <view class="order-list-head">
-          <text class="eyebrow">ORDER</text>
-          <text class="micro-copy">{{cart.totalCount}} 件</text>
-        </view>
-        <view class="order-item" wx:for="{{cart.items}}" wx:key="id">
-          <text class="order-item-name">{{item.productName}} · {{item.specName}}</text>
-          <text class="order-item-price">¥{{item.lineAmount}}</text>
-        </view>
-        <view class="split-line"></view>
-        <view class="order-total">
-          <text class="order-total-label">应付合计</text>
-          <text class="price-current">¥{{cart.totalAmount}}</text>
+      <view class="order-pay-stack">
+        <view class="order-pay-bar">
+          <view class="order-pay-right-group">
+            <view class="order-pay-summary">
+              <text class="order-pay-summary-text">共{{cart.totalCount}}件,合计：</text>
+              <text class="order-pay-summary-value">¥{{payAmountText}}</text>
+            </view>
+            <button class="order-pay-button" bindtap="submitOrder" loading="{{submitting}}">支付</button>
+          </view>
         </view>
       </view>
 
-      <button class="primary-button full-width" bindtap="submitOrder" loading="{{submitting}}">
-        确认支付
-      </button>
+      <view wx:if="{{showAddressSheet}}" class="address-screen">
+        <view wx:if="{{!showAddressEditor}}" class="address-sheet-shell">
+          <view class="address-sheet-backdrop" bindtap="closeAddressSheet"></view>
+          <view class="address-sheet-panel">
+            <view class="address-sheet-surface">
+              <view class="address-sheet-header">
+                <text class="address-sheet-title">请选择收货地址</text>
+                <text class="address-sheet-close" bindtap="closeAddressSheet">×</text>
+              </view>
+
+              <scroll-view scroll-y class="address-sheet-list">
+                <view
+                  class="address-sheet-card {{activeAddressId === item.id ? 'is-active' : ''}}"
+                  wx:for="{{addresses}}"
+                  wx:key="id"
+                  data-id="{{item.id}}"
+                  bindtap="chooseAddress"
+                >
+                  <view class="address-sheet-row">
+                    <text class="address-sheet-region">{{item.provinceCity}}</text>
+                  </view>
+                  <view class="address-sheet-main-row">
+                    <text class="address-sheet-main">{{item.detail}}</text>
+                    <text class="address-sheet-edit" data-id="{{item.id}}" catchtap="openEditAddress">修改</text>
+                  </view>
+                  <text class="address-sheet-contact">{{item.contactName}} {{item.maskedMobile}}</text>
+                </view>
+
+                <view wx:if="{{!addresses.length}}" class="address-sheet-empty">
+                  <text class="address-sheet-empty-title">暂无地址</text>
+                </view>
+              </scroll-view>
+
+              <button class="address-sheet-action" bindtap="openNewAddressEditor">新增收货地址</button>
+            </view>
+          </view>
+        </view>
+
+        <view wx:else class="address-editor-shell">
+          <view class="address-editor-panel">
+            <view class="address-editor-topbar">
+              <text class="order-back" bindtap="closeAddressEditor">‹</text>
+              <text class="address-editor-title">{{addressEditorTitle}}</text>
+              <view class="order-topbar-gap"></view>
+            </view>
+
+            <view class="address-editor-card">
+              <view class="address-editor-row">
+                <text class="address-editor-label">收货人</text>
+                <input
+                  class="address-editor-input"
+                  placeholder="您的姓名"
+                  placeholder-class="address-editor-placeholder"
+                  value="{{addressDraft.contactName}}"
+                  data-field="contactName"
+                  bindinput="bindAddressInput"
+                />
+              </view>
+
+              <view class="address-editor-row">
+                <text class="address-editor-label">手机号</text>
+                <view class="address-editor-phone">
+                  <text class="address-editor-phone-code">+86</text>
+                  <input
+                    class="address-editor-input"
+                    placeholder="手机号码"
+                    placeholder-class="address-editor-placeholder"
+                    value="{{addressDraft.mobile}}"
+                    data-field="mobile"
+                    bindinput="bindAddressInput"
+                  />
+                </view>
+              </view>
+
+              <view class="address-editor-row address-editor-row-area">
+                <text class="address-editor-label">收货地址</text>
+                <view class="address-editor-area">
+                  <input
+                    class="address-editor-input"
+                    placeholder="省/市/区"
+                    placeholder-class="address-editor-placeholder"
+                    value="{{addressDraft.provinceCity}}"
+                    data-field="provinceCity"
+                    bindinput="bindAddressInput"
+                  />
+                  <input
+                    class="address-editor-input address-editor-input-detail"
+                    placeholder="小区/大厦/学校"
+                    placeholder-class="address-editor-placeholder"
+                    value="{{addressDraft.detail}}"
+                    data-field="detail"
+                    bindinput="bindAddressInput"
+                  />
+                  <view wx:if="{{hasRealAddress && !editingAddressId}}" class="address-editor-current">
+                    <view class="address-editor-current-copy">
+                      <text class="address-editor-current-title">{{address.detail}}</text>
+                      <text class="address-editor-current-sub">{{address.provinceCity}}</text>
+                    </view>
+                    <button class="address-editor-current-btn" bindtap="useCurrentRegion">填入</button>
+                  </view>
+                </view>
+              </view>
+
+              <view class="address-editor-row">
+                <text class="address-editor-label">门牌号</text>
+                <input
+                  class="address-editor-input"
+                  placeholder="门牌号等"
+                  placeholder-class="address-editor-placeholder"
+                  value="{{addressDraft.houseNumber}}"
+                  data-field="houseNumber"
+                  bindinput="bindAddressInput"
+                />
+              </view>
+            </view>
+
+            <button class="address-editor-save" bindtap="saveAddress" loading="{{savingAddress}}">保存</button>
+          </view>
+        </view>
+      </view>
     </view>
 
     <view wx:else class="section-panel success-panel">

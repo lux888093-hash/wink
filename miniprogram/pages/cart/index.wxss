@@ -252,7 +252,7 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 118rpx;
+  bottom: 88rpx;
   z-index: 99;
   display: flex;
   align-items: center;
@@ -314,5 +314,5 @@
 }
 
 .tabbar-gap {
-  height: 320rpx;
+  height: 286rpx;
 }

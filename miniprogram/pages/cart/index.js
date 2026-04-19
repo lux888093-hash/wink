@@ -85,7 +85,6 @@ Page({
   checkout() {
     if (!this.data.cart || !this.data.cart.items.length) return;
 
-    wx.vibrateShort({ type: 'light' });
     wx.navigateTo({ url: '/pages/order-confirm/index' });
   }
 });
