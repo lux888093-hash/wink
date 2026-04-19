@@ -1,12 +1,51 @@
 const { request } = require('../../utils/api');
 
+function buildGalleryImages(product) {
+  const seen = new Set();
+  return [product.coverImage].concat(product.gallery || []).filter((item) => {
+    const value = String(item || '').trim();
+    if (!value || seen.has(value)) {
+      return false;
+    }
+    seen.add(value);
+    return true;
+  });
+}
+
+function buildWineMetaLine(product) {
+  const wine = (product && product.wine) || {};
+  return [wine.name, wine.region].filter(Boolean).join(' · ');
+}
+
+function formatStockText(sku) {
+  if (!sku || !sku.id) {
+    return '暂无规格';
+  }
+  return sku.availableStock > 0 ? `库存 ${sku.availableStock}件` : '暂时缺货';
+}
+
+function emptySku() {
+  return {
+    id: '',
+    specName: '',
+    price: '',
+    marketPrice: '',
+    availableStock: 0
+  };
+}
+
 Page({
   data: {
     loading: true,
     pageReady: false,
     product: null,
+    galleryImages: [],
+    activeGalleryIndex: 0,
+    galleryDisplayIndex: 1,
+    wineMetaLine: '',
     selectedSkuId: '',
-    selectedSku: null,
+    selectedSku: emptySku(),
+    stockText: '暂无规格',
     canBuy: false,
     cartCount: 0,
     errorTitle: '',
@@ -39,17 +78,24 @@ Page({
         request({ url: `/api/products/${this.productId}` }),
         request({ url: '/api/cart' })
       ]);
-      const selectedSku = productPayload.product.skus[0] || null;
+      const product = productPayload.product;
+      const selectedSku = product.skus[0] || emptySku();
+      const galleryImages = buildGalleryImages(product);
 
       getApp().setCartCount(cartPayload.cart.totalCount || 0);
 
       this.setData({
         loading: false,
         pageReady: true,
-        product: productPayload.product,
-        selectedSkuId: selectedSku ? selectedSku.id : '',
+        product,
+        galleryImages,
+        activeGalleryIndex: 0,
+        galleryDisplayIndex: galleryImages.length ? 1 : 0,
+        wineMetaLine: buildWineMetaLine(product),
+        selectedSkuId: selectedSku.id || '',
         selectedSku,
-        canBuy: Boolean(selectedSku && selectedSku.availableStock > 0),
+        stockText: formatStockText(selectedSku),
+        canBuy: Boolean(selectedSku.id && selectedSku.availableStock > 0),
         cartCount: cartPayload.cart.totalCount || 0
       });
     } catch (error) {
@@ -74,17 +120,44 @@ Page({
     this.setData({
       selectedSkuId: sku.id,
       selectedSku: sku,
+      stockText: formatStockText(sku),
       canBuy: sku.availableStock > 0
     });
   },
 
-  async addToCart() {
-    if (!this.data.selectedSkuId || !this.data.canBuy) {
-      wx.showToast({
-        title: '当前规格暂无库存',
-        icon: 'none'
-      });
+  handleGalleryChange(event) {
+    const current = Number(event.detail.current) || 0;
+    this.setData({
+      activeGalleryIndex: current,
+      galleryDisplayIndex: current + 1
+    });
+  },
+
+  previewGallery(event) {
+    const galleryImages = this.data.galleryImages || [];
+    if (!galleryImages.length) {
       return;
+    }
+
+    const index = Number(event.currentTarget.dataset.index);
+    const currentIndex = Number.isNaN(index) ? this.data.activeGalleryIndex : index;
+
+    wx.previewImage({
+      current: galleryImages[currentIndex] || galleryImages[0],
+      urls: galleryImages
+    });
+  },
+
+  async _addSelectedSku(options = {}) {
+    const silent = Boolean(options.silent);
+    if (!this.data.selectedSkuId || !this.data.canBuy) {
+      if (!silent) {
+        wx.showToast({
+          title: '当前规格暂无库存',
+          icon: 'none'
+        });
+      }
+      return false;
     }
 
     try {
@@ -102,20 +175,33 @@ Page({
         cartCount: payload.cart.totalCount || 0
       });
 
-      wx.showToast({
-        title: '已加入购物袋',
-        icon: 'none'
-      });
+      if (!silent) {
+        wx.showToast({
+          title: '已加入购物袋',
+          icon: 'none'
+        });
+      }
+      return true;
     } catch (error) {
-      wx.showToast({
-        title: '加入失败',
-        icon: 'none'
-      });
+      if (!silent) {
+        wx.showToast({
+          title: '加入失败',
+          icon: 'none'
+        });
+      }
+      return false;
     }
   },
 
+  async addToCart() {
+    await this._addSelectedSku();
+  },
+
   async buyNow() {
-    await this.addToCart();
+    const success = await this._addSelectedSku({ silent: true });
+    if (!success) {
+      return;
+    }
     wx.navigateTo({ url: '/pages/cart/index' });
   }
 });

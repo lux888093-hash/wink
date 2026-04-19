@@ -1,88 +1,141 @@
 <view class="shell">
   <view wx:if="{{pageReady}}" class="page-scroll product-page">
-    <view class="hero-gallery section-panel">
-      <image class="hero-gallery-main" src="{{product.coverImage}}" mode="aspectFill"></image>
-      <view class="hero-gallery-mask"></view>
-      <view class="hero-gallery-copy">
-        <view class="chip-row">
-          <text class="chip">{{product.badge}}</text>
-          <text class="chip">{{product.category}}</text>
+    <view class="section-panel product-gallery">
+      <swiper class="product-swiper" current="{{activeGalleryIndex}}" circular bindchange="handleGalleryChange">
+        <swiper-item wx:for="{{galleryImages}}" wx:key="*this">
+          <view class="product-swiper-item" data-index="{{index}}" bindtap="previewGallery">
+            <image class="product-swiper-image" src="{{item}}" mode="aspectFit"></image>
+          </view>
+        </swiper-item>
+      </swiper>
+
+      <view class="product-gallery-head">
+        <view class="product-chip-row">
+          <text class="product-chip">{{product.badge}}</text>
+          <text class="product-chip product-chip-muted">{{product.category}}</text>
         </view>
-        <text class="display-title product-title">{{product.name}}</text>
-        <text class="micro-copy hero-gallery-subtitle line-clamp-2">{{product.subtitle}}</text>
-        <view class="price-row product-price">
-          <text class="price-current">¥{{selectedSku.price}}</text>
-          <text class="price-original">¥{{selectedSku.marketPrice}}</text>
+        <text class="product-gallery-index">{{galleryDisplayIndex}} / {{galleryImages.length}}</text>
+      </view>
+
+      <view wx:if="{{galleryImages.length > 1}}" class="product-gallery-dots">
+        <view
+          wx:for="{{galleryImages}}"
+          wx:key="index"
+          class="product-gallery-dot {{activeGalleryIndex === index ? 'is-active' : ''}}"
+        ></view>
+      </view>
+    </view>
+
+    <view class="section-panel product-summary">
+      <text class="product-name">{{product.name}}</text>
+      <text wx:if="{{product.subtitle}}" class="product-subtitle">{{product.subtitle}}</text>
+      <text wx:if="{{wineMetaLine}}" class="product-wine-line">{{wineMetaLine}}</text>
+
+      <view class="product-price-row">
+        <view class="product-price-stack">
+          <text class="product-price-label">会员价</text>
+          <view class="product-price-main">
+            <text class="product-price-value">¥{{selectedSku.price}}</text>
+            <text wx:if="{{selectedSku.marketPrice}}" class="product-price-market">¥{{selectedSku.marketPrice}}</text>
+          </view>
+        </view>
+        <view class="product-stock {{canBuy ? '' : 'is-out'}}">
+          <text class="product-stock-text">{{stockText}}</text>
+        </view>
+      </view>
+
+      <view wx:if="{{product.tags && product.tags.length}}" class="product-tag-row">
+        <text wx:for="{{product.tags}}" wx:key="*this" class="product-tag">{{item}}</text>
+      </view>
+
+      <view class="summary-divider"></view>
+
+      <view class="sku-section">
+        <view class="sku-head">
+          <text class="sku-title">规格</text>
+          <text class="sku-selected">已选 {{selectedSku.specName}}</text>
+        </view>
+
+        <view class="sku-row">
+          <button
+            wx:for="{{product.skus}}"
+            wx:key="id"
+            class="sku-option {{selectedSkuId === item.id ? 'is-active' : ''}}"
+            hover-class="sku-option-hover"
+            data-sku-id="{{item.id}}"
+            bindtap="selectSku"
+          >
+            <text class="sku-option-name">{{item.specName}}</text>
+            <text class="sku-option-price">¥{{item.price}}</text>
+          </button>
         </view>
       </view>
     </view>
 
-    <view class="hero-gallery-strip">
-      <image
-        wx:for="{{product.gallery}}"
-        wx:key="*this"
-        class="hero-gallery-thumb"
-        src="{{item}}"
-        mode="aspectFill"
-      ></image>
-    </view>
-
-    <view class="paper-panel product-paper">
-      <text class="eyebrow">礼盒概述</text>
-      <text class="muted-copy line-clamp-3">{{product.story}}</text>
-
-      <view class="sku-list">
-        <button
-          wx:for="{{product.skus}}"
-          wx:key="id"
-          class="sku-chip {{selectedSkuId === item.id ? 'is-active' : ''}}"
-          data-sku-id="{{item.id}}"
-          bindtap="selectSku"
-        >
-          <text class="sku-name">{{item.specName}}</text>
-          <text class="sku-meta">可售 {{item.availableStock}}</text>
-        </button>
+    <view class="section-panel product-content">
+      <view class="content-block">
+        <text class="content-title">商品介绍</text>
+        <text class="content-copy">{{product.story}}</text>
       </view>
-    </view>
 
-    <view class="section-panel detail-panel">
-      <text class="eyebrow">酒款信息</text>
-      <text class="section-title">{{product.wine.name}}</text>
-      <text class="micro-copy line-clamp-3">{{product.wine.overview}}</text>
+      <view wx:if="{{product.highlights && product.highlights.length}}" class="content-divider"></view>
 
-      <view class="detail-grid">
-        <view class="detail-grid-item">
-          <text class="detail-label">产区</text>
-          <text class="detail-value">{{product.wine.region}}</text>
+      <view wx:if="{{product.highlights && product.highlights.length}}" class="content-block">
+        <text class="content-title">礼盒亮点</text>
+        <view class="highlight-list">
+          <view class="highlight-item" wx:for="{{product.highlights}}" wx:key="*this">
+            <text class="highlight-bullet"></text>
+            <text class="highlight-text">{{item}}</text>
+          </view>
         </view>
-        <view class="detail-grid-item">
-          <text class="detail-label">葡萄品种</text>
-          <text class="detail-value">{{product.wine.grapes}}</text>
-        </view>
-        <view class="detail-grid-item">
-          <text class="detail-label">酒精度</text>
-          <text class="detail-value">{{product.wine.abv}}</text>
-        </view>
-        <view class="detail-grid-item">
-          <text class="detail-label">建议饮用</text>
-          <text class="detail-value">{{product.wine.serving}}</text>
+      </view>
+
+      <view class="content-divider"></view>
+
+      <view class="content-block">
+        <text class="content-title">产品参数</text>
+        <view class="meta-list">
+          <view class="meta-row">
+            <text class="meta-label">酒款</text>
+            <text class="meta-value">{{product.wine.name}}</text>
+          </view>
+          <view class="meta-row">
+            <text class="meta-label">产区</text>
+            <text class="meta-value">{{product.wine.region}}</text>
+          </view>
+          <view class="meta-row">
+            <text class="meta-label">葡萄品种</text>
+            <text class="meta-value">{{product.wine.grapes}}</text>
+          </view>
+          <view class="meta-row">
+            <text class="meta-label">酒精度</text>
+            <text class="meta-value">{{product.wine.abv}}</text>
+          </view>
+          <view class="meta-row">
+            <text class="meta-label">建议饮用</text>
+            <text class="meta-value">{{product.wine.serving}}</text>
+          </view>
         </view>
       </view>
     </view>
 
-    <view class="section-panel highlight-panel">
-      <text class="eyebrow">礼盒亮点</text>
-      <view class="highlight-grid">
-        <view class="highlight-card" wx:for="{{product.highlights}}" wx:key="*this" wx:for-index="index">
-          <text class="highlight-index">0{{index + 1}}</text>
-          <text class="micro-copy line-clamp-2">{{item}}</text>
-        </view>
-      </view>
-    </view>
-
-    <view class="sticky-action section-panel">
-      <button class="ghost-button sticky-button" bindtap="addToCart" disabled="{{!canBuy}}">加入购物袋</button>
-      <button class="primary-button sticky-button" bindtap="buyNow" disabled="{{!canBuy}}">立即结算</button>
+    <view class="sticky-action">
+      <button
+        class="ghost-button sticky-button sticky-button-secondary"
+        bindtap="addToCart"
+        disabled="{{!canBuy}}"
+        hover-class="sticky-button-secondary-hover"
+      >
+        加入购物袋
+      </button>
+      <button
+        class="primary-button sticky-button sticky-button-primary"
+        bindtap="buyNow"
+        disabled="{{!canBuy}}"
+        hover-class="sticky-button-primary-hover"
+      >
+        立即结算
+      </button>
     </view>
   </view>
 
