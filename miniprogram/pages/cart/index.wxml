@@ -8,7 +8,7 @@
     </view>
 
     <view wx:if="{{hasItems}}" class="cart-list">
-      <view class="cart-board section-panel">
+      <view class="cart-board">
         <view class="cart-item-outer" wx:for="{{cart.items}}" wx:key="id">
           <view class="cart-item">
             <image class="cart-image" src="{{item.coverImage}}" mode="aspectFill"></image>
@@ -47,7 +47,7 @@
 
     <view wx:else class="cart-empty">
       <view class="empty-icon-wrap">
-        <text class="empty-icon">🛍</text>
+        <text class="empty-icon">BAG</text>
       </view>
       <text class="empty-title">购物袋是空的</text>
       <text class="empty-sub">去酒廊挑选心仪的好酒</text>
