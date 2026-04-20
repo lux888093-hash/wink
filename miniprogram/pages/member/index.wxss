@@ -10,23 +10,21 @@
   overflow: hidden;
   padding: 32rpx 28rpx 28rpx;
   border-radius: 36rpx;
-  border: 1rpx solid rgba(226, 199, 159, 0.1);
+  border: 1rpx solid var(--panel-line);
   background:
-    radial-gradient(circle at 88% 12%, rgba(231, 200, 150, 0.13), transparent 28%),
-    linear-gradient(180deg, rgba(33, 25, 23, 0.9), rgba(16, 12, 11, 0.96)),
-    rgba(16, 12, 11, 0.96);
-  box-shadow: 0 20rpx 38rpx rgba(0, 0, 0, 0.14);
+    linear-gradient(180deg, rgba(72, 49, 40, 0.9), rgba(31, 27, 23, 0.96)),
+    var(--panel-strong);
+  box-shadow: 0 18rpx 34rpx rgba(18, 15, 12, 0.14);
 }
 
 .member-hero-glow {
   position: absolute;
-  top: -52rpx;
-  right: -36rpx;
-  width: 250rpx;
-  height: 250rpx;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(231, 200, 150, 0.16), rgba(231, 200, 150, 0));
-  opacity: 0.95;
+  left: 28rpx;
+  right: 28rpx;
+  top: 0;
+  height: 1rpx;
+  background: linear-gradient(90deg, rgba(239, 208, 155, 0), rgba(239, 208, 155, 0.36), rgba(239, 208, 155, 0));
+  opacity: 0.86;
   pointer-events: none;
 }
 
@@ -40,7 +38,7 @@
 
 .member-kicker {
   display: block;
-  color: rgba(231, 200, 150, 0.84);
+  color: rgba(239, 208, 155, 0.86);
   font-size: 20rpx;
   font-weight: 500;
   letter-spacing: 0;
@@ -75,13 +73,13 @@
   font-size: 20rpx;
   font-weight: 600;
   letter-spacing: 0;
-  border: 1rpx solid rgba(226, 199, 159, 0.12);
-  background: rgba(244, 235, 225, 0.05);
+  border: 1rpx solid rgba(220, 185, 133, 0.16);
+  background: rgba(247, 236, 221, 0.07);
 }
 
 .member-status-pill.is-active {
   color: var(--gold-strong);
-  background: rgba(214, 177, 124, 0.1);
+  background: rgba(220, 185, 133, 0.12);
 }
 
 .member-status-pill.is-inactive {
@@ -130,8 +128,8 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  background: rgba(244, 235, 225, 0.038);
-  border: 1rpx solid rgba(214, 177, 124, 0.08);
+  background: rgba(247, 236, 221, 0.06);
+  border: 1rpx solid rgba(220, 185, 133, 0.12);
 }
 
 .member-metric-value {
@@ -211,11 +209,11 @@
   min-width: 0;
   padding: 22rpx;
   border-radius: 32rpx;
-  border: 1rpx solid rgba(226, 199, 159, 0.08);
+  border: 1rpx solid var(--panel-line);
   background:
-    linear-gradient(180deg, rgba(24, 19, 17, 0.76), rgba(15, 11, 10, 0.9)),
-    rgba(15, 11, 10, 0.88);
-  box-shadow: 0 16rpx 30rpx rgba(0, 0, 0, 0.1);
+    linear-gradient(180deg, rgba(44, 38, 32, 0.76), rgba(31, 27, 23, 0.92)),
+    var(--panel-strong);
+  box-shadow: 0 14rpx 28rpx rgba(18, 15, 12, 0.1);
 }
 
 .track-cover {
@@ -223,7 +221,7 @@
   height: 168rpx;
   border-radius: 24rpx;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(247, 236, 221, 0.06);
 }
 
 .track-main {
@@ -271,8 +269,8 @@
   justify-content: center;
   flex: none;
   border-radius: 999rpx;
-  border: 1rpx solid rgba(214, 177, 124, 0.12);
-  background: rgba(244, 235, 225, 0.05);
+  border: 1rpx solid rgba(220, 185, 133, 0.16);
+  background: rgba(247, 236, 221, 0.07);
 }
 
 .track-icon-button {
@@ -348,11 +346,11 @@
 .download-panel {
   padding: 8rpx 24rpx;
   border-radius: 32rpx;
-  border: 1rpx solid rgba(226, 199, 159, 0.08);
+  border: 1rpx solid var(--panel-line);
   background:
-    linear-gradient(180deg, rgba(24, 19, 17, 0.72), rgba(15, 11, 10, 0.88)),
-    rgba(15, 11, 10, 0.86);
-  box-shadow: 0 16rpx 30rpx rgba(0, 0, 0, 0.08);
+    linear-gradient(180deg, rgba(44, 38, 32, 0.72), rgba(31, 27, 23, 0.9)),
+    var(--panel-strong);
+  box-shadow: 0 14rpx 28rpx rgba(18, 15, 12, 0.08);
 }
 
 .download-item {
@@ -361,7 +359,7 @@
   justify-content: space-between;
   gap: 18rpx;
   padding: 22rpx 0;
-  border-bottom: 1rpx solid rgba(214, 177, 124, 0.08);
+  border-bottom: 1rpx solid rgba(220, 185, 133, 0.1);
 }
 
 .download-item:last-child {
@@ -392,15 +390,15 @@
   width: 10rpx;
   height: 10rpx;
   border-radius: 50%;
-  background: rgba(231, 200, 150, 0.74);
-  box-shadow: 0 0 16rpx rgba(231, 200, 150, 0.28);
+  background: rgba(239, 208, 155, 0.74);
+  box-shadow: 0 0 16rpx rgba(239, 208, 155, 0.24);
 }
 
 .empty-inline {
   padding: 32rpx 28rpx;
   border-radius: 32rpx;
-  border: 1rpx solid rgba(226, 199, 159, 0.08);
-  background: rgba(244, 235, 225, 0.03);
+  border: 1rpx solid var(--panel-line);
+  background: rgba(247, 236, 221, 0.05);
 }
 
 .empty-inline .muted-copy {

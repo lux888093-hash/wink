@@ -15,10 +15,10 @@
   ],
   "window": {
     "navigationBarTitleText": "鸿玖酒庄",
-    "navigationBarBackgroundColor": "#100d0c",
+    "navigationBarBackgroundColor": "#1d1916",
     "navigationBarTextStyle": "white",
     "backgroundTextStyle": "light",
-    "backgroundColor": "#110d0c"
+    "backgroundColor": "#181614"
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",

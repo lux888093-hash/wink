@@ -23,14 +23,13 @@
 
 .melody-bg-shadow {
   background:
-    radial-gradient(circle at 86% 18%, rgba(242, 216, 168, 0.08), rgba(242, 216, 168, 0)),
-    radial-gradient(circle at 50% 100%, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0));
+    linear-gradient(180deg, rgba(239, 208, 155, 0.08), rgba(24, 21, 18, 0.2));
 }
 
 .melody-bg-overlay {
   background:
-    linear-gradient(180deg, rgba(8, 7, 7, 0.1) 0%, rgba(8, 7, 7, 0.28) 28%, rgba(8, 7, 7, 0.86) 100%),
-    linear-gradient(90deg, rgba(8, 7, 7, 0.12) 0%, rgba(8, 7, 7, 0) 42%, rgba(8, 7, 7, 0.12) 100%);
+    linear-gradient(180deg, rgba(31, 27, 23, 0.12) 0%, rgba(31, 27, 23, 0.26) 28%, rgba(24, 21, 18, 0.8) 100%),
+    linear-gradient(90deg, rgba(24, 21, 18, 0.14) 0%, rgba(24, 21, 18, 0) 42%, rgba(24, 21, 18, 0.14) 100%);
 }
 
 .melody-topbar {
@@ -58,11 +57,11 @@
 
 .topbar-title {
   color: #efe9e4;
-  font-family: Baskerville, Georgia, "Times New Roman", serif;
-  font-size: 38rpx;
+  font-family: "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 36rpx;
   font-weight: 600;
   line-height: 1;
-  letter-spacing: 0.1em;
+  letter-spacing: 0;
 }
 
 .melody-stage {
@@ -84,8 +83,8 @@
   margin: 0 auto 0;
   border-radius: 28rpx;
   overflow: hidden;
-  box-shadow: 0 34rpx 100rpx rgba(0, 0, 0, 0.52);
-  background: rgba(53, 53, 52, 0.85);
+  box-shadow: 0 30rpx 86rpx rgba(18, 15, 12, 0.38);
+  background: rgba(50, 43, 36, 0.86);
 }
 
 .cover-image {
@@ -101,9 +100,9 @@
 .melody-kicker {
   margin-top: 98rpx;
   margin-bottom: 14rpx;
-  color: rgba(231, 200, 150, 0.84);
-  font-size: 13rpx;
-  letter-spacing: 0.36em;
+  color: rgba(239, 208, 155, 0.86);
+  font-size: 20rpx;
+  letter-spacing: 0;
 }
 
 .progress-wrap {
@@ -114,38 +113,38 @@
 .progress-rail {
   height: 5rpx;
   border-radius: 999rpx;
-  background: rgba(53, 53, 52, 0.9);
+  background: rgba(247, 236, 221, 0.14);
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
   border-radius: 999rpx;
-  background: linear-gradient(90deg, #f2a899 0%, #d9b96d 100%);
+  background: linear-gradient(90deg, #dcc08a 0%, #8f6a46 100%);
 }
 
 .progress-labels {
   display: flex;
   justify-content: space-between;
   margin-top: 8rpx;
-  color: rgba(163, 139, 136, 0.88);
-  font-size: 14rpx;
-  letter-spacing: 0.24em;
+  color: rgba(255, 246, 235, 0.58);
+  font-size: 20rpx;
+  letter-spacing: 0;
 }
 
 .melody-title {
   margin-top: 0;
-  color: #e5e2e1;
-  font-size: 82rpx;
+  color: #f7efe4;
+  font-size: 76rpx;
   line-height: 0.98;
   font-style: italic;
-  text-shadow: 0 0 20rpx rgba(233, 193, 118, 0.3);
+  text-shadow: 0 8rpx 24rpx rgba(18, 15, 12, 0.24);
 }
 
 .melody-description {
   max-width: 590rpx;
   margin-top: 28rpx;
-  color: rgba(168, 161, 159, 0.9);
+  color: rgba(255, 246, 235, 0.72);
   font-size: 22rpx;
   line-height: 1.72;
   font-style: italic;
@@ -155,7 +154,7 @@
   display: block;
   max-width: 590rpx;
   margin-top: 22rpx;
-  color: rgba(231, 200, 150, 0.92);
+  color: rgba(239, 208, 155, 0.92);
   font-size: 20rpx;
   line-height: 1.6;
 }
@@ -198,8 +197,8 @@
   width: 86rpx;
   height: 86rpx;
   border-radius: 14rpx;
-  background: linear-gradient(135deg, #f2b0a4 0%, #5e1810 100%);
-  box-shadow: 0 18rpx 34rpx rgba(82, 0, 0, 0.22);
+  background: linear-gradient(180deg, #ead0a3 0%, #6d5140 100%);
+  box-shadow: 0 16rpx 30rpx rgba(70, 45, 35, 0.22);
 }
 
 .control-touch-active {
@@ -261,7 +260,7 @@
   width: 7rpx;
   height: 28rpx;
   border-radius: 999rpx;
-  background: #33120d;
+  background: #241b14;
 }
 
 .play-icon-shape {
@@ -270,5 +269,5 @@
   margin-left: 6rpx;
   border-top: 14rpx solid transparent;
   border-bottom: 14rpx solid transparent;
-  border-left: 22rpx solid #33120d;
+  border-left: 22rpx solid #241b14;
 }

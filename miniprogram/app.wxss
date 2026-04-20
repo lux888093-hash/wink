@@ -1,27 +1,24 @@
 page {
-  --bg: #0d0908;
-  --bg-strong: #15100f;
-  --panel: rgba(25, 19, 17, 0.8);
-  --panel-strong: rgba(17, 13, 12, 0.94);
-  --panel-soft: rgba(244, 235, 225, 0.05);
-  --panel-line: rgba(226, 199, 159, 0.12);
-  --panel-line-strong: rgba(226, 199, 159, 0.2);
-  --ink: #f6efe7;
-  --ink-soft: rgba(246, 239, 231, 0.72);
-  --ink-faint: rgba(246, 239, 231, 0.46);
-  --gold: #cfa36a;
-  --gold-strong: #e7c896;
-  --gold-deep: #704625;
-  --wine: #5d261e;
-  --paper: #efe2d1;
-  --paper-deep: #e5d3bd;
-  --paper-ink: #2f241d;
-  --success: #8ea471;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
-    radial-gradient(circle at 14% 2%, rgba(176, 118, 78, 0.2), transparent 34%),
-    radial-gradient(circle at 84% 12%, rgba(231, 196, 145, 0.1), transparent 24%),
-    linear-gradient(180deg, #080606 0%, #110d0c 42%, #120f0d 100%);
+  --bg: #181614;
+  --bg-strong: #24211d;
+  --panel: rgba(44, 38, 32, 0.78);
+  --panel-strong: rgba(31, 27, 23, 0.94);
+  --panel-soft: rgba(247, 236, 221, 0.08);
+  --panel-line: rgba(220, 185, 133, 0.16);
+  --panel-line-strong: rgba(220, 185, 133, 0.28);
+  --ink: #f7efe4;
+  --ink-soft: rgba(255, 246, 235, 0.76);
+  --ink-faint: rgba(255, 246, 235, 0.52);
+  --gold: #b98c52;
+  --gold-strong: #dcc08a;
+  --gold-deep: #6e4c2c;
+  --wine: #4a2525;
+  --vine: #596c52;
+  --paper: #d8cebf;
+  --paper-deep: #c8baa8;
+  --paper-ink: #28221d;
+  --success: #829873;
+  background: linear-gradient(180deg, #24211d 0%, #1d1916 42%, #171512 100%);
   color: var(--ink);
   font-family: "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-size: 24rpx;
@@ -68,7 +65,7 @@ button::after {
 .eyebrow {
   display: block;
   margin-bottom: 10rpx;
-  color: rgba(231, 200, 150, 0.84);
+  color: rgba(239, 208, 155, 0.86);
   font-size: 20rpx;
   letter-spacing: 0;
 }
@@ -131,9 +128,9 @@ button::after {
   border-radius: 32rpx;
   border: 1rpx solid var(--panel-line);
   background:
-    linear-gradient(180deg, rgba(33, 25, 23, 0.92), rgba(18, 14, 13, 0.94)),
-    rgba(18, 14, 13, 0.92);
-  box-shadow: 0 22rpx 42rpx rgba(0, 0, 0, 0.18);
+    linear-gradient(180deg, rgba(50, 43, 36, 0.9), rgba(31, 27, 23, 0.94)),
+    var(--panel-strong);
+  box-shadow: 0 18rpx 34rpx rgba(18, 15, 12, 0.16);
   backdrop-filter: blur(22rpx);
 }
 
@@ -142,10 +139,10 @@ button::after {
   overflow: hidden;
   border-radius: 32rpx;
   background:
-    linear-gradient(180deg, rgba(245, 236, 223, 0.98), rgba(229, 214, 194, 0.95)),
+    linear-gradient(180deg, rgba(235, 226, 213, 0.98), rgba(209, 197, 180, 0.96)),
     var(--paper);
-  border: 1rpx solid rgba(99, 70, 43, 0.12);
-  box-shadow: 0 18rpx 36rpx rgba(31, 20, 14, 0.08);
+  border: 1rpx solid rgba(103, 76, 48, 0.12);
+  box-shadow: 0 16rpx 32rpx rgba(35, 30, 24, 0.08);
   color: var(--paper-ink);
 }
 
@@ -173,8 +170,8 @@ button::after {
   min-height: 52rpx;
   padding: 0 18rpx;
   border-radius: 999rpx;
-  border: 1rpx solid rgba(231, 200, 150, 0.18);
-  background: rgba(244, 235, 225, 0.04);
+  border: 1rpx solid rgba(239, 208, 155, 0.22);
+  background: rgba(247, 236, 221, 0.06);
   color: var(--gold-strong);
   font-size: 22rpx;
   line-height: 1;
@@ -194,8 +191,8 @@ button::after {
   min-height: 46rpx;
   padding: 0 18rpx;
   border-radius: 999rpx;
-  border: 1rpx solid rgba(214, 177, 124, 0.16);
-  background: rgba(214, 177, 124, 0.08);
+  border: 1rpx solid rgba(220, 185, 133, 0.2);
+  background: rgba(220, 185, 133, 0.1);
   color: var(--gold);
   font-size: 20rpx;
   letter-spacing: 0;
@@ -232,23 +229,23 @@ button::after {
 }
 
 .primary-button {
-  background: linear-gradient(180deg, #f5e7cd 0%, #dfba7d 54%, #b87938 100%);
-  color: #26150d;
+  background: linear-gradient(180deg, #ead0a3 0%, #b8874c 100%);
+  color: #241b14;
   box-shadow:
-    0 10rpx 24rpx rgba(135, 91, 50, 0.18),
+    0 10rpx 22rpx rgba(104, 76, 45, 0.16),
     inset 0 1rpx 0 rgba(255, 255, 255, 0.46);
 }
 
 .ghost-button {
-  border: 1rpx solid rgba(231, 200, 150, 0.22);
-  background: rgba(244, 235, 225, 0.045);
+  border: 1rpx solid rgba(239, 208, 155, 0.24);
+  background: rgba(247, 236, 221, 0.06);
   color: var(--ink);
   box-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(18rpx);
 }
 
 .soft-button {
-  background: rgba(244, 235, 225, 0.08);
+  background: rgba(247, 236, 221, 0.09);
   color: var(--ink);
   box-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.04);
 }
@@ -264,7 +261,7 @@ button::after {
 .ghost-button:active,
 .soft-button:active,
 .ghost-link:active {
-  background: rgba(244, 235, 225, 0.1);
+  background: rgba(247, 236, 221, 0.12);
 }
 
 .primary-button[disabled],
@@ -303,9 +300,9 @@ button::after {
   margin: 10rpx 0;
   background: linear-gradient(
     90deg,
-    rgba(214, 177, 124, 0),
-    rgba(214, 177, 124, 0.2),
-    rgba(214, 177, 124, 0)
+    rgba(220, 185, 133, 0),
+    rgba(220, 185, 133, 0.22),
+    rgba(220, 185, 133, 0)
   );
 }
 

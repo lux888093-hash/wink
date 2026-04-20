@@ -9,10 +9,10 @@
   padding: 8rpx;
   border-radius: 34rpx;
   background:
-    linear-gradient(180deg, rgba(28, 22, 20, 0.86), rgba(10, 8, 8, 0.9)),
-    rgba(12, 9, 8, 0.78);
-  border: 1rpx solid rgba(231, 200, 150, 0.14);
-  box-shadow: 0 14rpx 34rpx rgba(0, 0, 0, 0.26);
+    linear-gradient(180deg, rgba(44, 38, 32, 0.86), rgba(24, 21, 18, 0.9)),
+    rgba(24, 21, 18, 0.78);
+  border: 1rpx solid rgba(239, 208, 155, 0.18);
+  box-shadow: 0 14rpx 34rpx rgba(18, 15, 12, 0.22);
   backdrop-filter: saturate(180%) blur(26rpx);
   -webkit-backdrop-filter: saturate(180%) blur(26rpx);
 }
@@ -29,7 +29,7 @@
   align-items: center;
   justify-content: center;
   gap: 5rpx;
-  color: rgba(246, 239, 232, 0.5);
+  color: rgba(255, 246, 235, 0.56);
   transition: transform 0.18s ease, opacity 0.18s ease, color 0.18s ease;
 }
 
@@ -72,20 +72,20 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(180deg, #f5e7cd 0%, #d49b54 100%);
-  color: #2a170f;
+  background: linear-gradient(180deg, #ead0a3 0%, #b8874c 100%);
+  color: #241b14;
   font-size: 19rpx;
   font-weight: 700;
   line-height: 1;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.24);
+  box-shadow: 0 4rpx 12rpx rgba(18, 15, 12, 0.22);
 }
 
 .is-active {
-  color: #f2cf93;
+  color: #dcc08a;
   transform: translateY(-2rpx);
 }
 
 .is-active .dock-icon {
   opacity: 1;
-  filter: brightness(0) saturate(100%) invert(86%) sepia(18%) saturate(1044%) hue-rotate(349deg) brightness(99%) contrast(91%);
+  filter: brightness(0) saturate(100%) invert(86%) sepia(22%) saturate(739%) hue-rotate(348deg) brightness(100%) contrast(91%);
 }

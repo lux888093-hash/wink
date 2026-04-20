@@ -62,9 +62,7 @@
 }
 
 .detail-visual-mask {
-  background:
-    linear-gradient(180deg, rgba(8, 6, 5, 0.08) 0%, rgba(8, 6, 5, 0.82) 100%),
-    radial-gradient(circle at 82% 14%, rgba(245, 219, 176, 0.18), rgba(245, 219, 176, 0));
+  background: linear-gradient(180deg, rgba(31, 27, 23, 0.08) 0%, rgba(24, 21, 18, 0.74) 100%);
 }
 
 .detail-bottle {
@@ -121,7 +119,7 @@
   display: block;
   margin-bottom: 8rpx;
   color: rgba(63, 42, 20, 0.56);
-  font-size: 16rpx;
+  font-size: 20rpx;
 }
 
 .tech-value {
