@@ -4,6 +4,8 @@
     data-key="home"
     data-url="/pages/home/index"
     bindtap="switchView"
+    hover-class="dock-press"
+    hover-stay-time="80"
   >
     <image class="dock-icon" src="/assets/icons/home-light.svg" mode="aspectFit"></image>
     <text class="dock-label">庄园</text>
@@ -14,6 +16,8 @@
     data-key="store"
     data-url="/pages/store/index"
     bindtap="switchView"
+    hover-class="dock-press"
+    hover-stay-time="80"
   >
     <image class="dock-icon" src="/assets/icons/store-light.svg" mode="aspectFit"></image>
     <text class="dock-label">酒廊</text>
@@ -24,6 +28,8 @@
     data-key="member"
     data-url="/pages/member/index"
     bindtap="switchView"
+    hover-class="dock-press"
+    hover-stay-time="80"
   >
     <image class="dock-icon" src="/assets/icons/member-light.svg" mode="aspectFit"></image>
     <text class="dock-label">会员</text>
@@ -34,6 +40,8 @@
     data-key="cart"
     data-url="/pages/cart/index"
     bindtap="switchView"
+    hover-class="dock-press"
+    hover-stay-time="80"
   >
     <view class="dock-badge" wx:if="{{cartCount > 0}}">{{badgeText}}</view>
     <image class="dock-icon" src="/assets/icons/bag-light.svg" mode="aspectFit"></image>

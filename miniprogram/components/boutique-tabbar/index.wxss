@@ -38,6 +38,12 @@
   opacity: 0.86;
 }
 
+.dock-press {
+  background: transparent;
+  transform: scale(0.97);
+  opacity: 0.86;
+}
+
 .dock-icon {
   width: 32rpx;
   height: 32rpx;

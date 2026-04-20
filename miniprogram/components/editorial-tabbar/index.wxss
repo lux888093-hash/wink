@@ -37,6 +37,12 @@
   opacity: 0.86;
 }
 
+.tabbar-press {
+  background: transparent;
+  transform: scale(0.97);
+  opacity: 0.86;
+}
+
 .tabbar-icon {
   width: 32rpx;
   height: 32rpx;

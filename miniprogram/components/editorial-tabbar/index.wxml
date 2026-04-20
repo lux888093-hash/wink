@@ -4,6 +4,8 @@
     data-key="cellar"
     data-url="/pages/cellar/index"
     bindtap="switchView"
+    hover-class="tabbar-press"
+    hover-stay-time="80"
   >
     <image class="tabbar-icon" src="/assets/icons/cellar-light.svg" mode="aspectFit"></image>
     <text class="tabbar-label">酒庄</text>
@@ -14,6 +16,8 @@
     data-key="detail"
     data-url="/pages/detail/index"
     bindtap="switchView"
+    hover-class="tabbar-press"
+    hover-stay-time="80"
   >
     <image class="tabbar-icon" src="/assets/icons/wines-light.svg" mode="aspectFit"></image>
     <text class="tabbar-label">酒款</text>
@@ -24,6 +28,8 @@
     data-key="melody"
     data-url="/pages/melody/index"
     bindtap="switchView"
+    hover-class="tabbar-press"
+    hover-stay-time="80"
   >
     <image class="tabbar-icon" src="/assets/icons/music-light.svg" mode="aspectFit"></image>
     <text class="tabbar-label">配乐</text>
