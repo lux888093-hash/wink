@@ -5,8 +5,8 @@
     data-url="/pages/cellar/index"
     bindtap="switchView"
   >
+    <image class="tabbar-icon" src="/assets/icons/cellar-light.svg" mode="aspectFit"></image>
     <text class="tabbar-label">酒庄</text>
-    <text class="tabbar-meta">EXCLUSIVE</text>
   </button>
 
   <button
@@ -15,8 +15,8 @@
     data-url="/pages/detail/index"
     bindtap="switchView"
   >
+    <image class="tabbar-icon" src="/assets/icons/wines-light.svg" mode="aspectFit"></image>
     <text class="tabbar-label">酒款</text>
-    <text class="tabbar-meta">DETAIL</text>
   </button>
 
   <button
@@ -25,7 +25,7 @@
     data-url="/pages/melody/index"
     bindtap="switchView"
   >
+    <image class="tabbar-icon" src="/assets/icons/music-light.svg" mode="aspectFit"></image>
     <text class="tabbar-label">配乐</text>
-    <text class="tabbar-meta">LISTEN</text>
   </button>
 </view>

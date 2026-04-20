@@ -1,50 +1,67 @@
 .tabbar-shell {
   position: fixed;
-  left: 20rpx;
-  right: 20rpx;
+  left: 18rpx;
+  right: 18rpx;
   bottom: 20rpx;
   display: flex;
-  gap: 8rpx;
-  padding: 10rpx;
-  border-radius: 40rpx;
+  gap: 6rpx;
+  padding: 8rpx;
+  border-radius: 34rpx;
   background:
-    linear-gradient(180deg, rgba(20, 15, 14, 0.94), rgba(10, 7, 7, 0.96)),
-    rgba(11, 8, 7, 0.9);
-  border: 1rpx solid rgba(214, 177, 124, 0.12);
-  box-shadow: 0 16rpx 36rpx rgba(0, 0, 0, 0.28);
-  backdrop-filter: blur(24rpx);
+    linear-gradient(180deg, rgba(28, 22, 20, 0.86), rgba(10, 8, 8, 0.9)),
+    rgba(12, 9, 8, 0.78);
+  border: 1rpx solid rgba(231, 200, 150, 0.14);
+  box-shadow: 0 14rpx 34rpx rgba(0, 0, 0, 0.26);
+  backdrop-filter: saturate(180%) blur(26rpx);
+  -webkit-backdrop-filter: saturate(180%) blur(26rpx);
 }
 
 .tabbar-item {
   flex: 1;
+  min-width: 0;
   min-height: 84rpx;
-  padding: 13rpx 8rpx 15rpx;
-  border-radius: 28rpx;
+  padding: 10rpx 6rpx;
+  border-radius: 999rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4rpx;
-  color: rgba(246, 239, 232, 0.52);
+  gap: 5rpx;
+  color: rgba(246, 239, 232, 0.58);
+  transition: transform 0.18s ease, opacity 0.18s ease, background-color 0.18s ease;
+}
+
+.tabbar-item:active {
+  transform: scale(0.97);
+  opacity: 0.86;
+}
+
+.tabbar-icon {
+  width: 32rpx;
+  height: 32rpx;
+  opacity: 0.58;
+  filter: brightness(0) invert(1);
 }
 
 .tabbar-label {
   color: inherit;
-  font-size: 22rpx;
+  font-size: 23rpx;
+  font-weight: 600;
+  line-height: 1;
   letter-spacing: 0;
-}
-
-.tabbar-meta {
-  color: inherit;
-  font-size: 14rpx;
-  letter-spacing: 0;
-  opacity: 0.84;
+  white-space: nowrap;
 }
 
 .is-active {
   background:
-    linear-gradient(180deg, rgba(214, 177, 124, 0.16), rgba(214, 177, 124, 0.08)),
+    linear-gradient(180deg, rgba(244, 235, 225, 0.16), rgba(214, 177, 124, 0.08)),
     rgba(214, 177, 124, 0.08);
-  box-shadow: inset 0 0 0 1rpx rgba(214, 177, 124, 0.12);
-  color: #f4dcc0;
+  box-shadow:
+    inset 0 0 0 1rpx rgba(231, 200, 150, 0.18),
+    0 8rpx 18rpx rgba(0, 0, 0, 0.18);
+  color: #f6e4c8;
+}
+
+.is-active .tabbar-icon {
+  opacity: 0.98;
 }
