@@ -23,14 +23,14 @@
   min-width: 0;
   min-height: 84rpx;
   padding: 10rpx 6rpx;
-  border-radius: 999rpx;
+  border-radius: 24rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 5rpx;
-  color: rgba(246, 239, 232, 0.58);
-  transition: transform 0.18s ease, opacity 0.18s ease, background-color 0.18s ease;
+  color: rgba(246, 239, 232, 0.5);
+  transition: transform 0.18s ease, opacity 0.18s ease, color 0.18s ease;
 }
 
 .dock-item:active {
@@ -41,8 +41,9 @@
 .dock-icon {
   width: 32rpx;
   height: 32rpx;
-  opacity: 0.58;
+  opacity: 0.48;
   filter: brightness(0) invert(1);
+  transition: opacity 0.18s ease, filter 0.18s ease;
 }
 
 .dock-label {
@@ -74,15 +75,11 @@
 }
 
 .is-active {
-  background:
-    linear-gradient(180deg, rgba(244, 235, 225, 0.16), rgba(214, 177, 124, 0.08)),
-    rgba(214, 177, 124, 0.08);
-  box-shadow:
-    inset 0 0 0 1rpx rgba(231, 200, 150, 0.18),
-    0 8rpx 18rpx rgba(0, 0, 0, 0.18);
-  color: #f6e4c8;
+  color: #f2cf93;
+  transform: translateY(-2rpx);
 }
 
 .is-active .dock-icon {
-  opacity: 0.98;
+  opacity: 1;
+  filter: brightness(0) saturate(100%) invert(86%) sepia(18%) saturate(1044%) hue-rotate(349deg) brightness(99%) contrast(91%);
 }
