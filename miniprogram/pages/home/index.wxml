@@ -21,12 +21,13 @@
     <view class="estate-statement">
       <text class="estate-statement-kicker">庄园手册</text>
       <text class="estate-statement-title">把一瓶酒，放回它来的地方。</text>
-      <text class="estate-statement-body">鸿玖酒庄页面只讲一件事：这里的光线、气味、建筑与故事如何共同形成一个安静、完整的庄园印象。</text>
+      <text class="estate-statement-body">鸿玖酒庄页面只讲一件事：这里的光线、气味、建筑与夜色如何共同形成一个安静、完整的庄园印象。</text>
     </view>
 
     <view class="estate-chapters">
       <view class="estate-chapter" wx:for="{{estateChapters}}" wx:key="eyebrow">
         <image class="estate-chapter-image" src="{{item.image}}" mode="aspectFill"></image>
+        <view class="estate-chapter-mask"></view>
         <view class="estate-chapter-copy">
           <text class="estate-chapter-eyebrow">{{item.eyebrow}}</text>
           <text class="estate-chapter-title">{{item.title}}</text>

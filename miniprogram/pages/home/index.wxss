@@ -3,14 +3,14 @@
   flex-direction: column;
   gap: 0;
   padding: 0 24rpx 212rpx;
+  background: #050404;
 }
 
 .estate-hero {
   position: relative;
-  min-height: 780rpx;
+  min-height: 840rpx;
   margin: 0 -24rpx;
   overflow: hidden;
-  border-radius: 0 0 38rpx 38rpx;
   background: #050404;
 }
 
@@ -24,15 +24,15 @@
 
 .estate-hero-mask {
   background:
-    linear-gradient(180deg, rgba(5, 4, 4, 0.04) 0%, rgba(5, 4, 4, 0.3) 42%, rgba(5, 4, 4, 0.92) 100%),
-    linear-gradient(90deg, rgba(5, 4, 4, 0.76) 0%, rgba(5, 4, 4, 0.14) 56%, rgba(5, 4, 4, 0.72) 100%);
+    linear-gradient(180deg, rgba(0, 0, 0, 0.08) 0%, rgba(5, 4, 4, 0.18) 34%, rgba(5, 4, 4, 0.86) 100%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.18) 52%, rgba(0, 0, 0, 0.64) 100%);
 }
 
 .estate-hero-copy {
   position: absolute;
   left: 30rpx;
   right: 30rpx;
-  bottom: 56rpx;
+  bottom: 70rpx;
   z-index: 2;
   display: flex;
   flex-direction: column;
@@ -40,11 +40,10 @@
 }
 
 .estate-kicker,
-.estate-statement-kicker,
 .estate-chapter-eyebrow,
 .estate-fact-label {
   display: block;
-  color: rgba(231, 200, 150, 0.8);
+  color: rgba(231, 200, 150, 0.78);
   font-size: 20rpx;
   font-weight: 600;
   line-height: 1.2;
@@ -53,81 +52,104 @@
 
 .estate-title {
   display: block;
-  max-width: 560rpx;
+  max-width: 600rpx;
   margin: 18rpx 0 14rpx;
-  color: var(--ink);
+  color: #ffffff;
   font-family: "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  font-size: 56rpx;
+  font-size: 64rpx;
   font-weight: 600;
-  line-height: 1.05;
+  line-height: 1.04;
   letter-spacing: 0;
 }
 
 .estate-tagline {
   display: block;
-  max-width: 560rpx;
-  color: rgba(246, 239, 231, 0.82);
+  max-width: 580rpx;
+  color: rgba(255, 255, 255, 0.86);
   font-size: 26rpx;
   font-weight: 500;
-  line-height: 1.35;
+  line-height: 1.34;
   letter-spacing: 0;
 }
 
 .estate-intro {
   display: block;
-  max-width: 610rpx;
+  max-width: 620rpx;
   margin-top: 18rpx;
-  color: rgba(246, 239, 231, 0.72);
-  font-size: 23rpx;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 24rpx;
   line-height: 1.58;
   letter-spacing: 0;
 }
 
 .estate-facts {
   display: flex;
-  gap: 12rpx;
-  padding: 22rpx 0 42rpx;
+  gap: 0;
+  margin: 0 -24rpx;
+  padding: 30rpx 24rpx 42rpx;
+  background: #050404;
 }
 
 .estate-fact {
   flex: 1;
   min-width: 0;
-  padding: 20rpx 16rpx 18rpx;
-  border-bottom: 1rpx solid rgba(231, 200, 150, 0.18);
+  padding: 0 16rpx;
+  border-left: 1rpx solid rgba(231, 200, 150, 0.14);
+}
+
+.estate-fact:first-child {
+  border-left: 0;
+  padding-left: 0;
+}
+
+.estate-fact:last-child {
+  padding-right: 0;
 }
 
 .estate-fact-value {
   display: block;
   margin-top: 10rpx;
-  color: var(--ink);
+  color: rgba(255, 255, 255, 0.88);
   font-size: 22rpx;
   font-weight: 500;
-  line-height: 1.35;
+  line-height: 1.36;
   letter-spacing: 0;
 }
 
 .estate-statement {
-  padding: 14rpx 2rpx 44rpx;
+  margin: 0 -24rpx;
+  padding: 72rpx 30rpx 76rpx;
+  background: #f5f1ea;
+  color: #1d1d1f;
+}
+
+.estate-statement-kicker {
+  display: block;
+  color: rgba(29, 29, 31, 0.58);
+  font-size: 20rpx;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0;
 }
 
 .estate-statement-title {
   display: block;
-  max-width: 620rpx;
-  margin-top: 16rpx;
-  color: var(--ink);
+  max-width: 640rpx;
+  margin-top: 18rpx;
+  color: #1d1d1f;
   font-family: "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  font-size: 40rpx;
+  font-size: 44rpx;
   font-weight: 600;
-  line-height: 1.12;
+  line-height: 1.08;
   letter-spacing: 0;
 }
 
 .estate-statement-body {
   display: block;
-  max-width: 620rpx;
-  margin-top: 18rpx;
-  color: var(--ink-soft);
-  font-size: 24rpx;
+  max-width: 640rpx;
+  margin-top: 22rpx;
+  color: rgba(29, 29, 31, 0.72);
+  font-size: 25rpx;
   line-height: 1.62;
   letter-spacing: 0;
 }
@@ -135,41 +157,57 @@
 .estate-chapters {
   display: flex;
   flex-direction: column;
-  gap: 54rpx;
+  gap: 0;
+  margin: 0 -24rpx;
 }
 
 .estate-chapter {
-  display: flex;
-  flex-direction: column;
-  gap: 22rpx;
+  position: relative;
+  min-height: 700rpx;
+  overflow: hidden;
+  background: #000000;
 }
 
-.estate-chapter-image {
+.estate-chapter-image,
+.estate-chapter-mask {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: 370rpx;
-  border-radius: 28rpx;
-  background: rgba(244, 235, 225, 0.04);
+  height: 100%;
+}
+
+.estate-chapter-mask {
+  z-index: 1;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0.2) 44%, rgba(0, 0, 0, 0.84) 100%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.54), rgba(0, 0, 0, 0.06) 58%, rgba(0, 0, 0, 0.58));
 }
 
 .estate-chapter-copy {
-  padding: 0 2rpx 0;
+  position: absolute;
+  left: 30rpx;
+  right: 30rpx;
+  bottom: 52rpx;
+  z-index: 2;
 }
 
 .estate-chapter-title {
   display: block;
-  margin-top: 12rpx;
-  color: var(--ink);
+  max-width: 610rpx;
+  margin-top: 14rpx;
+  color: #ffffff;
   font-family: "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  font-size: 34rpx;
+  font-size: 42rpx;
   font-weight: 600;
-  line-height: 1.16;
+  line-height: 1.1;
   letter-spacing: 0;
 }
 
 .estate-chapter-body {
   display: block;
-  margin-top: 14rpx;
-  color: var(--ink-soft);
+  max-width: 620rpx;
+  margin-top: 16rpx;
+  color: rgba(255, 255, 255, 0.74);
   font-size: 24rpx;
   line-height: 1.62;
   letter-spacing: 0;
@@ -177,10 +215,10 @@
 
 .estate-age-note {
   display: block;
-  margin-top: 48rpx;
-  padding-top: 22rpx;
-  border-top: 1rpx solid rgba(231, 200, 150, 0.14);
-  color: var(--ink-faint);
+  margin: 0 -24rpx;
+  padding: 34rpx 30rpx 0;
+  background: #050404;
+  color: rgba(246, 239, 231, 0.46);
   font-size: 20rpx;
   line-height: 1.5;
   text-align: center;

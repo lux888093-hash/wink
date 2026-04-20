@@ -3,6 +3,7 @@
   left: 18rpx;
   right: 18rpx;
   bottom: 20rpx;
+  z-index: 999;
   display: flex;
   gap: 6rpx;
   padding: 8rpx;

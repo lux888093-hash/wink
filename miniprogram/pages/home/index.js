@@ -50,22 +50,22 @@ Page({
   },
 
   buildEstateIntro() {
-    return '鸿玖酒庄以月光、葡萄藤与木盒礼序为主线，讲述一处安静、克制、带有收藏感的东方酒庄。';
+    return '鸿玖酒庄以月光、葡萄藤、木屋与夜色为主线，讲述一处安静、克制、带有收藏感的东方庄园。';
   },
 
   buildEstateFacts(winery) {
     return [
       {
         label: '主线',
-        value: '月光、葡萄藤与木盒礼序'
+        value: '月光、葡萄藤与木屋'
       },
       {
         label: '气质',
         value: winery.tagline || 'Moonlit Vineyard Residency'
       },
       {
-        label: '体验',
-        value: '从庄园故事进入一瓶酒'
+        label: '秩序',
+        value: '安静、克制、留白'
       }
     ];
   },
@@ -76,8 +76,8 @@ Page({
         eyebrow: '01 / PLACE',
         title: '夜色里的葡萄园',
         body:
-          '鸿玖把庄园的第一印象留给夜色、藤影和远处的微光。它不是热闹的酒单入口，而是一处可以慢慢进入的场景。',
-        image: winery.heroImage || '/assets/images/winery-vineyard-moon.jpg'
+          '鸿玖把庄园的第一印象留给夜色、藤影和远处的微光。这里的画面不急着解释，只让葡萄园先成为记忆。',
+        image: winery.harvestImage || '/assets/images/harvest-under-moon.jpg'
       },
       {
         eyebrow: '02 / HOUSE',
@@ -88,10 +88,10 @@ Page({
       },
       {
         eyebrow: '03 / RITUAL',
-        title: '庄园手册的秩序',
+        title: '留白中的秩序',
         body:
-          '木质、深酒红与金色只作为背景，让酒庄本身成为主角。页面保留必要信息，像翻开一本短而完整的庄园手册。',
-        image: winery.harvestImage || '/assets/images/harvest-under-moon.jpg'
+          '深色、木质与一抹金色只作为背景，让庄园本身成为主角。信息被压缩到必要的几句，余下交给画面。',
+        image: winery.heroImage || '/assets/images/winery-vineyard-moon.jpg'
       }
     ];
   }
