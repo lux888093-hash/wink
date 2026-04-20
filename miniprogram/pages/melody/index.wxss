@@ -23,12 +23,13 @@
 
 .melody-bg-shadow {
   background:
+    linear-gradient(145deg, rgba(93, 31, 37, 0.22), rgba(18, 14, 13, 0) 46%),
     linear-gradient(180deg, rgba(239, 208, 155, 0.08), rgba(24, 21, 18, 0.2));
 }
 
 .melody-bg-overlay {
   background:
-    linear-gradient(180deg, rgba(31, 27, 23, 0.12) 0%, rgba(31, 27, 23, 0.26) 28%, rgba(24, 21, 18, 0.8) 100%),
+    linear-gradient(180deg, rgba(31, 27, 23, 0.12) 0%, rgba(42, 16, 19, 0.28) 28%, rgba(18, 14, 13, 0.82) 100%),
     linear-gradient(90deg, rgba(24, 21, 18, 0.14) 0%, rgba(24, 21, 18, 0) 42%, rgba(24, 21, 18, 0.14) 100%);
 }
 
@@ -84,7 +85,9 @@
   border-radius: 28rpx;
   overflow: hidden;
   box-shadow: 0 30rpx 86rpx rgba(18, 15, 12, 0.38);
-  background: rgba(50, 43, 36, 0.86);
+  background:
+    linear-gradient(135deg, rgba(93, 31, 37, 0.18), rgba(29, 23, 21, 0) 58%),
+    rgba(50, 43, 36, 0.86);
 }
 
 .cover-image {
@@ -120,7 +123,7 @@
 .progress-fill {
   height: 100%;
   border-radius: 999rpx;
-  background: linear-gradient(90deg, #dcc08a 0%, #8f6a46 100%);
+  background: linear-gradient(90deg, #dcc08a 0%, #8f6a46 62%, #5d1f25 100%);
 }
 
 .progress-labels {
@@ -197,7 +200,7 @@
   width: 86rpx;
   height: 86rpx;
   border-radius: 14rpx;
-  background: linear-gradient(180deg, #ead0a3 0%, #6d5140 100%);
+  background: linear-gradient(180deg, #ead0a3 0%, #8f6a46 62%, #5d1f25 100%);
   box-shadow: 0 16rpx 30rpx rgba(70, 45, 35, 0.22);
 }
 

@@ -12,7 +12,8 @@
   border-radius: 30rpx;
   border: 1rpx solid var(--panel-line);
   background:
-    linear-gradient(180deg, rgba(67, 45, 37, 0.98), rgba(39, 25, 22, 0.98)),
+    linear-gradient(145deg, rgba(93, 31, 37, 0.2) 0%, rgba(29, 23, 21, 0) 52%),
+    linear-gradient(180deg, rgba(48, 39, 33, 0.98), rgba(24, 18, 17, 0.98)),
     var(--panel-strong);
   box-shadow: none;
   backdrop-filter: none;
@@ -115,7 +116,8 @@
   padding: 30rpx 28rpx;
   border-radius: 28rpx;
   background:
-    linear-gradient(180deg, rgba(44, 38, 32, 0.88), rgba(31, 27, 23, 0.94)),
+    linear-gradient(145deg, rgba(93, 31, 37, 0.14) 0%, rgba(29, 23, 21, 0) 58%),
+    linear-gradient(180deg, rgba(44, 38, 32, 0.88), rgba(29, 23, 21, 0.94)),
     var(--panel-strong);
 }
 
@@ -416,8 +418,9 @@
   border-radius: 999rpx;
   border: 1rpx solid var(--panel-line);
   background:
-    linear-gradient(180deg, rgba(38, 32, 27, 0.98), rgba(24, 21, 18, 0.98)),
-    rgba(24, 21, 18, 0.98);
+    linear-gradient(135deg, rgba(93, 31, 37, 0.18), rgba(24, 18, 17, 0) 58%),
+    linear-gradient(180deg, rgba(38, 32, 27, 0.98), rgba(18, 14, 13, 0.98)),
+    rgba(18, 14, 13, 0.98);
   box-shadow: 0 -8rpx 22rpx rgba(18, 15, 12, 0.14);
   backdrop-filter: blur(24rpx);
   -webkit-backdrop-filter: blur(24rpx);

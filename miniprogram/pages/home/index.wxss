@@ -24,8 +24,9 @@
 
 .estate-hero-mask {
   background:
-    linear-gradient(180deg, rgba(31, 27, 23, 0.08) 0%, rgba(31, 27, 23, 0.18) 34%, rgba(24, 21, 18, 0.78) 100%),
-    linear-gradient(90deg, rgba(24, 21, 18, 0.66) 0%, rgba(24, 21, 18, 0.16) 52%, rgba(24, 21, 18, 0.54) 100%);
+    linear-gradient(145deg, rgba(93, 31, 37, 0.18) 0%, rgba(24, 21, 18, 0) 46%),
+    linear-gradient(180deg, rgba(31, 27, 23, 0.08) 0%, rgba(42, 16, 19, 0.22) 34%, rgba(18, 14, 13, 0.8) 100%),
+    linear-gradient(90deg, rgba(24, 18, 17, 0.66) 0%, rgba(24, 21, 18, 0.16) 52%, rgba(24, 18, 17, 0.54) 100%);
 }
 
 .estate-hero-copy {
@@ -179,8 +180,9 @@
 .estate-chapter-mask {
   z-index: 1;
   background:
-    linear-gradient(180deg, rgba(31, 27, 23, 0.06) 0%, rgba(31, 27, 23, 0.18) 44%, rgba(24, 21, 18, 0.78) 100%),
-    linear-gradient(90deg, rgba(24, 21, 18, 0.5), rgba(24, 21, 18, 0.06) 58%, rgba(24, 21, 18, 0.5));
+    linear-gradient(145deg, rgba(93, 31, 37, 0.14) 0%, rgba(24, 21, 18, 0) 50%),
+    linear-gradient(180deg, rgba(31, 27, 23, 0.06) 0%, rgba(42, 16, 19, 0.18) 44%, rgba(18, 14, 13, 0.8) 100%),
+    linear-gradient(90deg, rgba(24, 18, 17, 0.5), rgba(24, 21, 18, 0.06) 58%, rgba(24, 18, 17, 0.5));
 }
 
 .estate-chapter-copy {

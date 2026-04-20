@@ -18,7 +18,9 @@
 }
 
 .cellar-hero-mask {
-  background: linear-gradient(180deg, rgba(31, 27, 23, 0.12) 0%, rgba(24, 21, 18, 0.76) 100%);
+  background:
+    linear-gradient(145deg, rgba(93, 31, 37, 0.18) 0%, rgba(24, 21, 18, 0) 50%),
+    linear-gradient(180deg, rgba(31, 27, 23, 0.12) 0%, rgba(18, 14, 13, 0.78) 100%);
 }
 
 .cellar-hero-copy {
@@ -39,7 +41,9 @@
   z-index: 2;
   padding: 20rpx;
   border-radius: 24rpx;
-  background: linear-gradient(180deg, rgba(44, 38, 32, 0.58), rgba(24, 21, 18, 0.48));
+  background:
+    linear-gradient(135deg, rgba(93, 31, 37, 0.2), rgba(24, 21, 18, 0) 58%),
+    linear-gradient(180deg, rgba(44, 38, 32, 0.58), rgba(18, 14, 13, 0.5));
 }
 
 .dossier-card {

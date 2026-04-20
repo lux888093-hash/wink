@@ -62,7 +62,9 @@
 }
 
 .detail-visual-mask {
-  background: linear-gradient(180deg, rgba(31, 27, 23, 0.08) 0%, rgba(24, 21, 18, 0.74) 100%);
+  background:
+    linear-gradient(145deg, rgba(93, 31, 37, 0.18) 0%, rgba(24, 21, 18, 0) 50%),
+    linear-gradient(180deg, rgba(31, 27, 23, 0.08) 0%, rgba(18, 14, 13, 0.76) 100%);
 }
 
 .detail-bottle {

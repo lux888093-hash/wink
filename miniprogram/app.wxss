@@ -1,8 +1,8 @@
 page {
-  --bg: #181614;
-  --bg-strong: #24211d;
-  --panel: rgba(44, 38, 32, 0.78);
-  --panel-strong: rgba(31, 27, 23, 0.94);
+  --bg: #171211;
+  --bg-strong: #251515;
+  --panel: rgba(43, 32, 29, 0.8);
+  --panel-strong: rgba(29, 23, 21, 0.94);
   --panel-soft: rgba(247, 236, 221, 0.08);
   --panel-line: rgba(220, 185, 133, 0.16);
   --panel-line-strong: rgba(220, 185, 133, 0.28);
@@ -12,13 +12,18 @@ page {
   --gold: #b98c52;
   --gold-strong: #dcc08a;
   --gold-deep: #6e4c2c;
-  --wine: #4a2525;
+  --wine: #5d1f25;
+  --wine-deep: #2a1013;
+  --wine-glow: rgba(93, 31, 37, 0.26);
+  --wine-line: rgba(135, 49, 54, 0.22);
   --vine: #596c52;
   --paper: #d8cebf;
   --paper-deep: #c8baa8;
   --paper-ink: #28221d;
   --success: #829873;
-  background: linear-gradient(180deg, #24211d 0%, #1d1916 42%, #171512 100%);
+  background:
+    linear-gradient(145deg, rgba(93, 31, 37, 0.16) 0%, rgba(23, 18, 17, 0) 36%),
+    linear-gradient(180deg, #251515 0%, #1a1413 46%, #12100f 100%);
   color: var(--ink);
   font-family: "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-size: 24rpx;
@@ -128,9 +133,10 @@ button::after {
   border-radius: 32rpx;
   border: 1rpx solid var(--panel-line);
   background:
-    linear-gradient(180deg, rgba(50, 43, 36, 0.9), rgba(31, 27, 23, 0.94)),
+    linear-gradient(135deg, rgba(93, 31, 37, 0.18) 0%, rgba(50, 43, 36, 0.06) 38%, rgba(29, 23, 21, 0) 72%),
+    linear-gradient(180deg, rgba(48, 39, 33, 0.9), rgba(29, 23, 21, 0.95)),
     var(--panel-strong);
-  box-shadow: 0 18rpx 34rpx rgba(18, 15, 12, 0.16);
+  box-shadow: 0 18rpx 34rpx rgba(18, 12, 11, 0.18);
   backdrop-filter: blur(22rpx);
 }
 
@@ -229,7 +235,7 @@ button::after {
 }
 
 .primary-button {
-  background: linear-gradient(180deg, #ead0a3 0%, #b8874c 100%);
+  background: linear-gradient(180deg, #ead0a3 0%, #b8874c 78%, #8d5b34 100%);
   color: #241b14;
   box-shadow:
     0 10rpx 22rpx rgba(104, 76, 45, 0.16),

@@ -13,7 +13,9 @@
 }
 
 .redeem-mask {
-  background: linear-gradient(180deg, rgba(31, 27, 23, 0.22) 0%, rgba(24, 21, 18, 0.84) 100%);
+  background:
+    linear-gradient(145deg, rgba(93, 31, 37, 0.22) 0%, rgba(24, 21, 18, 0) 48%),
+    linear-gradient(180deg, rgba(31, 27, 23, 0.22) 0%, rgba(18, 14, 13, 0.86) 100%);
 }
 
 .redeem-copy {
@@ -38,7 +40,8 @@
   border-radius: 32rpx;
   border: 1rpx solid var(--panel-line);
   background:
-    linear-gradient(180deg, rgba(44, 38, 32, 0.82), rgba(24, 21, 18, 0.88)),
+    linear-gradient(145deg, rgba(93, 31, 37, 0.18) 0%, rgba(29, 23, 21, 0) 58%),
+    linear-gradient(180deg, rgba(44, 38, 32, 0.82), rgba(18, 14, 13, 0.9)),
     var(--panel-strong);
   backdrop-filter: blur(22rpx);
   display: flex;

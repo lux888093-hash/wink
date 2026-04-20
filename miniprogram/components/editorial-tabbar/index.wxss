@@ -9,9 +9,10 @@
   padding: 8rpx;
   border-radius: 34rpx;
   background:
-    linear-gradient(180deg, rgba(44, 38, 32, 0.86), rgba(24, 21, 18, 0.9)),
-    rgba(24, 21, 18, 0.78);
-  border: 1rpx solid rgba(239, 208, 155, 0.18);
+    linear-gradient(135deg, rgba(93, 31, 37, 0.22), rgba(24, 18, 17, 0) 58%),
+    linear-gradient(180deg, rgba(44, 38, 32, 0.86), rgba(18, 14, 13, 0.9)),
+    rgba(18, 14, 13, 0.78);
+  border: 1rpx solid rgba(239, 208, 155, 0.2);
   box-shadow: 0 14rpx 34rpx rgba(18, 15, 12, 0.22);
   backdrop-filter: saturate(180%) blur(26rpx);
   -webkit-backdrop-filter: saturate(180%) blur(26rpx);
