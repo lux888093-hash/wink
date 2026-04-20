@@ -1,7 +1,21 @@
 const { request } = require('../../utils/api');
 
+function buildProductItems(items = []) {
+  const sourceItems = Array.isArray(items) ? items : [];
+
+  return sourceItems.map((item) => {
+    const firstSku = item.skus && item.skus.length ? item.skus[0] : null;
+
+    return {
+      ...item,
+      firstSkuId: firstSku ? firstSku.id : '',
+      canQuickAdd: Boolean(firstSku && firstSku.availableStock > 0)
+    };
+  });
+}
+
 function buildCatalogSections(items = []) {
-  const normalizedItems = Array.isArray(items) ? items : [];
+  const normalizedItems = buildProductItems(items);
 
   return {
     featuredItem: normalizedItems[0] || null,
@@ -16,6 +30,7 @@ Page({
     featuredItem: null,
     gridItems: [],
     cartCount: 0,
+    addingSkuId: '',
     errorTitle: '',
     errorMessage: ''
   },
@@ -52,6 +67,52 @@ Page({
             ? '请先启动本地服务端。'
             : '商品目录加载失败，请稍后再试。'
       });
+    }
+  },
+
+  async addToCart(event) {
+    const skuId = event.currentTarget.dataset.skuId;
+
+    if (!skuId) {
+      wx.showToast({
+        title: '当前商品暂无库存',
+        icon: 'none'
+      });
+      return;
+    }
+
+    if (this.data.addingSkuId) {
+      return;
+    }
+
+    this.setData({ addingSkuId: skuId });
+
+    try {
+      const payload = await request({
+        url: '/api/cart/items',
+        method: 'POST',
+        data: {
+          skuId,
+          quantity: 1
+        }
+      });
+
+      getApp().setCartCount(payload.cart.totalCount || 0);
+      this.setData({
+        cartCount: payload.cart.totalCount || 0
+      });
+
+      wx.showToast({
+        title: '已加入购物袋',
+        icon: 'none'
+      });
+    } catch (error) {
+      wx.showToast({
+        title: '加入失败',
+        icon: 'none'
+      });
+    } finally {
+      this.setData({ addingSkuId: '' });
     }
   },
 

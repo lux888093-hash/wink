@@ -37,6 +37,15 @@
           <text class="catalog-title line-clamp-2">{{item.name}}</text>
           <view class="catalog-footer">
             <text class="catalog-price">¥{{item.lowestPrice}}</text>
+            <button
+              class="catalog-cart-button {{item.canQuickAdd ? '' : 'is-disabled'}} {{addingSkuId && addingSkuId === item.firstSkuId ? 'is-loading' : ''}}"
+              data-sku-id="{{item.canQuickAdd ? item.firstSkuId : ''}}"
+              catchtap="addToCart"
+            >
+              <view class="catalog-cart-icon">
+                <image class="cart-icon-svg" src="/assets/icons/cart-light.svg"></image>
+              </view>
+            </button>
           </view>
         </view>
       </view>

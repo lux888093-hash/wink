@@ -105,6 +105,7 @@
 }
 
 .catalog-card {
+  position: relative;
   width: calc((100% - 18rpx) / 2);
   min-height: 414rpx;
   display: flex;
@@ -153,8 +154,9 @@
 .catalog-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   margin-top: auto;
+  padding-right: 62rpx;
 }
 
 .catalog-price {
@@ -164,6 +166,57 @@
   line-height: 1;
   font-variant-numeric: lining-nums;
 }
+
+.catalog-cart-button {
+  position: absolute;
+  right: 10rpx;
+  bottom: 10rpx;
+  width: 72rpx;
+  height: 72rpx;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  box-shadow: none;
+}
+
+.catalog-cart-button.is-loading {
+  opacity: 0.62;
+}
+
+.catalog-cart-button.is-disabled {
+  opacity: 0.4;
+}
+
+.catalog-cart-icon {
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e6c18a 0%, #b38a4d 100%);
+  box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.catalog-cart-button:active .catalog-cart-icon {
+  transform: scale(0.9);
+  opacity: 0.8;
+}
+
+.cart-icon-svg {
+  width: 30rpx;
+  height: 30rpx;
+  filter: brightness(0) invert(1); /* Ensure it's white if the SVG used currentColor and we want white */
+}
+
+.catalog-cart-button.is-disabled .catalog-cart-icon {
+  background: rgba(244, 235, 225, 0.08);
+  box-shadow: none;
+}
+
 
 .catalog-empty {
   min-height: 360rpx;
