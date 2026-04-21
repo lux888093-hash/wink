@@ -4,18 +4,18 @@
       <image class="cellar-hero-image" src="{{wine.estateHeroImage}}" mode="aspectFill"></image>
       <view class="cellar-hero-mask"></view>
       <view class="cellar-hero-copy">
-        <text class="eyebrow">提取码专属</text>
-        <text class="display-title cellar-title">{{wine.name}}</text>
+        <text class="eyebrow">ESTATE</text>
+        <text class="display-title cellar-title">{{wine.estateName}}</text>
         <text class="muted-copy line-clamp-3">{{wine.estateIntro}}</text>
       </view>
       <view class="cellar-hero-note">
-        <text class="micro-copy line-clamp-2">{{wine.quote}}</text>
+        <text class="micro-copy line-clamp-2">{{wine.estateTagline}}</text>
       </view>
     </view>
 
     <view class="paper-panel dossier-card">
-      <text class="eyebrow dossier-kicker">{{wine.estateName}}</text>
-      <text class="section-title">{{wine.estateTagline}}</text>
+      <text class="eyebrow dossier-kicker">酒庄档案</text>
+      <text class="section-title">空间与风土</text>
       <text class="muted-copy">{{wine.estatePhilosophy}}</text>
 
       <view class="dossier-list">
@@ -28,7 +28,7 @@
 
     <view class="section-head">
       <view>
-        <text class="eyebrow">庄园印象</text>
+        <text class="eyebrow">PLACE</text>
         <text class="section-title">庄园画面</text>
       </view>
     </view>
@@ -42,11 +42,6 @@
           <text class="micro-copy line-clamp-2">{{item.note}}</text>
         </view>
       </view>
-    </view>
-
-    <view class="action-row">
-      <button class="ghost-button action-button" bindtap="openDetail">看酒款</button>
-      <button class="primary-button action-button" bindtap="openMelody">听配乐</button>
     </view>
 
     <view class="tabbar-gap"></view>

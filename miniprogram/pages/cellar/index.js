@@ -36,13 +36,5 @@ Page({
 
   goBack() {
     wx.redirectTo({ url: '/pages/redeem/index' });
-  },
-
-  openDetail() {
-    wx.redirectTo({ url: '/pages/detail/index' });
-  },
-
-  openMelody() {
-    wx.redirectTo({ url: '/pages/melody/index' });
   }
 });

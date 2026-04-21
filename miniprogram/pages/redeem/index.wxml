@@ -15,19 +15,26 @@
       <text class="muted-copy line-clamp-3">{{message}}</text>
 
       <view wx:if="{{state === 'idle' || state === 'error'}}" class="code-input-area">
-        <view class="digit-row">
-          <input
+        <view class="digit-row" bindtap="focusCodeInput">
+          <view
             wx:for="{{codeDigits}}"
             wx:key="index"
-            class="digit-box {{fullCode.length === 6 ? 'digit-filled' : ''}}"
+            class="digit-box {{item ? 'digit-filled' : ''}} {{activeIndex === index ? 'digit-active' : ''}}"
+          >
+            <text>{{item}}</text>
+          </view>
+          <input
+            class="code-hidden-input"
             type="number"
-            maxlength="1"
-            data-index="{{index}}"
-            value="{{item}}"
-            focus="{{focusIndex === index}}"
-            bindinput="onDigitInput"
-            bindfocus="onDigitFocus"
-            confirm-type="next"
+            maxlength="6"
+            value="{{fullCode}}"
+            focus="{{inputFocused}}"
+            confirm-type="done"
+            cursor-spacing="90"
+            adjust-position="{{true}}"
+            bindinput="onCodeInput"
+            bindfocus="onCodeFocus"
+            bindblur="onCodeBlur"
           />
         </view>
       </view>

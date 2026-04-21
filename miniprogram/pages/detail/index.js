@@ -63,31 +63,5 @@ Page({
             : '当前内容可能已过期，请重新进入。'
       });
     }
-  },
-
-  openMelody() {
-    const tracks = this.data.experience && this.data.experience.tracks ? this.data.experience.tracks : [];
-    if (!tracks.length) {
-      return;
-    }
-
-    if (this.wineId) {
-      wx.navigateTo({
-        url: `/pages/melody/index?trackId=${tracks[0].id}&scope=public`
-      });
-      return;
-    }
-
-    wx.redirectTo({ url: '/pages/melody/index' });
-  },
-
-  openProduct() {
-    if (!this.data.wine || !this.data.wine.productId) {
-      return;
-    }
-
-    wx.navigateTo({
-      url: `/pages/product-detail/index?id=${this.data.wine.productId}`
-    });
   }
 });

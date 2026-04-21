@@ -1,12 +1,16 @@
 .cellar-page {
   display: flex;
   flex-direction: column;
-  gap: 18rpx;
+  gap: 0;
+  padding-top: 0;
 }
 
 .cellar-hero {
-  min-height: 520rpx;
-  border-radius: 36rpx;
+  min-height: 760rpx;
+  margin: -30rpx -24rpx 0;
+  border-radius: 0 0 16rpx 16rpx;
+  border: 0;
+  box-shadow: none;
 }
 
 .cellar-hero-image,
@@ -19,35 +23,54 @@
 
 .cellar-hero-mask {
   background:
-    linear-gradient(145deg, rgba(93, 31, 37, 0.18) 0%, rgba(24, 21, 18, 0) 50%),
-    linear-gradient(180deg, rgba(31, 27, 23, 0.12) 0%, rgba(18, 14, 13, 0.78) 100%);
+    linear-gradient(145deg, rgba(93, 31, 37, 0.26) 0%, rgba(24, 21, 18, 0) 52%),
+    linear-gradient(180deg, rgba(31, 27, 23, 0.06) 0%, rgba(18, 14, 13, 0.24) 38%, rgba(18, 14, 13, 0.88) 100%),
+    linear-gradient(90deg, rgba(18, 14, 13, 0.62), rgba(18, 14, 13, 0.1) 54%, rgba(18, 14, 13, 0.42));
 }
 
 .cellar-hero-copy {
   position: relative;
   z-index: 2;
-  padding: 34rpx 28rpx 162rpx;
+  padding: 92rpx 30rpx 228rpx;
 }
 
 .cellar-title {
-  margin: 10rpx 0 12rpx;
+  max-width: 620rpx;
+  margin: 12rpx 0 14rpx;
+  font-family: "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 52rpx;
+  font-weight: 600;
+  line-height: 1.06;
 }
 
 .cellar-hero-note {
   position: absolute;
-  left: 18rpx;
-  right: 18rpx;
-  bottom: 18rpx;
+  left: 30rpx;
+  right: 30rpx;
+  bottom: 34rpx;
   z-index: 2;
-  padding: 20rpx;
-  border-radius: 24rpx;
+  padding: 0;
+  border-radius: 0;
   background:
-    linear-gradient(135deg, rgba(93, 31, 37, 0.2), rgba(24, 21, 18, 0) 58%),
-    linear-gradient(180deg, rgba(44, 38, 32, 0.58), rgba(18, 14, 13, 0.5));
+    linear-gradient(90deg, rgba(220, 192, 138, 0.32), rgba(220, 192, 138, 0));
+  border-top: 1rpx solid rgba(220, 192, 138, 0.24);
+}
+
+.cellar-hero-note .micro-copy {
+  padding-top: 18rpx;
+  color: rgba(247, 239, 228, 0.78);
 }
 
 .dossier-card {
-  padding: 24rpx;
+  margin: 0 -24rpx;
+  padding: 54rpx 30rpx 50rpx;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.cellar-page .section-head {
+  padding: 46rpx 4rpx 0;
 }
 
 .dossier-kicker {
@@ -58,12 +81,12 @@
   display: flex;
   flex-direction: column;
   gap: 14rpx;
-  margin-top: 18rpx;
+  margin-top: 30rpx;
 }
 
 .dossier-item {
-  padding-bottom: 14rpx;
-  border-bottom: 1rpx solid rgba(63, 42, 20, 0.08);
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid rgba(63, 42, 20, 0.1);
 }
 
 .dossier-label {
@@ -83,19 +106,24 @@
 .memory-list {
   display: flex;
   flex-direction: column;
-  gap: 14rpx;
+  gap: 0;
+  margin: 22rpx -24rpx 0;
 }
 
 .memory-card {
   display: flex;
-  gap: 14rpx;
-  padding: 16rpx;
+  gap: 20rpx;
+  padding: 24rpx;
+  border: 0;
+  border-top: 1rpx solid rgba(220, 185, 133, 0.1);
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .memory-image {
-  width: 176rpx;
-  height: 156rpx;
-  border-radius: 22rpx;
+  width: 204rpx;
+  height: 184rpx;
+  border-radius: 16rpx;
   flex-shrink: 0;
 }
 
@@ -115,15 +143,8 @@
   display: block;
   margin-bottom: 8rpx;
   color: var(--ink);
-  font-family: Baskerville, Georgia, "Times New Roman", serif;
+  font-family: "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-size: 27rpx;
-}
-
-.action-row {
-  display: flex;
-  gap: 12rpx;
-}
-
-.action-button {
-  flex: 1;
+  font-weight: 600;
+  line-height: 1.22;
 }

@@ -1,17 +1,69 @@
 .detail-page {
   display: flex;
   flex-direction: column;
-  gap: 18rpx;
+  gap: 0;
+  padding-top: 0;
 }
 
-.detail-hero {
+.detail-story {
   display: flex;
   flex-direction: column;
-  gap: 16rpx;
+  gap: 0;
+}
+
+.detail-product-hero {
+  min-height: 790rpx;
+  margin: -30rpx -24rpx 0;
+  border: 0;
+  border-radius: 0 0 16rpx 16rpx;
+  background:
+    linear-gradient(145deg, rgba(93, 31, 37, 0.24) 0%, rgba(24, 21, 18, 0) 52%),
+    linear-gradient(180deg, #251515 0%, #171211 50%, #12100f 100%);
+  box-shadow: none;
+}
+
+.detail-product-hero .detail-visual-mask {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background:
+    linear-gradient(90deg, rgba(18, 14, 13, 0.74) 0%, rgba(18, 14, 13, 0.24) 54%, rgba(18, 14, 13, 0.1) 100%),
+    linear-gradient(180deg, rgba(18, 14, 13, 0.1) 0%, rgba(18, 14, 13, 0.18) 44%, rgba(18, 14, 13, 0.82) 100%);
+}
+
+.detail-product-hero .detail-bottle {
+  left: 0;
+  top: 0;
+  right: auto;
+  bottom: auto;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  filter: none;
+}
+
+.detail-hero-copy {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 440rpx;
+  padding: 92rpx 30rpx 390rpx;
+}
+
+.detail-hero-kicker {
+  color: rgba(220, 192, 138, 0.9);
 }
 
 .detail-paper {
-  padding: 24rpx;
+  margin: 0 -24rpx;
+  padding: 54rpx 30rpx 50rpx;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .detail-kicker {
@@ -19,11 +71,21 @@
 }
 
 .detail-title {
-  margin: 12rpx 0 10rpx;
+  max-width: 440rpx;
+  margin: 12rpx 0 12rpx;
+  font-family: "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 54rpx;
+  font-weight: 600;
+  line-height: 1.04;
 }
 
 .detail-chip-row {
-  margin: 16rpx 0;
+  margin-top: 18rpx;
+  max-width: 430rpx;
+}
+
+.detail-overview {
+  margin-top: 18rpx;
 }
 
 .detail-quote {
@@ -49,8 +111,11 @@
 }
 
 .detail-visual {
-  min-height: 420rpx;
-  border-radius: 34rpx;
+  min-height: 520rpx;
+  margin: 0 -24rpx;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .detail-visual-bg,
@@ -63,22 +128,51 @@
 
 .detail-visual-mask {
   background:
-    linear-gradient(145deg, rgba(93, 31, 37, 0.18) 0%, rgba(24, 21, 18, 0) 50%),
-    linear-gradient(180deg, rgba(31, 27, 23, 0.08) 0%, rgba(18, 14, 13, 0.76) 100%);
+    linear-gradient(145deg, rgba(93, 31, 37, 0.26) 0%, rgba(24, 21, 18, 0) 52%),
+    linear-gradient(180deg, rgba(31, 27, 23, 0.08) 0%, rgba(18, 14, 13, 0.26) 40%, rgba(18, 14, 13, 0.84) 100%);
 }
 
 .detail-bottle {
   position: absolute;
-  right: 24rpx;
-  bottom: 18rpx;
-  width: 240rpx;
-  height: 360rpx;
+  right: 20rpx;
+  bottom: 22rpx;
+  width: 260rpx;
+  height: 390rpx;
   z-index: 2;
+}
+
+.detail-visual .detail-quote {
+  position: absolute;
+  left: 30rpx;
+  right: 30rpx;
+  bottom: 34rpx;
+  z-index: 3;
+  margin-top: 0;
+  padding-left: 24rpx;
+  border-left: 1rpx solid rgba(220, 192, 138, 0.28);
+}
+
+.detail-visual .detail-quote-mark {
+  color: rgba(220, 192, 138, 0.48);
+}
+
+.detail-visual .detail-quote-text {
+  color: rgba(247, 239, 228, 0.82);
 }
 
 .note-panel,
 .tech-panel {
-  padding: 24rpx;
+  margin: 0 -24rpx;
+  padding: 46rpx 30rpx;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.note-panel {
+  background:
+    linear-gradient(135deg, rgba(93, 31, 37, 0.16) 0%, rgba(29, 23, 21, 0) 58%),
+    linear-gradient(180deg, rgba(35, 28, 24, 0.94), rgba(18, 14, 13, 0.96));
 }
 
 .note-item {
@@ -129,13 +223,4 @@
   color: var(--paper-ink);
   font-size: 22rpx;
   line-height: 1.6;
-}
-
-.detail-actions {
-  display: flex;
-  gap: 12rpx;
-}
-
-.detail-action {
-  flex: 1;
 }

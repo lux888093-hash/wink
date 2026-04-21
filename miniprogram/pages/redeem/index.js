@@ -51,42 +51,40 @@ Page({
     title: '输入提取码',
     message: '输入酒瓶标签上的六位数字提取码，开启专属体验。',
     codeDigits: ['', '', '', '', '', ''],
-    focusIndex: 0,
+    inputFocused: false,
+    activeIndex: 0,
     fullCode: ''
   },
 
   onLoad() {
-    this.setData({ focusIndex: 0 });
+    this.setData({ inputFocused: true, activeIndex: 0 });
   },
 
-  onDigitInput(e) {
-    const { index } = e.currentTarget.dataset;
-    const value = e.detail.value.replace(/\D/g, '').slice(0, 1);
-
-    const codeDigits = [...this.data.codeDigits];
-    codeDigits[index] = value;
-
-    const focusIndex = value && index < 5 ? index + 1 : this.data.focusIndex;
-    const fullCode = codeDigits.join('');
-
-    this.setData({ codeDigits, focusIndex, fullCode });
-
-    if (fullCode.length === 6) {
-      this.verifyCode(fullCode);
+  focusCodeInput() {
+    if (this.data.state !== 'idle' && this.data.state !== 'error') {
+      return;
     }
+
+    this.setData({ inputFocused: true });
   },
 
-  onDigitFocus(e) {
-    const { index } = e.currentTarget.dataset;
-    this.setData({ focusIndex: index });
+  onCodeFocus() {
+    this.setData({ inputFocused: true, activeIndex: Math.min(this.data.fullCode.length, 5) });
   },
 
-  onKeyboardDelete(e) {
-    const { index } = e.currentTarget.dataset;
-    if (!this.data.codeDigits[index] && index > 0) {
-      const codeDigits = [...this.data.codeDigits];
-      codeDigits[index - 1] = '';
-      this.setData({ codeDigits, focusIndex: index - 1, fullCode: codeDigits.join('') });
+  onCodeBlur() {
+    this.setData({ inputFocused: false });
+  },
+
+  onCodeInput(e) {
+    const fullCode = String(e.detail.value || '').replace(/\D/g, '').slice(0, 6);
+    const codeDigits = Array.from({ length: 6 }, (_, index) => fullCode[index] || '');
+    const activeIndex = Math.min(fullCode.length, 5);
+
+    this.setData({ codeDigits, activeIndex, fullCode });
+
+    if (fullCode.length === 6 && (this.data.state === 'idle' || this.data.state === 'error')) {
+      this.verifyCode(fullCode);
     }
   },
 
@@ -124,7 +122,8 @@ Page({
       title: '输入提取码',
       message: '输入酒瓶标签上的六位数字提取码，开启专属体验。',
       codeDigits: ['', '', '', '', '', ''],
-      focusIndex: 0,
+      inputFocused: true,
+      activeIndex: 0,
       fullCode: ''
     });
   }

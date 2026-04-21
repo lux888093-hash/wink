@@ -53,8 +53,8 @@
       "moodLine": "把灯光压低，再开始倒酒。",
       "estateName": "鸿玖月庭酒庄",
       "estateTagline": "月色、葡萄藤与一盏留亮的窗",
-      "estateIntro": "专属体验页不展示商城，而是先让用户看到酒庄，再看到这瓶酒，最后听到与它绑定的曲目。",
-      "estatePhilosophy": "酒庄内容不应像硬广告，而更像礼盒内页。它负责建立空间感和稀缺感，再把用户带向酒与音乐。",
+      "estateIntro": "鸿玖月庭酒庄坐落在夜色葡萄园之间，以月光、木质长廊和留灯小屋构成第一印象。",
+      "estatePhilosophy": "这里的叙事只关于庄园本身：葡萄藤的秩序、夜收的节奏、木屋窗光与低照度的酒窖气息。",
       "estateHeroImage": "/assets/images/winery-vineyard-moon.jpg",
       "estatePortraitImage": "/assets/images/winery-cottage-night.jpg",
       "harvestImage": "/assets/images/harvest-under-moon.jpg",
@@ -63,16 +63,16 @@
       "giftImage": "/assets/images/wine-gift-set.jpg",
       "estateStats": [
         {
-          "label": "体验入口",
-          "value": "礼盒二维码首扫进入"
+          "label": "所属产区",
+          "value": "宁夏贺兰山东麓"
         },
         {
-          "label": "适饮场景",
-          "value": "晚宴、送礼、私享夜饮"
+          "label": "庄园景观",
+          "value": "月色葡萄藤、留灯小屋、夜收葡萄"
         },
         {
-          "label": "内容编排",
-          "value": "酒庄 / 酒款 / 音乐 / 会员转化"
+          "label": "空间气质",
+          "value": "静谧、克制、木质与暗红光线"
         }
       ],
       "tasting": [
@@ -122,8 +122,8 @@
           "value": "木盒与单瓶同色系包装，适合节庆送礼"
         },
         {
-          "label": "音乐搭配",
-          "value": "缓拍钢琴、低频弦乐、夜色爵士"
+          "label": "杯型建议",
+          "value": "高脚红酒杯，杯肚保留足够醒香空间"
         }
       ],
       "collection": [
@@ -172,14 +172,14 @@
       "style": "珍藏干红",
       "serving": "16-18°C · 醒酒 30 分钟",
       "quote": "更深、更密，也更适合礼盒陈列。",
-      "overview": "琥珀夜曲适合放在商城主推位。它在包装、颜色和层次上都更偏典藏风，适合作为高客单礼盒和会员推荐款。",
+      "overview": "琥珀夜曲珍藏呈现更深的黑果、雪松与可可气息，结构比旗舰款更紧实，尾段保留清晰木质回甘。",
       "storyTitle": "礼序与陈列",
       "story": "它更像会员橱窗里的主展示品，强调视觉深度、收藏感与更正式的礼盒结构。",
       "moodLine": "适合在正式宴请前开场。",
       "estateName": "鸿玖珍藏酒窖",
       "estateTagline": "更深的木质气息与更正式的礼序",
-      "estateIntro": "公共首页展示这支酒时，会更强调收藏、送礼和会员尊享，而非扫码首扫体验。",
-      "estatePhilosophy": "它承担的是商城的高客单定位与品牌调性的稳定输出。",
+      "estateIntro": "鸿玖珍藏酒窖以木桶、石墙和低照度陈列为核心，空间更深、更安静。",
+      "estatePhilosophy": "酒窖不强调喧闹陈列，而是用材质、温度和暗光呈现更正式的收藏秩序。",
       "estateHeroImage": "/assets/images/wine-bottle-poster.jpg",
       "estatePortraitImage": "/assets/images/wine-bottle-estate.jpg",
       "harvestImage": "/assets/images/wine-gift-set.jpg",
@@ -188,16 +188,16 @@
       "giftImage": "/assets/images/wine-gift-set.jpg",
       "estateStats": [
         {
-          "label": "定位",
-          "value": "商务礼赠 / 年节礼盒"
+          "label": "空间类型",
+          "value": "珍藏酒窖"
         },
         {
-          "label": "核心卖点",
-          "value": "木盒包装、层次更饱满、会员推荐"
+          "label": "主要材质",
+          "value": "木桶、石墙、暗色陈列架"
         },
         {
-          "label": "建议页位",
-          "value": "商城头图第二屏与精选位"
+          "label": "酒窖气质",
+          "value": "深沉、正式、适合珍藏"
         }
       ],
       "tasting": [
@@ -247,8 +247,8 @@
           "value": "商务礼赠、纪念日、企业客户"
         },
         {
-          "label": "零售价带",
-          "value": "高客单精品礼盒"
+          "label": "陈年潜力",
+          "value": "具备 3-5 年陈放潜力"
         }
       ],
       "collection": [],
@@ -275,14 +275,14 @@
       "style": "桃红",
       "serving": "8-10°C · 冰镇后饮用",
       "quote": "更轻快，也更适合白天聚会与入门客群。",
-      "overview": "作为商城中更轻松的一支产品，它承担拉新和社交分享。页面会更轻盈，但仍保持精致的礼盒与编辑感。",
+      "overview": "铜曦桃红以草莓、覆盆子和清爽酸度为主线，酒体更轻盈，适合低温饮用。",
       "storyTitle": "白昼款的必要性",
-      "story": "如果所有页面都太深太重，品牌会显得单一。桃红款负责让商城首页有呼吸感。",
-      "moodLine": "午后露台、轻食和更明亮的音乐。",
+      "story": "这支桃红的重点在于明亮果香、轻盈酒体和更清爽的饮用节奏。",
+      "moodLine": "午后露台、轻食和更明亮的果香。",
       "estateName": "鸿玖晨曦园",
       "estateTagline": "更明亮的果香与轻礼社交",
-      "estateIntro": "这支酒更多出现在商城和新客活动位，承担拉新和节日社交需求。",
-      "estatePhilosophy": "明亮一点，但不要失掉庄园的克制感。",
+      "estateIntro": "鸿玖晨曦园更靠近日间葡萄园，保留清晨光线、石径与花果香气。",
+      "estatePhilosophy": "晨曦园的表达更轻盈，但仍以酒庄的秩序感、自然光和克制留白为核心。",
       "estateHeroImage": "/assets/images/harvest-under-moon.jpg",
       "estatePortraitImage": "/assets/images/wine-gift-set.jpg",
       "harvestImage": "/assets/images/winery-vineyard-moon.jpg",
@@ -291,16 +291,16 @@
       "giftImage": "/assets/images/wine-gift-set.jpg",
       "estateStats": [
         {
-          "label": "定位",
-          "value": "聚会 / 入门 / 节日分享"
+          "label": "园区光线",
+          "value": "晨间自然光与开阔葡萄园"
         },
         {
-          "label": "口感",
-          "value": "轻盈果香与清爽酸度"
+          "label": "庄园景观",
+          "value": "石径、花果香气、低矮葡萄藤"
         },
         {
-          "label": "页面策略",
-          "value": "提亮商城节奏，平衡整体色调"
+          "label": "空间气质",
+          "value": "轻盈、明净、克制"
         }
       ],
       "tasting": [
@@ -351,8 +351,8 @@
           "value": "午后露台、野餐、小型聚会"
         },
         {
-          "label": "推荐渠道",
-          "value": "商城拉新位 / 节日活动位"
+          "label": "杯型建议",
+          "value": "郁金香杯或白葡萄酒杯"
         }
       ],
       "collection": [],
