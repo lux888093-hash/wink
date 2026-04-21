@@ -9,8 +9,8 @@
       <text class="muted-copy redeem-subtitle">输入酒瓶标签上的六位提取码，开启这瓶酒的专属体验。</text>
     </view>
 
-    <view class="redeem-card">
-      <text class="eyebrow">{{state === 'idle' || state === 'error' ? '提取码验证' : title}}</text>
+    <view class="redeem-card {{state === 'success' ? 'redeem-card-success' : ''}}">
+      <text class="eyebrow">{{state === 'idle' || state === 'error' ? '提取码验证' : state === 'success' ? 'ACCESS GRANTED' : title}}</text>
       <text class="section-title redeem-card-title">{{title}}</text>
       <text class="muted-copy line-clamp-3">{{message}}</text>
 
@@ -45,8 +45,16 @@
         <view class="loading-dot"></view>
       </view>
 
-      <view wx:if="{{state === 'success'}}" class="success-seal">
-        <text class="success-seal-text">OPEN</text>
+      <view wx:if="{{state === 'success'}}" class="success-stage">
+        <view class="success-mark">
+          <view class="success-mark-core">
+            <text class="success-mark-icon">✓</text>
+          </view>
+        </view>
+        <view class="success-progress">
+          <view class="success-progress-fill"></view>
+        </view>
+        <text class="success-note">正在打开酒庄私享内容</text>
       </view>
 
       <button wx:if="{{state === 'error'}}" class="ghost-button full-width" bindtap="clearInput">重新输入</button>

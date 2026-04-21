@@ -113,13 +113,13 @@ Page({
       await consumeCode(code);
       this.setData({
         state: 'success',
-        title: '验证成功',
-        message: '正在进入专属体验...'
+        title: '专属体验已解锁',
+        message: '正在打开这瓶酒的酒庄与酒款内容。'
       });
 
       setTimeout(() => {
         wx.redirectTo({ url: '/pages/cellar/index' });
-      }, 650);
+      }, 900);
     } catch (error) {
       const copy = errorCopy(error.message);
       this.setData({
