@@ -17,26 +17,26 @@
       <view wx:if="{{state === 'idle' || state === 'error'}}" class="code-input-area">
         <view class="digit-row" bindtap="focusCodeInput">
           <view
-            wx:for="{{codeDigits}}"
+            wx:for="{{codeBoxes}}"
             wx:key="index"
-            class="digit-box {{item ? 'digit-filled' : ''}} {{activeIndex === index ? 'digit-active' : ''}}"
+            class="digit-box {{item.digit ? 'digit-filled' : ''}} {{item.isActive ? 'digit-active' : ''}}"
           >
-            <text>{{item}}</text>
+            <text>{{item.digit}}</text>
           </view>
-          <input
-            class="code-hidden-input"
-            type="number"
-            maxlength="6"
-            value="{{fullCode}}"
-            focus="{{inputFocused}}"
-            confirm-type="done"
-            cursor-spacing="90"
-            adjust-position="{{true}}"
-            bindinput="onCodeInput"
-            bindfocus="onCodeFocus"
-            bindblur="onCodeBlur"
-          />
         </view>
+        <input
+          class="code-hidden-input"
+          type="number"
+          maxlength="6"
+          value="{{fullCode}}"
+          focus="{{inputFocused}}"
+          confirm-type="done"
+          cursor-spacing="90"
+          adjust-position="{{true}}"
+          bindinput="onCodeInput"
+          bindfocus="onCodeFocus"
+          bindblur="onCodeBlur"
+        />
       </view>
 
       <view wx:if="{{state === 'loading'}}" class="loading-row">

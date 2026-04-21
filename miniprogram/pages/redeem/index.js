@@ -45,12 +45,26 @@ function errorCopy(code) {
   }
 }
 
+function getCodeInputState(value) {
+  const fullCode = String(value || '').replace(/\D/g, '').slice(0, 6);
+  const activeIndex = Math.min(fullCode.length, 5);
+
+  return {
+    fullCode,
+    activeIndex,
+    codeBoxes: Array.from({ length: 6 }, (_, index) => ({
+      digit: fullCode[index] || '',
+      isActive: index === activeIndex
+    }))
+  };
+}
+
 Page({
   data: {
     state: 'idle',
     title: '输入提取码',
     message: '输入酒瓶标签上的六位数字提取码，开启专属体验。',
-    codeDigits: ['', '', '', '', '', ''],
+    codeBoxes: getCodeInputState('').codeBoxes,
     inputFocused: false,
     activeIndex: 0,
     fullCode: ''
@@ -69,7 +83,8 @@ Page({
   },
 
   onCodeFocus() {
-    this.setData({ inputFocused: true, activeIndex: Math.min(this.data.fullCode.length, 5) });
+    const inputState = getCodeInputState(this.data.fullCode);
+    this.setData({ inputFocused: true, activeIndex: inputState.activeIndex, codeBoxes: inputState.codeBoxes });
   },
 
   onCodeBlur() {
@@ -77,11 +92,10 @@ Page({
   },
 
   onCodeInput(e) {
-    const fullCode = String(e.detail.value || '').replace(/\D/g, '').slice(0, 6);
-    const codeDigits = Array.from({ length: 6 }, (_, index) => fullCode[index] || '');
-    const activeIndex = Math.min(fullCode.length, 5);
+    const inputState = getCodeInputState(e.detail.value);
+    const { fullCode } = inputState;
 
-    this.setData({ codeDigits, activeIndex, fullCode });
+    this.setData(inputState);
 
     if (fullCode.length === 6 && (this.data.state === 'idle' || this.data.state === 'error')) {
       this.verifyCode(fullCode);
@@ -117,14 +131,16 @@ Page({
   },
 
   clearInput() {
+    const inputState = getCodeInputState('');
+
     this.setData({
       state: 'idle',
       title: '输入提取码',
       message: '输入酒瓶标签上的六位数字提取码，开启专属体验。',
-      codeDigits: ['', '', '', '', '', ''],
+      codeBoxes: inputState.codeBoxes,
       inputFocused: true,
-      activeIndex: 0,
-      fullCode: ''
+      activeIndex: inputState.activeIndex,
+      fullCode: inputState.fullCode
     });
   }
 });
