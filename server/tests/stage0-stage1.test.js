@@ -71,6 +71,14 @@ function main() {
     assert.strictEqual(consumed.experience.tracks.length, 1);
     assert.strictEqual(consumed.experience.tracks[0].id, 'track_harvest_whisper');
 
+    const autoBatch = createCodeBatch({
+      wineId: 'soundless-a-quiet-world-2022',
+      quantity: 1,
+      batchNo: 'TEST_STAGE_0_AUTO_BATCH'
+    });
+    assert.strictEqual(autoBatch.codes.length, 1);
+    assert.strictEqual(autoBatch.codes[0].trackId, 'track_moonlit_path');
+
     const storedCode = readStore().scanCodes.find((item) => item.id === batch.codes[0].id);
     assert.strictEqual(storedCode.status, 'claimed');
     assert(storedCode.firstUsedAt);

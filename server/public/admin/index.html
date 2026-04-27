@@ -7,254 +7,303 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <div class="grain"></div>
     <div class="admin-shell">
       <aside class="nav-rail">
         <div class="brand-lockup">
-          <p class="brand-kicker">HONGJIU ESTATE</p>
-          <h1 class="brand-title">运营台</h1>
-          <p class="brand-copy">
-            按“品牌体验 + 商城交易 + 会员权益”三条线统一管理，而不是零散堆页面。
-          </p>
+          <div class="brand-mark" aria-hidden="true">
+            <div class="brand-mark-ring">
+              <span class="brand-mark-letter">H</span>
+            </div>
+          </div>
+          <p class="eyebrow-label brand-kicker">HONGJIU ESTATE</p>
+          <h1 class="brand-title">鸿玖酒庄</h1>
+          <p class="brand-copy">运营控制台</p>
         </div>
 
-        <nav class="nav-stack">
-          <button class="nav-item is-active" data-view="dashboard">概览</button>
-          <button class="nav-item" data-view="wines">酒款</button>
-          <button class="nav-item" data-view="wineries">酒庄</button>
-          <button class="nav-item" data-view="tracks">音乐</button>
-          <button class="nav-item" data-view="codes">码池</button>
-          <button class="nav-item" data-view="products">商品</button>
-          <button class="nav-item" data-view="orders">订单</button>
-          <button class="nav-item" data-view="members">会员</button>
-          <button class="nav-item" data-view="audit">审计</button>
+        <nav class="nav-stack" aria-label="主导航">
+          <button class="nav-item is-active" data-view="overview">概览</button>
+          <button class="nav-item" data-view="wines">酒款管理</button>
+          <button class="nav-item" data-view="codes">提取码管理</button>
         </nav>
 
         <div class="nav-note">
-          <p>本页是本地演示后台。</p>
-          <p>当前已切到 PostgreSQL 兼容实体仓库，接口与小程序、后台联动。</p>
+          <p>支持按关键词搜索酒款。</p>
+          <p>支持按批次和状态查看提取码。</p>
+        </div>
+
+        <div class="rail-profile">
+          <div class="rail-avatar">A</div>
+          <div class="rail-user-meta">
+            <strong class="rail-user-name">Admin</strong>
+            <span class="rail-user-role">管理员</span>
+          </div>
+          <span class="rail-profile-arrow" aria-hidden="true">›</span>
         </div>
       </aside>
 
       <main class="workspace">
         <header class="topbar">
-          <div>
-            <p class="topbar-kicker">CURATOR CONSOLE</p>
-            <h2 class="topbar-title" id="view-title">项目概览</h2>
+          <div class="topbar-copy">
+            <p class="eyebrow-label topbar-kicker">运营控制台</p>
+            <h2 class="topbar-title" id="view-title">运营概览</h2>
+            <p class="topbar-description" id="view-description">查看酒款、提取码和品牌资料。</p>
           </div>
 
           <div class="topbar-actions">
             <div class="session-pill" id="session-pill">未登录</div>
-            <button class="outline-button" id="refresh-button">刷新数据</button>
-            <button class="outline-button" id="logout-button">退出登录</button>
+            <button class="outline-button" id="refresh-button" type="button">刷新数据</button>
+            <button class="outline-button" id="logout-button" type="button">退出登录</button>
           </div>
         </header>
 
         <div class="status-banner" id="status-banner" aria-live="polite"></div>
 
-        <section class="view is-active" id="view-dashboard">
-          <div class="metric-grid" id="dashboard-cards"></div>
+        <section class="view is-active" id="view-overview">
+          <section class="hero-surface">
+            <div class="hero-copy">
+              <p class="eyebrow-label">概览</p>
+              <h3 class="hero-title">内容与提取码概览</h3>
+              <p class="hero-description">查看酒款数量、提取码状态和近期使用情况。</p>
+              <div class="hero-actions">
+                <button class="primary-button" type="button" data-view-target="wines">进入酒款管理</button>
+                <button class="outline-button" type="button" data-view-target="codes">进入提取码管理</button>
+              </div>
+            </div>
+            <div class="metric-grid" id="overview-metrics"></div>
+          </section>
 
-          <div class="insight-grid" id="dashboard-insights"></div>
-
-          <div class="split-grid">
-            <section class="panel">
-              <div class="panel-head">
+          <div class="overview-grid">
+            <section class="surface">
+              <div class="surface-head">
                 <div>
-                  <p class="panel-kicker">RECENT ORDERS</p>
-                  <h3 class="panel-title">最近订单</h3>
+                  <p class="eyebrow-label">常用操作</p>
+                  <h3 class="surface-title">快捷操作</h3>
                 </div>
               </div>
-              <div class="panel-body">
-                <div class="table-shell">
-                  <table class="data-table" id="orders-preview-table"></table>
-                </div>
-              </div>
+              <div class="surface-body" id="overview-focus"></div>
             </section>
 
-            <section class="panel">
-              <div class="panel-head">
+            <section class="surface">
+              <div class="surface-head">
                 <div>
-                  <p class="panel-kicker">CODE HEALTH</p>
-                  <h3 class="panel-title">码池分布</h3>
+                  <p class="eyebrow-label">资料</p>
+                  <h3 class="surface-title">品牌资料</h3>
                 </div>
               </div>
-              <div class="panel-body" id="code-health"></div>
+              <div class="surface-body" id="overview-fixed-content"></div>
             </section>
           </div>
         </section>
 
         <section class="view" id="view-wines">
-          <section class="panel">
-            <div class="panel-head">
-              <div>
-                <p class="panel-kicker">CONTENT</p>
-                <h3 class="panel-title">酒款内容配置</h3>
-              </div>
-            </div>
-            <div class="panel-body" id="wines-list"></div>
-          </section>
-        </section>
-
-        <section class="view" id="view-wineries">
-          <section class="panel">
-            <div class="panel-head">
-              <div>
-                <p class="panel-kicker">WINERY</p>
-                <h3 class="panel-title">酒庄内容管理</h3>
-              </div>
-            </div>
-            <div class="panel-body" id="wineries-list"></div>
-          </section>
-        </section>
-
-        <section class="view" id="view-tracks">
-          <section class="panel">
-            <div class="panel-head">
-              <div>
-                <p class="panel-kicker">MUSIC</p>
-                <h3 class="panel-title">音乐资源管理</h3>
-              </div>
-            </div>
-            <div class="panel-body" id="tracks-list"></div>
-          </section>
-        </section>
-
-        <section class="view" id="view-codes">
-          <div class="split-grid">
-            <section class="panel">
-              <div class="panel-head">
+          <div class="workspace-grid wines-grid">
+            <section class="surface list-surface">
+              <div class="surface-head">
                 <div>
-                  <p class="panel-kicker">BATCH GENERATOR</p>
-                  <h3 class="panel-title">生成提取码批次</h3>
+                  <p class="eyebrow-label">酒款管理</p>
+                  <h3 class="surface-title">酒款目录</h3>
+                </div>
+                <button class="primary-button" id="open-create-wine" type="button">新增酒款</button>
+              </div>
+
+              <div class="toolbar wine-toolbar">
+                <label class="search-field search-field-with-icon">
+                  <span class="visually-hidden">搜索酒款</span>
+                  <input id="wine-search" type="search" placeholder="搜索酒名、年份、产区、文案" />
+                </label>
+              </div>
+
+              <div class="wine-status-row">
+                <div class="segmented-control" id="wine-status-tabs">
+                  <button class="segment is-active" type="button" data-wine-status="all">全部</button>
+                  <button class="segment" type="button" data-wine-status="active">启用中</button>
+                  <button class="segment" type="button" data-wine-status="archived">已归档</button>
                 </div>
               </div>
-              <div class="panel-body">
-                <form id="batch-form" class="batch-form">
-                  <label>
-                    <span>绑定酒款</span>
-                    <select id="batch-wine"></select>
-                  </label>
-                  <label>
-                    <span>绑定歌曲</span>
-                    <select id="batch-track"></select>
-                  </label>
-                  <label>
-                    <span>批次数量</span>
-                    <input id="batch-quantity" type="number" min="1" max="200" value="12" />
-                  </label>
-                  <label>
-                    <span>批次号</span>
-                    <input id="batch-batch-no" type="text" placeholder="可选，留空自动生成" />
-                  </label>
-                  <button class="primary-button" type="submit">生成批次</button>
-                </form>
-              </div>
+
+              <div class="collection-summary" id="wines-summary"></div>
+              <div class="selection-list" id="wines-collection"></div>
             </section>
 
-            <section class="panel">
-              <div class="panel-head">
-                <div>
-                  <p class="panel-kicker">FIXED ENTRY</p>
-                  <h3 class="panel-title">固定小程序码</h3>
-                </div>
-              </div>
-              <div class="panel-body">
-                <p class="card-subtitle">生成指向提取码页的固定小程序码。需要先配置真实 AppID 和 AppSecret。</p>
-                <button class="outline-button" id="fixed-qrcode-button">生成固定码</button>
-                <p class="card-subtitle" id="fixed-qrcode-result"></p>
-              </div>
-            </section>
-
-            <section class="panel">
-              <div class="panel-head">
-                <div>
-                  <p class="panel-kicker">STATUS FEED</p>
-                  <h3 class="panel-title">提取码列表</h3>
-                </div>
-                <button class="outline-button" id="export-codes-button">导出 CSV</button>
-              </div>
-              <div class="panel-body">
-                <div class="table-shell">
-                  <table class="data-table" id="codes-table"></table>
-                </div>
-              </div>
+            <section class="surface editor-surface">
+              <div class="surface-body" id="wine-editor"></div>
             </section>
           </div>
         </section>
 
-        <section class="view" id="view-products">
-          <section class="panel">
-            <div class="panel-head">
-              <div>
-                <p class="panel-kicker">STORE OPS</p>
-                <h3 class="panel-title">商品与价格管理</h3>
+        <section class="view" id="view-codes">
+          <div class="workspace-grid codes-grid">
+            <section class="surface side-surface">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow-label">批量生成</p>
+                  <h3 class="surface-title">批量生成提取码</h3>
+                </div>
               </div>
-            </div>
-            <div class="panel-body" id="products-list"></div>
-          </section>
-        </section>
+              <div class="surface-body">
+                <form id="batch-form" class="stack-form">
+                  <label class="form-row">
+                    <span class="form-row-label">酒款</span>
+                    <div class="form-row-control">
+                      <select id="batch-wine"></select>
+                    </div>
+                  </label>
+                  <label class="form-row">
+                    <span class="form-row-label">数量</span>
+                    <div class="form-row-control">
+                      <input id="batch-quantity" type="number" min="1" max="500" value="24" />
+                      <span class="form-hint">建议按单个批次统一管理，便于追踪。</span>
+                    </div>
+                  </label>
+                  <label class="form-row">
+                    <span class="form-row-label">批次号</span>
+                    <div class="form-row-control">
+                      <input id="batch-batch-no" type="text" placeholder="留空则自动生成" />
+                      <span class="form-hint">可自定义批次号，便于线下物料归档。</span>
+                    </div>
+                  </label>
+                  <label class="form-row">
+                    <span class="form-row-label">有效期</span>
+                    <div class="form-row-control">
+                      <input id="batch-expire-at" type="datetime-local" />
+                      <span class="form-hint">从生成日起计算有效期。</span>
+                    </div>
+                  </label>
+                  <button class="primary-button batch-submit-button" type="submit">生成提取码</button>
+                </form>
 
-        <section class="view" id="view-orders">
-          <section class="panel">
-            <div class="panel-head">
-              <div>
-                <p class="panel-kicker">TRANSACTION</p>
-                <h3 class="panel-title">订单列表</h3>
+                <div class="fixed-code-block">
+                  <div>
+                    <p class="eyebrow-label">入口码</p>
+                    <h4 class="minor-title">固定小程序码</h4>
+                  </div>
+                  <p class="minor-copy">用于用户扫码进入提取页，线下物料可重复投放。</p>
+                  <div class="fixed-code-layout">
+                    <div class="fixed-qrcode-preview" id="fixed-qrcode-preview">
+                      <div class="fixed-qrcode-placeholder">待生成</div>
+                    </div>
+                    <div class="fixed-code-actions">
+                      <button class="outline-button" id="fixed-qrcode-button" type="button">生成固定入口码</button>
+                      <a class="outline-button" id="fixed-qrcode-download" href="#" download hidden>下载二维码</a>
+                      <button class="text-button" id="fixed-qrcode-copy" type="button" hidden>复制链接</button>
+                    </div>
+                  </div>
+                  <p class="inline-feedback" id="fixed-qrcode-result"></p>
+                </div>
+
+                <div class="fail-log-block">
+                  <div class="panel-head-inline">
+                    <div>
+                      <p class="eyebrow-label">失败记录</p>
+                      <h4 class="minor-title">最近验证失败</h4>
+                    </div>
+                    <span class="panel-meta-text">最近 6 条</span>
+                  </div>
+                  <div id="codes-fail-logs"></div>
+                </div>
               </div>
-              <button class="outline-button" id="reconciliation-button">生成对账报告</button>
-              <button class="outline-button" id="export-orders-button">导出订单 CSV</button>
-              <button class="outline-button" id="close-expired-orders-button">关闭超时订单</button>
-            </div>
-            <div class="panel-body">
+            </section>
+
+            <section class="surface table-surface">
+              <div class="surface-head">
+                <div>
+                  <p class="eyebrow-label">状态列表</p>
+                  <h3 class="surface-title">提取码列表</h3>
+                </div>
+                <button class="outline-button" id="export-codes-button" type="button">导出 CSV</button>
+              </div>
+
+              <div class="codes-workspace-head">
+                <div class="codes-filter-block">
+                  <label class="search-field search-field-with-icon">
+                    <span class="visually-hidden">搜索提取码</span>
+                    <input id="code-search" type="search" placeholder="搜索提取码" />
+                  </label>
+                  <div class="codes-filter-row">
+                    <label class="select-field">
+                      <span>状态</span>
+                      <select id="code-status-filter">
+                        <option value="all">全部</option>
+                        <option value="ready">待使用</option>
+                        <option value="claimed">已使用</option>
+                        <option value="expired">已过期</option>
+                        <option value="disabled">已停用</option>
+                      </select>
+                    </label>
+                    <label class="select-field">
+                      <span>酒款</span>
+                      <select id="code-wine-filter"></select>
+                    </label>
+                  </div>
+                </div>
+                <div class="summary-cards" id="codes-summary"></div>
+              </div>
+
               <div class="table-shell">
-                <table class="data-table" id="orders-table"></table>
+                <table class="data-table" id="codes-table"></table>
               </div>
-            </div>
-          </section>
-        </section>
 
-        <section class="view" id="view-members">
-          <section class="panel">
-            <div class="panel-head">
-              <div>
-                <p class="panel-kicker">MEMBERSHIP</p>
-                <h3 class="panel-title">会员与下载权益</h3>
-              </div>
-            </div>
-            <div class="panel-body" id="members-list"></div>
-          </section>
-        </section>
-
-        <section class="view" id="view-audit">
-          <section class="panel">
-            <div class="panel-head">
-              <div>
-                <p class="panel-kicker">AUDIT</p>
-                <h3 class="panel-title">操作审计</h3>
-              </div>
-            </div>
-            <div class="panel-body">
-              <div class="table-shell">
-                <table class="data-table" id="audit-table"></table>
-              </div>
-            </div>
-          </section>
+              <div class="table-footer" id="codes-footer"></div>
+            </section>
+          </div>
         </section>
       </main>
     </div>
 
+    <dialog class="sheet-dialog" id="create-wine-dialog">
+      <form class="sheet-form" id="create-wine-form" method="dialog">
+        <div class="sheet-head">
+          <div>
+            <p class="eyebrow-label">新增酒款</p>
+            <h3 class="surface-title">新增酒款</h3>
+          </div>
+          <button class="ghost-icon-button" type="button" data-action="close-create-wine" aria-label="关闭">×</button>
+        </div>
+
+        <div class="sheet-grid">
+          <label>
+            <span>酒款名称</span>
+            <input name="name" type="text" placeholder="例如：静夜序曲 2026" required />
+          </label>
+          <label>
+            <span>英文标题</span>
+            <input name="title" type="text" placeholder="例如：Soundless A Quiet World" />
+          </label>
+          <label>
+            <span>副标题</span>
+            <input name="subtitle" type="text" placeholder="例如：庄园限定干红" />
+          </label>
+          <label>
+            <span>年份 / 版次</span>
+            <input name="vintage" type="text" placeholder="例如：2026 Estate Edition" />
+          </label>
+          <label>
+            <span>产区</span>
+            <input name="region" type="text" placeholder="例如：宁夏贺兰山东麓" />
+          </label>
+          <label>
+            <span>状态标签</span>
+            <input name="eyebrow" type="text" placeholder="例如：扫码限定" />
+          </label>
+          <label class="sheet-span-full">
+            <span>酒款介绍</span>
+            <textarea name="overview" rows="5" placeholder="先写这瓶酒最关键的介绍，后续可继续在编辑区补充故事、引言和图片。"></textarea>
+          </label>
+        </div>
+
+        <div class="sheet-actions">
+          <button class="outline-button" type="button" data-action="close-create-wine">取消</button>
+          <button class="primary-button" type="submit">创建酒款</button>
+        </div>
+      </form>
+    </dialog>
+
     <div class="login-overlay" id="login-overlay">
       <div class="login-card">
         <div class="login-visual">
-          <div class="login-image"></div>
-          <div class="login-copy">
-            <p class="panel-kicker">ADMIN ACCESS</p>
-            <h2 class="login-title">鸿玖酒庄运营台</h2>
-            <p class="login-subtitle">
-              当前演示账号：`curator / Curator!2026`。登录后可直接新增、编辑、归档酒款与商品，并修改码池、订单和会员状态。
-            </p>
-          </div>
+          <p class="eyebrow-label">管理员登录</p>
+          <h2 class="login-title">鸿玖酒庄运营台</h2>
+          <p class="login-subtitle">登录后可维护酒款资料、生成提取码并查看使用状态。</p>
         </div>
 
         <form id="login-form" class="login-form">
@@ -266,7 +315,7 @@
             <span>密码</span>
             <input id="login-password" type="password" value="Curator!2026" />
           </label>
-          <button class="primary-button" type="submit">进入运营台</button>
+          <button class="primary-button" type="submit">登录</button>
           <p class="login-error" id="login-error"></p>
         </form>
       </div>

@@ -273,6 +273,176 @@ function ensureIsoDate(value, options = {}) {
   return new Date(timestamp).toISOString();
 }
 
+function ensurePlainObject(value, defaultValue = {}) {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value : { ...defaultValue };
+}
+
+function getOptionalText(value, fallback = '') {
+  const normalized = value === undefined || value === null ? '' : String(value).trim();
+  return normalized || fallback;
+}
+
+function parseTextLines(value, options = {}) {
+  const { maxItems = 20 } = options;
+
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => String(item || '').trim())
+      .filter(Boolean)
+      .slice(0, maxItems);
+  }
+
+  const text = String(value || '').trim();
+  if (!text) {
+    return [];
+  }
+
+  return text
+    .split(/\r?\n/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, maxItems);
+}
+
+function parsePipeObjectList(value, columns, options = {}) {
+  const { maxItems = 20 } = options;
+
+  const toRow = (source) => {
+    const item = ensurePlainObject(source);
+    return columns.reduce((accumulator, column) => {
+      accumulator[column] = getOptionalText(item[column]);
+      return accumulator;
+    }, {});
+  };
+
+  if (Array.isArray(value)) {
+    return value.slice(0, maxItems).map(toRow);
+  }
+
+  const rows = String(value || '')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(0, maxItems);
+
+  return rows.map((line) => {
+    const parts = line.split('|').map((item) => item.trim());
+    return columns.reduce((accumulator, column, index) => {
+      accumulator[column] = parts[index] || '';
+      return accumulator;
+    }, {});
+  });
+}
+
+function parseWineTastingList(value) {
+  const rows = parsePipeObjectList(value, ['key', 'icon', 'text', 'meter'], { maxItems: 12 });
+  return rows.map((item) => {
+    const meterValue = Number(item.meter);
+    const normalized = {
+      key: item.key,
+      icon: item.icon,
+      text: item.text
+    };
+
+    if (Number.isFinite(meterValue)) {
+      normalized.meter = Math.max(0, Math.min(100, Math.round(meterValue)));
+    }
+
+    return normalized;
+  });
+}
+
+const DEFAULT_HOME_AGE_NOTE = '理性饮酒，拒绝酒驾。未成年人禁止饮酒。';
+
+function buildDefaultHomeContent(store) {
+  const winery = store.wineries[0] || {};
+
+  return {
+    intro:
+      winery.intro || '鸿玖酒庄以月光、葡萄藤、木屋与夜色为主线，讲述一处安静、克制、带有收藏感的东方庄园。',
+    statementKicker: '庄园手册',
+    statementTitle: '月色、藤影与木屋',
+    statementBody: '月光、木质与暗红光线构成庄园第一印象。',
+    ageNote: DEFAULT_HOME_AGE_NOTE,
+    facts: [
+      {
+        label: '主线',
+        value: '月光、葡萄藤与木屋'
+      },
+      {
+        label: '气质',
+        value: winery.tagline || 'Moonlit Vineyard Residency'
+      },
+      {
+        label: '秩序',
+        value: '安静、克制、留白'
+      }
+    ],
+    chapters: [
+      {
+        eyebrow: '01 / PLACE',
+        title: '夜色里的葡萄园',
+        body: '鸿玖把庄园的第一印象留给夜色、藤影和远处的微光。这里的画面不急着解释，只让葡萄园先成为记忆。',
+        image: winery.harvestImage || '/assets/images/harvest-under-moon.jpg'
+      },
+      {
+        eyebrow: '02 / HOUSE',
+        title: '一盏留亮的窗',
+        body: '庄园的故事从一盏窗开始：木屋、藤影、夜风和被留住的微光，让酒有了可以被记住的住所。',
+        image: winery.portraitImage || '/assets/images/winery-cottage-night.jpg'
+      },
+      {
+        eyebrow: '03 / RITUAL',
+        title: '留白中的秩序',
+        body: '深色、木质与一抹金色只作为背景，让庄园本身成为主角。信息被压缩到必要的几句，余下交给画面。',
+        image: winery.heroImage || '/assets/images/winery-vineyard-moon.jpg'
+      }
+    ]
+  };
+}
+
+function normalizeStructuredList(items, fallbackItems, columns) {
+  if (!Array.isArray(items)) {
+    return fallbackItems.map((item) => ({ ...item }));
+  }
+
+  return items.map((item, index) => {
+    const source = ensurePlainObject(item);
+    const fallback = ensurePlainObject(fallbackItems[index]);
+
+    return columns.reduce((accumulator, column) => {
+      accumulator[column] = getOptionalText(source[column], getOptionalText(fallback[column]));
+      return accumulator;
+    }, {});
+  });
+}
+
+function getResolvedHomeHero(store) {
+  const hero = ensurePlainObject(store.settings && store.settings.homeHero);
+
+  return {
+    eyebrow: getOptionalText(hero.eyebrow, 'Hongjiu Estate'),
+    title: getOptionalText(hero.title, '鸿玖酒庄'),
+    subtitle: getOptionalText(hero.subtitle, '月色葡萄园、木屋灯光与庄园礼盒。'),
+    ambienceNote: getOptionalText(hero.ambienceNote, DEFAULT_HOME_AGE_NOTE)
+  };
+}
+
+function getResolvedHomeContent(store) {
+  const defaults = buildDefaultHomeContent(store);
+  const content = ensurePlainObject(store.settings && store.settings.homeContent);
+
+  return {
+    intro: getOptionalText(content.intro, defaults.intro),
+    statementKicker: getOptionalText(content.statementKicker, defaults.statementKicker),
+    statementTitle: getOptionalText(content.statementTitle, defaults.statementTitle),
+    statementBody: getOptionalText(content.statementBody, defaults.statementBody),
+    ageNote: getOptionalText(content.ageNote, defaults.ageNote),
+    facts: normalizeStructuredList(content.facts, defaults.facts, ['label', 'value']),
+    chapters: normalizeStructuredList(content.chapters, defaults.chapters, ['eyebrow', 'title', 'body', 'image'])
+  };
+}
+
 function ensureAdminToken(token) {
   const normalized = String(token || '').trim();
 
@@ -427,14 +597,20 @@ function getDefaultTrackForWine(store, wineId) {
   return trackId ? getTrackById(store, trackId) : store.tracks.find((track) => track.wineId === wineId);
 }
 
+function getFixedTrack(store) {
+  return store.tracks[0] || null;
+}
+
 function getTrackForWine(store, wineId, trackId) {
-  const track = trackId ? getTrackById(store, trackId) : getDefaultTrackForWine(store, wineId);
+  const track = trackId
+    ? getTrackById(store, trackId)
+    : getDefaultTrackForWine(store, wineId) || getFixedTrack(store);
 
   if (!track) {
     throw createAppError('TRACK_NOT_FOUND', 404);
   }
 
-  if (track.wineId !== wineId) {
+  if (trackId && track.wineId !== wineId) {
     throw createAppError('TRACK_WINE_MISMATCH', 400);
   }
 
@@ -786,7 +962,7 @@ function buildCartSummary(store, userId) {
   };
 }
 
-function buildProductCard(store, productId) {
+function buildProductCard(store, productId, options = {}) {
   const product = getProductById(store, productId);
 
   if (!product) {
@@ -794,8 +970,10 @@ function buildProductCard(store, productId) {
   }
 
   const wine = getWineById(store, product.wineId);
+  const includeAllSkus = Boolean(options.includeAllSkus);
   const skus = store.productSkus
-    .filter((sku) => sku.productId === product.id && sku.status === 'published')
+    .filter((sku) => sku.productId === product.id)
+    .filter((sku) => includeAllSkus || sku.status === 'published')
     .sort((left, right) => left.price - right.price)
     .map((sku) => ({
       ...sku,
@@ -803,12 +981,17 @@ function buildProductCard(store, productId) {
       availableStock: getAvailableStock(sku)
     }));
   const lowestPrice = skus.length ? skus[0].price : 0;
+  const skuSummary = {
+    total: store.productSkus.filter((sku) => sku.productId === product.id).length,
+    published: store.productSkus.filter((sku) => sku.productId === product.id && sku.status === 'published').length
+  };
 
   return {
     ...product,
     wine,
     skus,
-    lowestPrice
+    lowestPrice,
+    skuSummary
   };
 }
 
@@ -1193,7 +1376,8 @@ function getStoreHome(userId) {
   const cart = buildCartSummary(store, user.id);
 
   return {
-    hero: store.settings.homeHero,
+    hero: getResolvedHomeHero(store),
+    homeContent: getResolvedHomeContent(store),
     winery: store.wineries[0],
     user: buildUserSummary(store, user.id),
     cartCount: cart.totalCount,
@@ -3054,6 +3238,89 @@ function adminDashboard() {
   };
 }
 
+function adminGetSiteContent() {
+  const store = readStore();
+
+  return {
+    hero: getResolvedHomeHero(store),
+    homeContent: getResolvedHomeContent(store)
+  };
+}
+
+function adminSaveSiteContent(payload = {}) {
+  const store = readStore();
+  const currentHero = getResolvedHomeHero(store);
+  const currentContent = getResolvedHomeContent(store);
+
+  store.settings = ensurePlainObject(store.settings);
+  store.settings.homeHero = {
+    eyebrow: ensureText(payload.heroEyebrow, {
+      field: 'heroEyebrow',
+      min: 0,
+      max: 80,
+      defaultValue: currentHero.eyebrow
+    }),
+    title: ensureText(payload.heroTitle, {
+      field: 'heroTitle',
+      min: 2,
+      max: 120,
+      defaultValue: currentHero.title
+    }),
+    subtitle: ensureText(payload.heroSubtitle, {
+      field: 'heroSubtitle',
+      min: 2,
+      max: 240,
+      defaultValue: currentHero.subtitle
+    }),
+    ambienceNote: ensureText(payload.heroAmbienceNote, {
+      field: 'heroAmbienceNote',
+      min: 0,
+      max: 120,
+      defaultValue: currentHero.ambienceNote
+    })
+  };
+
+  store.settings.homeContent = {
+    intro: ensureText(payload.intro, {
+      field: 'intro',
+      min: 0,
+      max: 500,
+      defaultValue: currentContent.intro
+    }),
+    statementKicker: ensureText(payload.statementKicker, {
+      field: 'statementKicker',
+      min: 0,
+      max: 40,
+      defaultValue: currentContent.statementKicker
+    }),
+    statementTitle: ensureText(payload.statementTitle, {
+      field: 'statementTitle',
+      min: 0,
+      max: 120,
+      defaultValue: currentContent.statementTitle
+    }),
+    statementBody: ensureText(payload.statementBody, {
+      field: 'statementBody',
+      min: 0,
+      max: 600,
+      defaultValue: currentContent.statementBody
+    }),
+    ageNote: ensureText(payload.ageNote, {
+      field: 'ageNote',
+      min: 0,
+      max: 120,
+      defaultValue: currentContent.ageNote
+    }),
+    facts: parsePipeObjectList(payload.factsText, ['label', 'value'], { maxItems: 8 }),
+    chapters: parsePipeObjectList(payload.chaptersText, ['eyebrow', 'title', 'body', 'image'], { maxItems: 8 })
+  };
+
+  writeAudit(store, 'site.updated', 'settings.home', DEFAULT_ADMIN_USERNAME);
+  writeStore(store);
+
+  return adminGetSiteContent();
+}
+
 function adminReconciliationReport() {
   const store = readStore();
   if (closeExpiredOrders(store)) {
@@ -3537,7 +3804,7 @@ function adminCreateWine(payload = {}) {
     overview: payload.overview || '待补充酒款概述。',
     storyTitle: payload.storyTitle || '酒款故事',
     story: payload.story || '待补充酒款故事。',
-    moodLine: payload.moodLine || '待补充配乐提示。',
+    moodLine: payload.moodLine || '待补充饮用情境。',
     estateName: payload.estateName || winery.name,
     estateTagline: payload.estateTagline || winery.tagline || '待补充酒庄标语',
     estateIntro: payload.estateIntro || winery.intro || '待补充酒庄简介。',
@@ -3567,7 +3834,7 @@ function adminCreateWine(payload = {}) {
       { label: '醒酒建议', value: '待完善' },
       { label: '配餐建议', value: '待完善' },
       { label: '礼赠属性', value: '待完善' },
-      { label: '音乐搭配', value: '待完善' }
+      { label: '建议场景', value: '待完善' }
     ],
     collection: payload.collection || [],
     trackIds: payload.trackIds || [],
@@ -3590,39 +3857,131 @@ function adminSaveWine(payload = {}) {
   }
 
   const fields = [
+    'brand',
     'eyebrow',
+    'title',
     'name',
     'subtitle',
-    'overview',
-    'quote',
+    'vintage',
     'region',
+    'country',
     'grapes',
     'abv',
-    'serving'
+    'style',
+    'serving',
+    'quote',
+    'overview',
+    'storyTitle',
+    'story',
+    'moodLine',
+    'estateName',
+    'estateTagline',
+    'estateIntro',
+    'estatePhilosophy',
+    'estateHeroImage',
+    'estatePortraitImage',
+    'harvestImage',
+    'bottleImage',
+    'posterImage',
+    'giftImage'
   ];
 
   const fieldRules = {
+    brand: { min: 0, max: 80, required: false },
     eyebrow: { min: 1, max: 24 },
+    title: { min: 2, max: 100 },
     name: { min: 2, max: 80 },
     subtitle: { min: 2, max: 120 },
-    overview: { min: 2, max: 500 },
-    quote: { min: 2, max: 160 },
+    vintage: { min: 0, max: 80, required: false },
     region: { min: 2, max: 80 },
-    grapes: { min: 2, max: 120 },
-    abv: { min: 2, max: 40 },
-    serving: { min: 2, max: 80 }
+    country: { min: 0, max: 80, required: false },
+    grapes: { min: 0, max: 120, required: false },
+    abv: { min: 0, max: 40, required: false },
+    style: { min: 0, max: 80, required: false },
+    serving: { min: 0, max: 80, required: false },
+    quote: { min: 0, max: 160, required: false },
+    overview: { min: 0, max: 800, required: false },
+    storyTitle: { min: 0, max: 80, required: false },
+    story: { min: 0, max: 3000, required: false },
+    moodLine: { min: 0, max: 160, required: false },
+    estateName: { min: 0, max: 120, required: false },
+    estateTagline: { min: 0, max: 160, required: false },
+    estateIntro: { min: 0, max: 1000, required: false },
+    estatePhilosophy: { min: 0, max: 2000, required: false },
+    estateHeroImage: { min: 0, max: 500, required: false },
+    estatePortraitImage: { min: 0, max: 500, required: false },
+    harvestImage: { min: 0, max: 500, required: false },
+    bottleImage: { min: 0, max: 500, required: false },
+    posterImage: { min: 0, max: 500, required: false },
+    giftImage: { min: 0, max: 500, required: false }
   };
 
   fields.forEach((field) => {
     if (payload[field] !== undefined) {
       wine[field] = ensureText(payload[field], {
         field,
-        required: true,
+        required: fieldRules[field].required !== false,
         min: fieldRules[field].min,
-        max: fieldRules[field].max
+        max: fieldRules[field].max,
+        defaultValue: wine[field] || ''
       });
     }
   });
+
+  if (payload.status !== undefined) {
+    wine.status = ensureEnum(payload.status, ['active', 'archived'], {
+      field: 'status'
+    });
+  }
+
+  if (payload.wineryId !== undefined) {
+    const wineryId = ensureText(payload.wineryId, {
+      field: 'wineryId',
+      required: true,
+      min: 2,
+      max: 120
+    });
+    const winery = store.wineries.find((item) => item.id === wineryId);
+    if (!winery) {
+      throw createAppError('WINERY_NOT_FOUND', 404);
+    }
+    wine.wineryId = winery.id;
+  }
+
+  if (payload.productId !== undefined) {
+    const productId = ensureText(payload.productId, {
+      field: 'productId',
+      min: 0,
+      max: 120,
+      defaultValue: ''
+    });
+    if (productId && !store.products.find((item) => item.id === productId)) {
+      throw createAppError('PRODUCT_NOT_FOUND', 404);
+    }
+    wine.productId = productId;
+  }
+
+  if (payload.estateStatsText !== undefined) {
+    wine.estateStats = parsePipeObjectList(payload.estateStatsText, ['label', 'value'], { maxItems: 12 });
+  }
+
+  if (payload.tastingText !== undefined) {
+    wine.tasting = parseWineTastingList(payload.tastingText);
+  }
+
+  if (payload.scoresText !== undefined) {
+    wine.scores = parsePipeObjectList(payload.scoresText, ['source', 'score'], { maxItems: 12 });
+  }
+
+  if (payload.technicalText !== undefined) {
+    wine.technical = parsePipeObjectList(payload.technicalText, ['label', 'value'], { maxItems: 16 });
+  }
+
+  if (payload.collectionText !== undefined) {
+    wine.collection = parsePipeObjectList(payload.collectionText, ['id', 'vintage', 'title', 'note', 'image'], {
+      maxItems: 12
+    });
+  }
 
   writeAudit(store, 'wine.updated', wine.id, DEFAULT_ADMIN_USERNAME);
   writeStore(store);
@@ -3673,14 +4032,12 @@ function adminDeleteWine(wineId) {
 
 function adminExportCodesCsv() {
   const store = readStore();
-  const header = '提取码,酒款,歌曲,批次,状态,创建时间,使用时间,使用用户\n';
+  const header = '提取码,酒款,批次,状态,创建时间,使用时间,使用用户\n';
   const rows = store.scanCodes
     .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())
     .map((code) => {
       const wineName = code.wineId ? (getWineById(store, code.wineId) || {}).name || '' : '';
-      const track = code.trackId ? getTrackById(store, code.trackId) : null;
-      const trackName = track ? track.cnTitle || track.title || '' : '';
-      return `${code.redeemCode || code.token},${wineName},${trackName},${code.batchNo || ''},${code.status},${code.createdAt || ''},${code.firstUsedAt || ''},${code.firstUserId || ''}`;
+      return `${code.redeemCode || code.token},${wineName},${code.batchNo || ''},${code.status},${code.createdAt || ''},${code.firstUsedAt || ''},${code.firstUserId || ''}`;
     })
     .join('\n');
   return header + rows;
@@ -3701,7 +4058,7 @@ function adminListCodes() {
 function adminListProducts() {
   const store = readStore();
 
-  return store.products.map((product) => buildProductCard(store, product.id));
+  return store.products.map((product) => buildProductCard(store, product.id, { includeAllSkus: true }));
 }
 
 function adminCreateProduct(payload = {}) {
@@ -3745,10 +4102,30 @@ function adminCreateProduct(payload = {}) {
       max: 32,
       defaultValue: '新建商品'
     }),
-    story: payload.story || '待补充商品故事。',
-    highlights: payload.highlights || ['待补充卖点'],
-    gallery: payload.gallery || [payload.coverImage || wine.giftImage || '/assets/images/wine-gift-set.jpg'],
-    tags: payload.tags || ['待完善'],
+    story: ensureText(payload.story, {
+      field: 'story',
+      min: 0,
+      max: 3000,
+      defaultValue: '待补充商品故事。'
+    }),
+    highlights:
+      payload.highlights !== undefined
+        ? parseTextLines(payload.highlights, { maxItems: 20 })
+        : payload.highlightsText !== undefined
+          ? parseTextLines(payload.highlightsText, { maxItems: 20 })
+          : ['待补充卖点'],
+    gallery:
+      payload.gallery !== undefined
+        ? parseTextLines(payload.gallery, { maxItems: 20 })
+        : payload.galleryText !== undefined
+          ? parseTextLines(payload.galleryText, { maxItems: 20 })
+          : [payload.coverImage || wine.giftImage || '/assets/images/wine-gift-set.jpg'],
+    tags:
+      payload.tags !== undefined
+        ? parseTextLines(payload.tags, { maxItems: 20 })
+        : payload.tagsText !== undefined
+          ? parseTextLines(payload.tagsText, { maxItems: 20 })
+          : ['待完善'],
     featuredRank: ensureInteger(payload.featuredRank, {
       field: 'featuredRank',
       min: 1,
@@ -3805,7 +4182,7 @@ function adminCreateProduct(payload = {}) {
   }
   writeAudit(store, 'product.created', product.id, DEFAULT_ADMIN_USERNAME);
   writeStore(store);
-  return buildProductCard(store, product.id);
+  return buildProductCard(store, product.id, { includeAllSkus: true });
 }
 
 function adminUpdateProduct(productId, payload = {}) {
@@ -3814,6 +4191,26 @@ function adminUpdateProduct(productId, payload = {}) {
 
   if (!product) {
     throw createAppError('PRODUCT_NOT_FOUND', 404);
+  }
+
+  if (payload.wineId !== undefined) {
+    const wineId = ensureText(payload.wineId, {
+      field: 'wineId',
+      required: true,
+      min: 2,
+      max: 120
+    });
+    const nextWine = getWineById(store, wineId);
+    if (!nextWine) {
+      throw createAppError('WINE_NOT_FOUND', 404);
+    }
+    store.wines
+      .filter((wine) => wine.productId === product.id && wine.id !== nextWine.id)
+      .forEach((wine) => {
+        wine.productId = '';
+      });
+    nextWine.productId = product.id;
+    product.wineId = nextWine.id;
   }
 
   if (payload.name !== undefined) {
@@ -3843,8 +4240,7 @@ function adminUpdateProduct(productId, payload = {}) {
   if (payload.badge !== undefined) {
     product.badge = ensureText(payload.badge, {
       field: 'badge',
-      required: true,
-      min: 1,
+      min: 0,
       max: 32
     });
   }
@@ -3858,9 +4254,52 @@ function adminUpdateProduct(productId, payload = {}) {
     });
   }
 
+  if (payload.coverImage !== undefined) {
+    product.coverImage = ensureText(payload.coverImage, {
+      field: 'coverImage',
+      min: 0,
+      max: 500,
+      defaultValue: product.coverImage || ''
+    });
+  }
+
+  if (payload.story !== undefined) {
+    product.story = ensureText(payload.story, {
+      field: 'story',
+      min: 0,
+      max: 3000,
+      defaultValue: product.story || ''
+    });
+  }
+
+  if (payload.featuredRank !== undefined) {
+    product.featuredRank = ensureInteger(payload.featuredRank, {
+      field: 'featuredRank',
+      min: 1,
+      max: 9999,
+      required: true
+    });
+  }
+
+  if (payload.highlightsText !== undefined || payload.highlights !== undefined) {
+    product.highlights = parseTextLines(payload.highlights !== undefined ? payload.highlights : payload.highlightsText, {
+      maxItems: 20
+    });
+  }
+
+  if (payload.galleryText !== undefined || payload.gallery !== undefined) {
+    product.gallery = parseTextLines(payload.gallery !== undefined ? payload.gallery : payload.galleryText, {
+      maxItems: 20
+    });
+  }
+
+  if (payload.tagsText !== undefined || payload.tags !== undefined) {
+    product.tags = parseTextLines(payload.tags !== undefined ? payload.tags : payload.tagsText, { maxItems: 20 });
+  }
+
   writeAudit(store, 'product.updated', product.id, DEFAULT_ADMIN_USERNAME);
   writeStore(store);
-  return buildProductCard(store, product.id);
+  return buildProductCard(store, product.id, { includeAllSkus: true });
 }
 
 function adminDeleteProduct(productId) {
@@ -3913,6 +4352,15 @@ function adminUpdateSkuPrice(skuId, payload = {}) {
 
   if (!sku) {
     throw createAppError('SKU_NOT_FOUND', 404);
+  }
+
+  if (payload.specName !== undefined) {
+    sku.specName = ensureText(payload.specName, {
+      field: 'specName',
+      required: true,
+      min: 1,
+      max: 40
+    });
   }
 
   if (payload.price !== undefined) {
@@ -4264,6 +4712,7 @@ module.exports = {
   adminDashboard,
   adminCreateProduct,
   adminCreateSku,
+  adminGetSiteContent,
   adminCreateWine,
   adminDeleteProduct,
   adminDeleteWine,
@@ -4286,6 +4735,7 @@ module.exports = {
   adminLogin,
   adminLogout,
   adminSaveWine,
+  adminSaveSiteContent,
   adminSetCodeStatus,
   adminUpdateOrder,
   adminUpdateProduct,

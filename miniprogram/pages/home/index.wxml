@@ -1,13 +1,12 @@
 <view class="shell">
   <view wx:if="{{pageReady}}" class="page-scroll estate-page">
     <view class="estate-hero">
-      <image class="estate-hero-image" src="{{winery.heroImage}}" mode="aspectFill"></image>
+      <image class="estate-hero-image" src="{{heroImage}}" mode="aspectFill"></image>
       <view class="estate-hero-mask"></view>
       <view class="estate-hero-copy">
-        <text class="estate-kicker">{{winery.englishName}}</text>
+        <text class="estate-kicker">{{hero.eyebrow || winery.englishName}}</text>
         <text class="estate-title">{{winery.name}}</text>
         <text class="estate-tagline">{{winery.tagline}}</text>
-        <text class="estate-intro">{{estateIntro}}</text>
       </view>
     </view>
 
@@ -19,9 +18,10 @@
     </view>
 
     <view class="estate-statement">
-      <text class="estate-statement-kicker">庄园手册</text>
-      <text class="estate-statement-title">把一瓶酒，放回它来的地方。</text>
-      <text class="estate-statement-body">鸿玖酒庄页面只讲一件事：这里的光线、气味、建筑与夜色如何共同形成一个安静、完整的庄园印象。</text>
+      <view class="estate-statement-copy">
+        <text class="estate-statement-kicker">{{statementKicker}}</text>
+        <text class="estate-statement-title">{{statementTitle}}</text>
+      </view>
     </view>
 
     <view class="estate-chapters">
@@ -31,12 +31,11 @@
         <view class="estate-chapter-copy">
           <text class="estate-chapter-eyebrow">{{item.eyebrow}}</text>
           <text class="estate-chapter-title">{{item.title}}</text>
-          <text class="estate-chapter-body">{{item.body}}</text>
         </view>
       </view>
     </view>
 
-    <text class="estate-age-note">理性饮酒，拒绝酒驾。未成年人禁止饮酒。</text>
+    <text class="estate-age-note">{{ageNote}}</text>
 
     <view class="tabbar-gap"></view>
     <boutique-tabbar active="home" cartCount="{{cartCount}}"></boutique-tabbar>

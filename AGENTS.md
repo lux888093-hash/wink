@@ -35,3 +35,13 @@ The project was tuned on April 19, 2026 to avoid looking too small on real phone
 - Avoid negative or wide letter spacing in mini-program UI. Use `letter-spacing: 0` unless a very specific decorative label needs otherwise.
 - Keep bottom fixed bars clear of content by increasing page bottom padding or `.tabbar-gap` when their height changes.
 - Before finishing UI edits, scan modified `wxss` for accidental tiny content text (`font-size: 12rpx`-`18rpx`) and for negative `letter-spacing`.
+
+## Product UI Copy Guardrail
+
+Never place task discussion, prompt wording, design rationale, or chat-derived requirement summaries directly into product UI text.
+
+- Do not expose phrases that sound like implementation notes or request summaries, such as "当前需求", "本次对话", "固定规则", "后台只保留", "不再逐条绑定", "按这次需求收敛", or similar wording derived from collaboration chat.
+- UI copy must read as real product text for operators or end users: labels, helper text, empty states, status text, or concise operational instructions.
+- This applies to all user-facing surfaces in this repo, including admin dashboards, login pages, dialogs, empty states, helper text, and error/status copy.
+- If a business rule must appear in UI, express it as neutral product guidance, not as an explanation of why the code or design was changed.
+- Before finishing any UI task, scan changed text for prompt-like language, meta commentary, or references to the design process and remove them.

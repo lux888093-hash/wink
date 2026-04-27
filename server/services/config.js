@@ -73,7 +73,7 @@ const runtimeConfig = {
   postgresUser: process.env.PGUSER || '',
   postgresPassword: process.env.PGPASSWORD || '',
   postgresSsl: parseBoolean(process.env.PGSSL, false),
-  jsonBodyLimit: process.env.JSON_BODY_LIMIT || '256kb',
+  jsonBodyLimit: process.env.JSON_BODY_LIMIT || '8mb',
   corsAllowedOrigins: parseOrigins(
     process.env.CORS_ALLOWED_ORIGINS,
     isProduction ? [] : ['http://127.0.0.1:3100', 'http://localhost:3100']

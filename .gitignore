@@ -3,7 +3,9 @@
 /server/runtime-logs/
 /server/*.log
 /server/data/backups/
+/server/public/uploads/
 /downloads/
+/.runlogs/
 /sam音乐.zip
 /server/.env
 /server/data/db-snapshot.json

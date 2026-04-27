@@ -5,10 +5,14 @@ Page({
     loading: true,
     pageReady: false,
     hero: null,
+    homeContent: null,
     winery: null,
-    estateIntro: '',
+    heroImage: '',
     estateFacts: [],
     estateChapters: [],
+    statementKicker: '',
+    statementTitle: '',
+    ageNote: '',
     cartCount: 0,
     errorTitle: '',
     errorMessage: ''
@@ -23,17 +27,23 @@ Page({
 
     try {
       const payload = await request({ url: '/api/store/home' });
+      const hero = payload.hero || {};
+      const homeContent = payload.homeContent || {};
       const winery = payload.winery || {};
       getApp().setCartCount(payload.cartCount || 0);
 
       this.setData({
         loading: false,
         pageReady: true,
-        hero: payload.hero,
+        hero,
+        homeContent,
         winery,
-        estateIntro: this.buildEstateIntro(winery),
-        estateFacts: this.buildEstateFacts(winery),
-        estateChapters: this.buildEstateChapters(winery),
+        heroImage: this.resolveHeroImage(winery),
+        estateFacts: this.buildEstateFacts(winery, homeContent),
+        estateChapters: this.buildEstateChapters(winery, homeContent),
+        statementKicker: homeContent.statementKicker || '庄园手册',
+        statementTitle: this.buildStatementTitle(homeContent),
+        ageNote: homeContent.ageNote || hero.ambienceNote || '理性饮酒，拒绝酒驾。未成年人禁止饮酒。',
         cartCount: payload.cartCount || 0
       });
     } catch (error) {
@@ -49,11 +59,28 @@ Page({
     }
   },
 
-  buildEstateIntro() {
-    return '鸿玖酒庄以月光、葡萄藤、木屋与夜色为主线，讲述一处安静、克制、带有收藏感的东方庄园。';
+  resolveHeroImage(winery) {
+    return winery.heroImage || '/assets/images/winery-vineyard-moon.jpg';
   },
 
-  buildEstateFacts(winery) {
+  buildStatementTitle(homeContent) {
+    const title = homeContent && homeContent.statementTitle ? String(homeContent.statementTitle).trim() : '';
+
+    if (title && title.length <= 10) {
+      return title;
+    }
+
+    return '月色、藤影与木屋';
+  },
+
+  buildEstateFacts(winery, homeContent) {
+    if (Array.isArray(homeContent.facts)) {
+      const facts = homeContent.facts.filter((item) => item && item.label && item.value);
+      if (facts.length) {
+        return facts;
+      }
+    }
+
     return [
       {
         label: '主线',
@@ -70,7 +97,14 @@ Page({
     ];
   },
 
-  buildEstateChapters(winery) {
+  buildEstateChapters(winery, homeContent) {
+    if (Array.isArray(homeContent.chapters)) {
+      const chapters = homeContent.chapters.filter((item) => item && item.title);
+      if (chapters.length) {
+        return chapters;
+      }
+    }
+
     return [
       {
         eyebrow: '01 / PLACE',

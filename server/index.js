@@ -11,6 +11,7 @@ const {
   adminDashboard,
   adminCreateProduct,
   adminCreateSku,
+  adminGetSiteContent,
   adminCreateWine,
   adminDeleteProduct,
   adminDeleteWine,
@@ -33,6 +34,7 @@ const {
   adminLogin,
   adminLogout,
   adminSaveWine,
+  adminSaveSiteContent,
   adminSetCodeStatus,
   adminUpdateOrder,
   adminUpdateProduct,
@@ -119,6 +121,14 @@ const audioStaticDirs = [
   path.join(__dirname, '..', 'miniprogram', 'assets', 'audio'),
   path.join(__dirname, '..', 'music')
 ];
+const imageUploadRootDir = path.join(__dirname, 'public', 'uploads', 'images');
+const IMAGE_UPLOAD_MAX_BYTES = 8 * 1024 * 1024;
+const imageMimeExtensionMap = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'image/gif': 'gif'
+};
 
 ensureStoreFile();
 app.disable('x-powered-by');
@@ -132,6 +142,56 @@ function decodeAssetFilename(fileUrl = '') {
   } catch (error) {
     return basename;
   }
+}
+
+function sanitizeUploadFolder(folder = '') {
+  const normalized = String(folder || 'general')
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, '');
+
+  if (['wines', 'wineries', 'products', 'tracks', 'site', 'general'].includes(normalized)) {
+    return normalized;
+  }
+
+  return 'general';
+}
+
+function saveAdminImageUpload(payload = {}) {
+  const dataUrl = String(payload.dataUrl || '').trim();
+  const folder = sanitizeUploadFolder(payload.folder);
+
+  const match = dataUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,([A-Za-z0-9+/=]+)$/);
+  if (!match) {
+    throw appError('UPLOAD_IMAGE_INVALID', 400);
+  }
+
+  const mimeType = match[1].toLowerCase();
+  const extension = imageMimeExtensionMap[mimeType];
+  if (!extension) {
+    throw appError('UPLOAD_IMAGE_TYPE_UNSUPPORTED', 400);
+  }
+
+  const buffer = Buffer.from(match[2], 'base64');
+  if (!buffer.length || buffer.length > IMAGE_UPLOAD_MAX_BYTES) {
+    throw appError('UPLOAD_IMAGE_TOO_LARGE', 400);
+  }
+
+  const fileName = `${Date.now()}-${crypto.randomBytes(6).toString('hex')}.${extension}`;
+  const folderDir = path.join(imageUploadRootDir, folder);
+  fs.mkdirSync(folderDir, { recursive: true });
+
+  const absolutePath = path.join(folderDir, fileName);
+  const publicPath = `/uploads/images/${folder}/${fileName}`;
+  fs.writeFileSync(absolutePath, buffer);
+
+  return {
+    fileName,
+    folder,
+    mimeType,
+    size: buffer.length,
+    publicPath,
+    url: `${runtimeConfig.miniprogramBaseUrl}${publicPath}`
+  };
 }
 
 function resolveAudioFilePath(fileUrl = '') {
@@ -355,6 +415,7 @@ app.use('/api', (req, res, next) => {
 app.use('/preview', express.static(path.join(__dirname, 'public', 'preview')));
 app.use('/admin', express.static(path.join(__dirname, 'public', 'admin')));
 app.use('/assets/images', express.static(path.join(__dirname, '..', 'miniprogram', 'assets', 'images')));
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 audioStaticDirs.forEach((directory) => {
   app.use('/assets/audio', express.static(directory));
 });
@@ -1097,6 +1158,27 @@ app.get('/api/admin/dashboard', withAdmin('dashboard.read', (_req, res) => {
   res.json({
     ok: true,
     ...adminDashboard()
+  });
+}));
+
+app.get('/api/admin/site-content', withAdmin('wineries.read', (_req, res) => {
+  res.json({
+    ok: true,
+    item: adminGetSiteContent()
+  });
+}));
+
+app.put('/api/admin/site-content', withAdmin('wineries.write', (req, res) => {
+  res.json({
+    ok: true,
+    item: adminSaveSiteContent(req.body || {})
+  });
+}));
+
+app.post('/api/admin/uploads/image', withAdmin((req, res) => {
+  res.json({
+    ok: true,
+    item: saveAdminImageUpload(req.body || {})
   });
 }));
 
