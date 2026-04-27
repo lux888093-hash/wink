@@ -74,7 +74,7 @@
   align-items: center;
   justify-content: flex-start;
   text-align: center;
-  padding: 34rpx 34rpx 0;
+  padding: 92rpx 34rpx 0;
 }
 
 .cover-shell {

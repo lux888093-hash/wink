@@ -1,53 +1,70 @@
 <view class="shell">
   <view wx:if="{{ready}}" class="page-scroll detail-page">
-    <view class="section-panel detail-product-hero">
-      <view class="detail-visual-mask"></view>
-      <image class="detail-bottle" src="{{wine.bottleImage}}" mode="aspectFill"></image>
+    <view class="detail-hero">
+      <image class="detail-hero-image" src="{{wine.posterImage || wine.bottleImage}}" mode="aspectFill"></image>
+      <view class="detail-hero-mask"></view>
       <view class="detail-hero-copy">
-        <text class="eyebrow detail-hero-kicker">{{wine.eyebrow}}</text>
-        <text class="display-title detail-title">{{wine.name}}</text>
-        <text class="muted-copy line-clamp-2">{{wine.subtitle}}</text>
-        <view class="chip-row detail-chip-row">
-          <text class="chip">{{wine.region}}</text>
-          <text class="chip">{{wine.grapes}}</text>
-          <text class="chip">{{wine.abv}}</text>
+        <text class="detail-kicker">{{wine.region}}</text>
+        <text class="detail-title">{{wine.name}}</text>
+        <text class="detail-subtitle">{{wine.subtitle}}</text>
+      </view>
+    </view>
+
+    <view class="detail-facts">
+      <view class="detail-fact">
+        <text class="detail-fact-label">产区</text>
+        <text class="detail-fact-value">{{wine.region}}</text>
+      </view>
+      <view class="detail-fact">
+        <text class="detail-fact-label">葡萄</text>
+        <text class="detail-fact-value">{{wine.grapes}}</text>
+      </view>
+      <view class="detail-fact">
+        <text class="detail-fact-label">酒精度</text>
+        <text class="detail-fact-value">{{wine.abv}}</text>
+      </view>
+    </view>
+
+    <view class="detail-statement">
+      <view class="detail-statement-copy">
+        <view class="detail-statement-head">
+          <text class="detail-statement-kicker">酒款说明</text>
+          <text class="detail-statement-sub">Tasting note</text>
+        </view>
+        <text class="detail-statement-title">风味与结构</text>
+        <view class="detail-statement-rule"></view>
+        <text class="detail-statement-body">{{wine.overview}}</text>
+      </view>
+    </view>
+
+    <view class="detail-poster">
+      <image class="detail-poster-image" src="{{wine.bottleImage || wine.posterImage}}" mode="aspectFill"></image>
+      <view class="detail-poster-mask"></view>
+      <view class="detail-quote">
+        <text class="detail-quote-mark">“</text>
+        <text class="detail-quote-text line-clamp-3">{{wine.quote}}</text>
+      </view>
+    </view>
+
+    <view class="detail-tasting">
+      <text class="detail-section-kicker">品鉴结构</text>
+      <view class="detail-note" wx:for="{{wine.tasting}}" wx:key="key">
+        <view class="detail-note-head">
+          <text class="detail-note-icon">{{item.icon || item.key}}</text>
+          <text class="detail-note-title">{{item.key}}</text>
+        </view>
+        <text class="detail-note-copy">{{item.text}}</text>
+        <view wx:if="{{item.meter}}" class="detail-note-meter">
+          <view class="detail-note-meter-fill" style="width: {{item.meter}}%;"></view>
         </view>
       </view>
     </view>
 
-    <view class="detail-story">
-      <view class="paper-panel detail-paper">
-        <text class="eyebrow detail-kicker">酒款说明</text>
-        <text class="section-title">风味与结构</text>
-        <text class="muted-copy detail-overview">{{wine.overview}}</text>
-      </view>
-
-      <view class="section-panel detail-visual">
-        <image class="detail-visual-bg" src="{{wine.posterImage}}" mode="aspectFill"></image>
-        <view class="detail-visual-mask"></view>
-        <view class="detail-quote">
-          <text class="detail-quote-mark">“</text>
-          <text class="detail-quote-text line-clamp-3">{{wine.quote}}</text>
-        </view>
-      </view>
-    </view>
-
-    <view class="section-panel note-panel">
-      <text class="eyebrow">品鉴结构</text>
-      <view class="note-item" wx:for="{{wine.tasting}}" wx:key="key">
-        <view class="note-head">
-          <text class="note-title">{{item.key}}</text>
-          <text class="note-meter" wx:if="{{item.meter}}">{{item.meter}}</text>
-        </view>
-        <text class="muted-copy">{{item.text}}</text>
-      </view>
-    </view>
-
-    <view class="paper-panel tech-panel">
-      <text class="eyebrow detail-kicker">饮用建议</text>
-      <view class="tech-item" wx:for="{{wine.technical}}" wx:key="label">
-        <text class="tech-label">{{item.label}}</text>
-        <text class="tech-value">{{item.value}}</text>
+    <view class="detail-service">
+      <text class="detail-section-kicker">饮用建议</text>
+      <view class="detail-service-row" wx:for="{{wine.technical}}" wx:key="label">
+        <text class="detail-service-label">{{item.label}}</text>
+        <text class="detail-service-value">{{item.value}}</text>
       </view>
     </view>
 

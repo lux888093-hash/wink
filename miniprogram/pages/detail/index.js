@@ -59,7 +59,7 @@ Page({
         errorTitle: '酒款详情暂不可用',
         errorMessage:
           error.message === 'NETWORK_ERROR'
-            ? '请先启动本地服务端。'
+            ? '网络连接不可用，请确认连接后重试。'
             : '当前内容可能已过期，请重新进入。'
       });
     }

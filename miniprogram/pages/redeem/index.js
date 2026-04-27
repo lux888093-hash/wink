@@ -34,13 +34,13 @@ function errorCopy(code) {
       };
     case 'NETWORK_ERROR':
       return {
-        title: '服务端未连接',
-        message: '请先启动 server/，并在开发者工具里关闭 request 合法域名校验。'
+        title: '网络连接不可用',
+        message: '请确认连接后重试。'
       };
     default:
       return {
         title: '验证失败',
-        message: '本地接口返回了未预期错误，请检查服务端日志。'
+        message: '提取码暂时无法验证，请稍后重试。'
       };
   }
 }
@@ -114,7 +114,7 @@ Page({
       this.setData({
         state: 'success',
         title: '专属体验已解锁',
-        message: '正在打开这瓶酒的酒庄与酒款内容。'
+        message: '正在打开酒庄。'
       });
 
       setTimeout(() => {

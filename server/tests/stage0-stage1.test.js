@@ -1,4 +1,6 @@
 const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
 
 const { createSeedStore } = require('../services/demo-data');
 const { replaceStore } = require('../services/db');
@@ -36,11 +38,26 @@ function findMissingCode() {
   throw new Error('No missing redeem code available');
 }
 
+function getLocalMusicCount() {
+  const musicDir = path.join(__dirname, '..', '..', 'music');
+
+  if (!fs.existsSync(musicDir)) {
+    return 0;
+  }
+
+  return fs
+    .readdirSync(musicDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && ['.mp3', '.m4a', '.aac', '.wav', '.flac'].includes(path.extname(entry.name).toLowerCase()))
+    .length;
+}
+
 function main() {
   const originalStore = readStore();
 
   try {
     replaceStore(createSeedStore());
+    const localMusicCount = getLocalMusicCount();
+    const expectedExclusiveTrackCount = localMusicCount || 1;
 
     const batch = createCodeBatch({
       wineId: 'soundless-a-quiet-world-2022',
@@ -68,8 +85,10 @@ function main() {
       userId: 'user_demo_guest'
     });
     assert.strictEqual(consumed.experience.access.scope, 'exclusive');
-    assert.strictEqual(consumed.experience.tracks.length, 1);
-    assert.strictEqual(consumed.experience.tracks[0].id, 'track_harvest_whisper');
+    assert.strictEqual(consumed.experience.tracks.length, expectedExclusiveTrackCount);
+    if (!localMusicCount) {
+      assert.strictEqual(consumed.experience.tracks[0].id, 'track_harvest_whisper');
+    }
 
     const autoBatch = createCodeBatch({
       wineId: 'soundless-a-quiet-world-2022',
@@ -102,8 +121,10 @@ function main() {
       ip: '127.0.0.1',
       userId: 'user_demo_guest'
     });
-    assert.strictEqual(singlePayload.experience.tracks.length, 1);
-    assert.strictEqual(singlePayload.experience.tracks[0].id, 'track_quiet_world');
+    assert.strictEqual(singlePayload.experience.tracks.length, expectedExclusiveTrackCount);
+    if (!localMusicCount) {
+      assert.strictEqual(singlePayload.experience.tracks[0].id, 'track_quiet_world');
+    }
 
     assertAppError(() => consumeOneTimeCode('abc', 'user_demo_guest', {}), 'INVALID_REDEEM_CODE');
     assertAppError(() => consumeOneTimeCode(findMissingCode(), 'user_demo_guest', {}), 'CODE_NOT_FOUND');

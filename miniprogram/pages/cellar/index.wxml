@@ -1,45 +1,42 @@
 <view class="shell">
   <view wx:if="{{ready}}" class="page-scroll cellar-page">
-    <view class="section-panel cellar-hero">
+    <view class="cellar-hero">
       <image class="cellar-hero-image" src="{{wine.estateHeroImage}}" mode="aspectFill"></image>
       <view class="cellar-hero-mask"></view>
       <view class="cellar-hero-copy">
-        <text class="eyebrow">ESTATE</text>
-        <text class="display-title cellar-title">{{wine.estateName}}</text>
-        <text class="muted-copy line-clamp-3">{{wine.estateIntro}}</text>
-      </view>
-      <view class="cellar-hero-note">
-        <text class="micro-copy line-clamp-2">{{wine.estateTagline}}</text>
+        <text class="cellar-kicker">ESTATE</text>
+        <text class="cellar-title">{{wine.estateName}}</text>
+        <text class="cellar-tagline">{{wine.estateTagline}}</text>
       </view>
     </view>
 
-    <view class="paper-panel dossier-card">
-      <text class="eyebrow dossier-kicker">酒庄档案</text>
-      <text class="section-title">空间与风土</text>
-      <text class="muted-copy">{{wine.estatePhilosophy}}</text>
+    <view class="cellar-facts">
+      <view class="cellar-fact" wx:for="{{wine.estateStats}}" wx:key="label">
+        <text class="cellar-fact-label">{{item.label}}</text>
+        <text class="cellar-fact-value">{{item.value}}</text>
+      </view>
+    </view>
 
-      <view class="dossier-list">
-        <view class="dossier-item" wx:for="{{wine.estateStats}}" wx:key="label">
-          <text class="dossier-label">{{item.label}}</text>
-          <text class="dossier-value">{{item.value}}</text>
+    <view class="cellar-statement">
+      <view class="cellar-statement-copy">
+        <view class="cellar-statement-head">
+          <text class="cellar-statement-kicker">酒庄档案</text>
+          <text class="cellar-statement-sub">Estate file</text>
         </view>
+        <text class="cellar-statement-title">风土与夜色的秩序</text>
+        <view class="cellar-statement-rule"></view>
+        <text class="cellar-statement-body">{{wine.estatePhilosophy}}</text>
       </view>
     </view>
 
-    <view class="section-head">
-      <view>
-        <text class="eyebrow">PLACE</text>
-        <text class="section-title">庄园画面</text>
-      </view>
-    </view>
-
-    <view class="memory-list">
-      <view class="section-panel memory-card" wx:for="{{collection}}" wx:key="id">
-        <image class="memory-image" src="{{item.image}}" mode="aspectFill"></image>
-        <view class="memory-copy">
-          <text class="memory-meta">{{item.vintage}}</text>
-          <text class="memory-title">{{item.title}}</text>
-          <text class="micro-copy line-clamp-2">{{item.note}}</text>
+    <view class="cellar-scenes">
+      <view class="cellar-scene" wx:for="{{collection}}" wx:key="id" bindtap="openDetail" hover-class="cellar-scene-press" hover-stay-time="80">
+        <image class="cellar-scene-image" src="{{item.image}}" mode="aspectFill"></image>
+        <view class="cellar-scene-mask"></view>
+        <view class="cellar-scene-copy">
+          <text class="cellar-scene-eyebrow">{{item.vintage}}</text>
+          <text class="cellar-scene-title">{{item.title}}</text>
+          <text class="cellar-scene-note line-clamp-2">{{item.note}}</text>
         </view>
       </view>
     </view>

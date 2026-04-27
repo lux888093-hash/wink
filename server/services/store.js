@@ -1,4 +1,6 @@
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 const { AsyncLocalStorage } = require('async_hooks');
 const {
   DEFAULT_ADMIN_PASSWORD,
@@ -22,6 +24,8 @@ const {
 } = require('./security');
 
 const auditContext = new AsyncLocalStorage();
+const LOCAL_MUSIC_DIR = path.join(__dirname, '..', '..', 'music');
+const LOCAL_MUSIC_EXTENSIONS = new Set(['.mp3', '.m4a', '.aac', '.wav', '.flac']);
 
 const DEFAULT_ADMIN_ROLES = [
   {
@@ -890,6 +894,60 @@ function buildTrackCard(store, userId, track, options = {}) {
   };
 }
 
+function localMusicTitle(fileName) {
+  return path.basename(fileName, path.extname(fileName)).replace(/[_-]+/g, ' ').trim();
+}
+
+function localMusicId(fileName) {
+  const title = localMusicTitle(fileName);
+  const normalized = title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+  return `local_music_${normalized || crypto.createHash('sha1').update(fileName).digest('hex').slice(0, 10)}`;
+}
+
+function listLocalMusicTracks(wine) {
+  if (!fs.existsSync(LOCAL_MUSIC_DIR)) {
+    return [];
+  }
+
+  return fs
+    .readdirSync(LOCAL_MUSIC_DIR, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && LOCAL_MUSIC_EXTENSIONS.has(path.extname(entry.name).toLowerCase()))
+    .map((entry) => entry.name)
+    .sort((left, right) => left.localeCompare(right, 'en', { sensitivity: 'base' }))
+    .map((fileName, index) => {
+      const title = localMusicTitle(fileName);
+
+      return {
+        id: localMusicId(fileName),
+        wineId: wine.id,
+        mood: index === 0 ? 'Estate Playlist' : 'Moonlit Sequence',
+        title,
+        cnTitle: title,
+        description: '庄园专属曲库，提取码验证后可完整循环播放。',
+        src: `/assets/audio/${encodeURIComponent(fileName)}`,
+        durationLabel: '00:00',
+        art: 'noir',
+        cover: wine.posterImage || wine.estateHeroImage || '/assets/images/melody-phone-cover.jpg',
+        playRule: 'scan_or_member',
+        previewSeconds: 0,
+        unlockPrice: 0,
+        access: {
+          canPlayFull: true,
+          previewSeconds: null,
+          playSource: 'scan',
+          hasEntitlement: false,
+          canDownload: false,
+          unlockPrice: 0,
+          assetId: null
+        }
+      };
+    });
+}
+
 function buildWineExperience(store, wineId, userId, options = {}) {
   const wine = getWineById(store, wineId);
 
@@ -898,13 +956,16 @@ function buildWineExperience(store, wineId, userId, options = {}) {
   }
 
   const winery = store.wineries.find((item) => item.id === wine.wineryId) || null;
+  const localMusicTracks = options.visibility === 'exclusive' ? listLocalMusicTracks(wine) : [];
   const scopedTrackIds =
     Array.isArray(options.trackIds) && options.trackIds.length ? options.trackIds : wine.trackIds || [];
-  const tracks = scopedTrackIds
-    .map((trackId) => getTrackById(store, trackId))
-    .filter((track) => track && track.wineId === wine.id)
-    .filter(Boolean)
-    .map((track) => buildTrackCard(store, userId, track, options));
+  const tracks = localMusicTracks.length
+    ? localMusicTracks
+    : scopedTrackIds
+        .map((trackId) => getTrackById(store, trackId))
+        .filter((track) => track && track.wineId === wine.id)
+        .filter(Boolean)
+        .map((track) => buildTrackCard(store, userId, track, options));
 
   return {
     wine,

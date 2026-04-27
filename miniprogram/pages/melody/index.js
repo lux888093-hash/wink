@@ -1,33 +1,10 @@
-const { getBaseUrl, request } = require('../../utils/api');
+const { request } = require('../../utils/api');
 const { getCurrentExperience } = require('../../utils/session');
-const { formatSeconds } = require('../../utils/format');
 const { isPaymentCancelled, payPendingOrder, randomKey } = require('../../utils/payment');
 
-let audioContext = null;
-const DEFAULT_FEATURED_TRACK_ID = 'track_quiet_world';
 const UI_DEFAULT_CURRENT = '00:00';
 const UI_DEFAULT_DURATION = '00:00';
 const UI_DEFAULT_PROGRESS = 0;
-
-function resolveTrackSrc(src) {
-  if (!src) {
-    return '';
-  }
-
-  if (/^https?:\/\//i.test(src) || /^wxfile:\/\//i.test(src)) {
-    return src;
-  }
-
-  if (src.startsWith('//')) {
-    return `https:${src}`;
-  }
-
-  if (src.startsWith('/')) {
-    return `${getBaseUrl()}${src}`;
-  }
-
-  return src;
-}
 
 function trackGateMessage(track) {
   if (!track || !track.access || track.access.canPlayFull) {
@@ -62,23 +39,56 @@ Page({
   },
 
   onShow() {
+    this.unsubscribePlayer = getApp().subscribePlayer((state) => {
+      this.applyPlayerState(state);
+    });
     this.loadContext();
   },
 
   onHide() {
-    if (audioContext) {
-      audioContext.pause();
-      this.setData({ isPlaying: false });
-    }
+    this.teardownPlayerSubscription();
   },
 
   onUnload() {
-    this.destroyAudio();
+    this.teardownPlayerSubscription();
+  },
+
+  teardownPlayerSubscription() {
+    if (this.unsubscribePlayer) {
+      this.unsubscribePlayer();
+      this.unsubscribePlayer = null;
+    }
+  },
+
+  applyPlayerState(state) {
+    if (!state || !state.tracks || !state.tracks.length) {
+      return;
+    }
+
+    this.setData({
+      tracks: state.tracks,
+      currentTrack: state.currentTrack,
+      currentTrackIndex: state.currentTrackIndex,
+      isPlaying: state.isPlaying,
+      currentTimeLabel: state.currentTimeLabel || UI_DEFAULT_CURRENT,
+      durationLabel: state.durationLabel || UI_DEFAULT_DURATION,
+      progress: state.progress || UI_DEFAULT_PROGRESS,
+      gateMessage: trackGateMessage(state.currentTrack)
+    });
+
+    if (state.errorMessage) {
+      this.setData({
+        ready: false,
+        errorTitle: '音频资源加载失败',
+        errorMessage: state.errorMessage
+      });
+    }
   },
 
   async loadContext() {
     try {
       let experience = null;
+      let currentTrackIndex = 0;
 
       if (this.trackId) {
         const profile = await request({ url: '/api/member/profile' });
@@ -105,174 +115,44 @@ Page({
         return;
       }
 
-      const currentTrackIndex = this.trackId
-        ? Math.max(
-            0,
-            experience.tracks.findIndex((item) => item.id === this.trackId)
-          )
-        : Math.max(
-            0,
-            experience.tracks.findIndex((item) => item.id === DEFAULT_FEATURED_TRACK_ID)
-          );
-      const currentTrack = experience.tracks[currentTrackIndex] || experience.tracks[0];
+      if (this.trackId) {
+        currentTrackIndex = Math.max(
+          0,
+          experience.tracks.findIndex((item) => item.id === this.trackId)
+        );
+      }
 
       this.setData({
         ready: true,
         wine: experience.wine,
-        tracks: experience.tracks,
-        currentTrackIndex,
-        currentTrack,
-        currentTimeLabel: UI_DEFAULT_CURRENT,
-        durationLabel: currentTrack.durationLabel || UI_DEFAULT_DURATION,
-        progress: UI_DEFAULT_PROGRESS,
-        gateMessage: trackGateMessage(currentTrack),
         errorTitle: '',
         errorMessage: ''
       });
 
-      this.setupAudio(currentTrack, this.entryScope === 'exclusive');
+      getApp().startExperiencePlayback(experience, {
+        index: currentTrackIndex,
+        autoplay: this.entryScope === 'exclusive',
+        preserve: this.entryScope === 'exclusive'
+      });
+      this.applyPlayerState(getApp().getPlayerState());
     } catch (error) {
       this.setData({
         ready: false,
         errorTitle: '配乐页暂不可用',
         errorMessage:
           error.message === 'NETWORK_ERROR'
-            ? '本地服务端未启动。'
+            ? '网络连接不可用，请确认连接后重试。'
             : '当前会话已失效，请重新进入。'
       });
     }
   },
 
-  destroyAudio() {
-    if (!audioContext) {
-      return;
-    }
-
-    audioContext.destroy();
-    audioContext = null;
-  },
-
-  setupAudio(track, autoplay) {
-    this.destroyAudio();
-    this.previewStopped = false;
-
-    audioContext = wx.createInnerAudioContext({
-      useWebAudioImplement: false
-    });
-
-    audioContext.src = resolveTrackSrc(track.src);
-    audioContext.loop = true;
-    audioContext.obeyMuteSwitch = false;
-
-    audioContext.onPlay(() => {
-      this.setData({ isPlaying: true });
-    });
-
-    audioContext.onPause(() => {
-      this.setData({ isPlaying: false });
-    });
-
-    audioContext.onStop(() => {
-      this.setData({
-        isPlaying: false,
-        currentTimeLabel: UI_DEFAULT_CURRENT,
-        durationLabel: track.durationLabel || UI_DEFAULT_DURATION,
-        progress: UI_DEFAULT_PROGRESS
-      });
-    });
-
-    audioContext.onCanplay(() => {
-      setTimeout(() => {
-        const duration = audioContext ? audioContext.duration || 0 : 0;
-        if (duration > 0) {
-          this.setData({ durationLabel: formatSeconds(duration) });
-        }
-      }, 200);
-    });
-
-    audioContext.onTimeUpdate(() => {
-      const duration = audioContext.duration || 0;
-      const currentTime = audioContext.currentTime || 0;
-      const safeDuration = duration > 0 ? duration : 0;
-      const progress = safeDuration ? Math.min(100, (currentTime / safeDuration) * 100) : 0;
-      const previewSeconds = track.access && track.access.previewSeconds;
-
-      if (
-        track.access &&
-        !track.access.canPlayFull &&
-        previewSeconds &&
-        currentTime >= previewSeconds &&
-        !this.previewStopped
-      ) {
-        this.previewStopped = true;
-        audioContext.pause();
-        this.setData({
-          gateMessage: trackGateMessage(track)
-        });
-        wx.showToast({
-          title: '试听已结束',
-          icon: 'none'
-        });
-      }
-
-      this.setData({
-        currentTimeLabel: formatSeconds(currentTime),
-        durationLabel: safeDuration ? formatSeconds(safeDuration) : track.durationLabel || UI_DEFAULT_DURATION,
-        progress
-      });
-    });
-
-    audioContext.onError(() => {
-      this.setData({
-        errorTitle: '音频资源加载失败',
-        errorMessage: '请确认音频资源存在，或重新生成本地演示数据。',
-        ready: false
-      });
-    });
-
-    this.setData({
-      currentTrack: track,
-      currentTimeLabel: UI_DEFAULT_CURRENT,
-      durationLabel: track.durationLabel || UI_DEFAULT_DURATION,
-      progress: UI_DEFAULT_PROGRESS,
-      isPlaying: false,
-      gateMessage: trackGateMessage(track)
-    });
-
-    if (autoplay) {
-      setTimeout(() => {
-        if (audioContext) {
-          audioContext.play();
-        }
-      }, 120);
-    }
-  },
-
   togglePlayback() {
-    if (!audioContext || !this.data.currentTrack) {
-      return;
-    }
-
-    if (this.data.isPlaying) {
-      audioContext.pause();
-      return;
-    }
-
-    audioContext.play();
+    getApp().togglePlayerPlayback();
   },
 
   playByIndex(index) {
-    const targetIndex = Number(index);
-    const track = this.data.tracks[targetIndex];
-
-    if (!track) {
-      return;
-    }
-
-    this.setData({
-      currentTrackIndex: targetIndex
-    });
-    this.setupAudio(track, true);
+    getApp().playPlayerByIndex(index, true);
   },
 
   selectTrack(event) {
@@ -280,22 +160,11 @@ Page({
   },
 
   playPrev() {
-    if (!this.data.tracks.length) {
-      return;
-    }
-
-    const nextIndex =
-      (this.data.currentTrackIndex - 1 + this.data.tracks.length) % this.data.tracks.length;
-    this.playByIndex(nextIndex);
+    getApp().playPlayerPrev(true);
   },
 
   playNext() {
-    if (!this.data.tracks.length) {
-      return;
-    }
-
-    const nextIndex = (this.data.currentTrackIndex + 1) % this.data.tracks.length;
-    this.playByIndex(nextIndex);
+    getApp().playPlayerNext(true);
   },
 
   async unlockCurrentTrack() {
