@@ -6,6 +6,14 @@ function getBaseUrl() {
   return getAppInstance().globalData.apiBaseUrl;
 }
 
+async function resolveBaseUrl(app, force = false) {
+  if (app && typeof app.resolveApiBaseUrl === 'function') {
+    return app.resolveApiBaseUrl(force);
+  }
+
+  return getBaseUrl();
+}
+
 function getHeaders(extraHeaders) {
   const app = getAppInstance();
 
@@ -26,10 +34,11 @@ async function request(options) {
     await app.ensureUserSession();
   }
 
-  return new Promise((resolve, reject) => {
+  const sendRequest = (baseUrl) => new Promise((resolve, reject) => {
     const requestOptions = {
-      url: `${getBaseUrl()}${url}`,
+      url: `${baseUrl}${url}`,
       method,
+      timeout: 8000,
       header: getHeaders(headers),
       success(res) {
         if (res.statusCode >= 200 && res.statusCode < 300 && res.data && res.data.ok !== false) {
@@ -54,6 +63,23 @@ async function request(options) {
 
     wx.request(requestOptions);
   });
+
+  const baseUrl = await resolveBaseUrl(app);
+
+  try {
+    return await sendRequest(baseUrl);
+  } catch (error) {
+    if (error.message !== 'NETWORK_ERROR') {
+      throw error;
+    }
+
+    const nextBaseUrl = await resolveBaseUrl(app, true);
+    if (!nextBaseUrl || nextBaseUrl === baseUrl) {
+      throw error;
+    }
+
+    return sendRequest(nextBaseUrl);
+  }
 }
 
 module.exports = {

@@ -53,7 +53,7 @@ Page({
         errorTitle: '庄园目录暂时不可用',
         errorMessage:
           error.message === 'NETWORK_ERROR'
-            ? '请先启动本地服务端，再重新进入首页。'
+            ? '网络连接不可用，请确认连接后重试。'
             : '首页数据加载失败，请稍后重试。'
       });
     }
