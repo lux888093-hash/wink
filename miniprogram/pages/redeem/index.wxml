@@ -3,16 +3,10 @@
     <image class="redeem-bg" src="/assets/images/winery-vineyard-moon.jpg" mode="aspectFill"></image>
     <view class="redeem-mask"></view>
 
-    <view class="redeem-copy">
-      <text class="eyebrow">专属入口</text>
-      <text class="display-title redeem-title">输入提取码</text>
-      <text class="muted-copy redeem-subtitle">请输入六位数字。</text>
-    </view>
-
     <view class="redeem-card {{state === 'success' ? 'redeem-card-success' : ''}}">
       <text class="eyebrow">{{state === 'idle' || state === 'error' ? '六位数字' : state === 'success' ? '已解锁' : '正在验证'}}</text>
-      <text class="section-title redeem-card-title">{{title}}</text>
-      <text class="muted-copy line-clamp-3">{{message}}</text>
+      <text wx:if="{{title}}" class="section-title redeem-card-title">{{title}}</text>
+      <text wx:if="{{message}}" class="muted-copy line-clamp-3">{{message}}</text>
 
       <view wx:if="{{state === 'idle' || state === 'error'}}" class="code-input-area">
         <view class="digit-row" bindtap="focusCodeInput">
