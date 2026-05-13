@@ -17,6 +17,10 @@ function buildWineMetaLine(product) {
   return [wine.name, wine.region].filter(Boolean).join(' · ');
 }
 
+function buildStoryImages(galleryImages = []) {
+  return galleryImages.slice(1, 4);
+}
+
 function formatStockText(sku) {
   if (!sku || !sku.id) {
     return '暂无规格';
@@ -42,6 +46,9 @@ Page({
     galleryImages: [],
     activeGalleryIndex: 0,
     galleryDisplayIndex: 1,
+    storyImagePrimary: '',
+    storyImageSecondary: '',
+    storyImageTertiary: '',
     wineMetaLine: '',
     selectedSkuId: '',
     selectedSku: emptySku(),
@@ -81,6 +88,7 @@ Page({
       const product = productPayload.product;
       const selectedSku = product.skus[0] || emptySku();
       const galleryImages = buildGalleryImages(product);
+      const storyImages = buildStoryImages(galleryImages);
 
       getApp().setCartCount(cartPayload.cart.totalCount || 0);
 
@@ -91,6 +99,9 @@ Page({
         galleryImages,
         activeGalleryIndex: 0,
         galleryDisplayIndex: galleryImages.length ? 1 : 0,
+        storyImagePrimary: storyImages[0] || '',
+        storyImageSecondary: storyImages[1] || '',
+        storyImageTertiary: storyImages[2] || '',
         wineMetaLine: buildWineMetaLine(product),
         selectedSkuId: selectedSku.id || '',
         selectedSku,

@@ -8,6 +8,7 @@
     hover-stay-time="80"
   >
     <text class="dock-label">庄园</text>
+    <view class="dock-indicator"></view>
   </button>
 
   <button
@@ -19,6 +20,7 @@
     hover-stay-time="80"
   >
     <text class="dock-label">酒廊</text>
+    <view class="dock-indicator"></view>
   </button>
 
   <button
@@ -30,6 +32,7 @@
     hover-stay-time="80"
   >
     <text class="dock-label">会员</text>
+    <view class="dock-indicator"></view>
   </button>
 
   <button
@@ -42,5 +45,6 @@
   >
     <view class="dock-badge" wx:if="{{cartCount > 0}}">{{badgeText}}</view>
     <text class="dock-label">购物袋</text>
+    <view class="dock-indicator"></view>
   </button>
 </view>

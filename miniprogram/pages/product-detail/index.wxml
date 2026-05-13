@@ -1,6 +1,6 @@
 <view class="shell">
   <view wx:if="{{pageReady}}" class="page-scroll product-page">
-    <view class="section-panel product-gallery">
+    <view class="product-gallery">
       <swiper class="product-swiper" current="{{activeGalleryIndex}}" circular bindchange="handleGalleryChange">
         <swiper-item wx:for="{{galleryImages}}" wx:key="*this">
           <view class="product-swiper-item" data-index="{{index}}" bindtap="previewGallery">
@@ -78,12 +78,16 @@
         <text class="content-copy">{{product.story}}</text>
       </view>
 
+      <image wx:if="{{storyImagePrimary}}" class="product-story-image" src="{{storyImagePrimary}}" mode="aspectFill"></image>
+
       <view wx:if="{{product.wine && product.wine.story}}" class="content-divider"></view>
 
       <view wx:if="{{product.wine && product.wine.story}}" class="content-block">
         <text class="content-title">{{product.wine.storyTitle || '酒款叙事'}}</text>
         <text class="content-copy">{{product.wine.story}}</text>
       </view>
+
+      <image wx:if="{{storyImageSecondary}}" class="product-story-image" src="{{storyImageSecondary}}" mode="aspectFill"></image>
 
       <view wx:if="{{product.wine && product.wine.winemakerName}}" class="content-divider"></view>
 
@@ -108,6 +112,8 @@
           </view>
         </view>
       </view>
+
+      <image wx:if="{{storyImageTertiary}}" class="product-story-image" src="{{storyImageTertiary}}" mode="aspectFill"></image>
 
       <view class="content-divider"></view>
 

@@ -27,6 +27,7 @@ Page({
     winery: null,
     heroImage: '',
     estateFacts: [],
+    estateSections: [],
     estateChapters: [],
     statementKicker: '',
     statementTitle: '',
@@ -58,6 +59,7 @@ Page({
         winery,
         heroImage: this.resolveHeroImage(winery),
         estateFacts: this.buildEstateFacts(winery, homeContent),
+        estateSections: this.buildEstateSections(homeContent, winery),
         estateChapters: this.buildEstateChapters(winery, homeContent),
         statementKicker: homeContent.statementKicker || '酒庄档案',
         statementTitle: this.buildStatementTitle(homeContent),
@@ -122,7 +124,8 @@ Page({
         .map((item, index) => ({
           ...item,
           eyebrow: normalizeChapterEyebrow(item.eyebrow, `篇章 ${index + 1}`)
-        }));
+        }))
+        .slice(0, 3);
       if (chapters.length) {
         return chapters;
       }
@@ -151,5 +154,39 @@ Page({
         image: winery.heroImage || '/assets/images/winery-vineyard-moon.jpg'
       }
     ];
+  },
+
+  buildEstateSections(homeContent, winery) {
+    if (Array.isArray(homeContent.sections)) {
+      const sections = homeContent.sections.filter((item) => item && item.title && item.body);
+      if (sections.length) {
+        return sections;
+      }
+    }
+
+    if (Array.isArray(homeContent.chapters)) {
+      const sections = homeContent.chapters
+        .filter((item) => item && item.title && item.body)
+        .map((item, index) => ({
+          ...item,
+          eyebrow: normalizeChapterEyebrow(item.eyebrow, `篇章 ${index + 1}`)
+        }));
+      if (sections.length) {
+        return sections;
+      }
+    }
+
+    return [
+      {
+        eyebrow: '静界',
+        title: '先把世界留在门外',
+        body: winery.story || ''
+      },
+      {
+        eyebrow: '风土',
+        title: '老藤、红土与桶中时间',
+        body: homeContent.statementBody || ''
+      }
+    ].filter((item) => item.body);
   }
 });

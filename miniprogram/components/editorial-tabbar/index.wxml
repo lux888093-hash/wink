@@ -8,6 +8,7 @@
     hover-stay-time="80"
   >
     <text class="tabbar-label">酒庄</text>
+    <view class="tabbar-indicator"></view>
   </button>
 
   <button
@@ -19,6 +20,7 @@
     hover-stay-time="80"
   >
     <text class="tabbar-label">酒款</text>
+    <view class="tabbar-indicator"></view>
   </button>
 
   <button
@@ -30,5 +32,6 @@
     hover-stay-time="80"
   >
     <text class="tabbar-label">配乐</text>
+    <view class="tabbar-indicator"></view>
   </button>
 </view>

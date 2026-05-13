@@ -25,16 +25,17 @@
       </view>
     </view>
 
-    <view wx:if="{{winery.intro || winery.story}}" class="estate-archive">
+    <view wx:if="{{homeContent.intro || winery.intro || winery.story}}" class="estate-archive">
       <text class="estate-archive-kicker">庄园简介</text>
       <text class="estate-archive-title">{{winery.name}}</text>
+      <text wx:if="{{homeContent.intro}}" class="estate-archive-body">{{homeContent.intro}}</text>
       <text wx:if="{{winery.intro}}" class="estate-archive-body">{{winery.intro}}</text>
       <text wx:if="{{winery.story}}" class="estate-archive-body">{{winery.story}}</text>
     </view>
 
-    <view wx:if="{{estateChapters.length}}" class="estate-chapter-list">
+    <view wx:if="{{estateSections.length}}" class="estate-chapter-list">
       <text class="estate-chapter-list-kicker">静界篇章</text>
-      <view class="estate-copy-chapter" wx:for="{{estateChapters}}" wx:key="title">
+      <view class="estate-copy-chapter" wx:for="{{estateSections}}" wx:key="title">
         <text class="estate-copy-chapter-eyebrow">{{item.eyebrow}}</text>
         <text class="estate-copy-chapter-title">{{item.title}}</text>
         <text wx:if="{{item.body}}" class="estate-copy-chapter-body">{{item.body}}</text>

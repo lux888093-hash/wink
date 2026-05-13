@@ -41,6 +41,72 @@ function createSeedStore() {
       loungeCopy: {
         title: '庄园会所',
         note: '会员可无限听歌，已购单曲可签名下载。'
+      },
+      homeContent: {
+        intro:
+          '古藤村落酒庄把南澳红土、百年老藤、18个月橡木桶熟成与黑胶意象放进同一条叙事：一瓶酒，一组密钥，一段只属于独饮时刻的安静体验。',
+        statementKicker: '酒庄档案',
+        statementTitle: '老藤、时间与共振',
+        statementBody:
+          '这里不靠喧闹渠道抬高身价，也不为销量牺牲体面。567 不是噱头，而是风土、工艺与价格之间的稳定坐标。',
+        ageNote: '理性饮酒，拒绝酒驾。未成年人禁止饮酒。',
+        facts: [
+          { label: '产区', value: '南澳巴罗萨谷' },
+          { label: '熟成', value: '橡木桶 18 个月' },
+          { label: '私享', value: '16位密钥 · 19首乐章' }
+        ],
+        chapters: [
+          {
+            eyebrow: '静界',
+            title: '静下来，再开瓶',
+            body: '这不是一瓶用来热闹分享的酒，而是一段把外界暂时关掉的独处仪式。',
+            image: '/assets/images/village-ancient-vine-sign.jpg'
+          },
+          {
+            eyebrow: '老藤',
+            title: '红土里的老藤',
+            body: '百年老藤扎根南澳红土，把矿物感、黑果张力和年份力量一起带进杯中。',
+            image: '/assets/images/village-ancient-vine-cellar.jpg'
+          },
+          {
+            eyebrow: '共振',
+            title: '密钥与乐章',
+            body: '瓶封上的专属密钥对应 Sam 写下的 19 首私享乐章，让酒香与旋律在同一时刻展开。',
+            image: '/assets/images/eva-glaetzer-winemaker.jpg'
+          }
+        ],
+        sections: [
+          {
+            eyebrow: '静界',
+            title: '先把世界留在门外',
+            body: '这不是一瓶为热闹场合准备的酒。开瓶的第一步，不是举杯，而是离场：把屏幕放下，把噪声关小，让感官重新回到自己身上。'
+          },
+          {
+            eyebrow: '老藤',
+            title: '红土里的百年根系',
+            body: '古藤村落酒庄把南澳红土、石屋、老藤与桶陈酒窖放在同一个场景里。百年老藤穿过硬土与岩层，把更深的果味骨架、矿物感和稳定张力留进杯中。'
+          },
+          {
+            eyebrow: '时间',
+            title: '十八个月的慢慢收束',
+            body: '采收后的西拉并不急着表达。18个月橡木桶熟成让黑果、香料与木质感慢慢收束，换来入口的克制、层次和后段的延展。'
+          },
+          {
+            eyebrow: '价值',
+            title: '567 不是噱头，是坐标',
+            body: '这里不靠喧闹渠道抬高身价，也不为销量牺牲体面。567 是风土、工艺与价格之间的稳定坐标，也是这支酒的价值底线。'
+          },
+          {
+            eyebrow: '共振',
+            title: '一组密钥，十九首乐章',
+            body: '瓶封上的专属密钥连接 Sam 写下的 19 首私享乐章。开瓶、醒酒、落针，酒香与旋律在同一个时刻慢慢展开。'
+          },
+          {
+            eyebrow: '契约',
+            title: '不同频，也保留体面',
+            body: '如果这支酒的风味没有与你当下的心境共振，请停止饮用。我们更在意真实的感官连接，也愿意把选择权和体面一起留给你。'
+          }
+        ]
       }
     },
     wineries: [
@@ -171,14 +237,14 @@ function createSeedStore() {
         collection: [
           {
             id: 'moon-arch',
-            vintage: 'ESTATE',
+            vintage: '酒庄',
             title: '古藤村落入口',
-            note: '南澳古藤葡萄园的第一眼，是红土、石屋与写着 Village Ancient Vine 的木牌。',
+            note: '南澳古藤葡萄园的第一眼，是红土、石屋与写着古藤村落酒庄的木牌。',
             image: '/assets/images/village-ancient-vine-sign.jpg'
           },
           {
             id: 'oak-cellar',
-            vintage: 'AGING',
+            vintage: '时间',
             title: '橡木桶中的十八个月',
             note: '西拉的野性在微氧黑暗中慢慢收束，留下克制之后的爆发力。',
             image: '/assets/images/village-ancient-vine-cellar.jpg'

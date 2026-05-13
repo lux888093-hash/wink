@@ -1,7 +1,7 @@
 <view class="shell">
   <view wx:if="{{pageReady}}" class="page-scroll store-page">
     <view class="store-head">
-      <text class="eyebrow">CURATED CELLAR</text>
+      <text class="eyebrow">酒廊</text>
       <text class="display-title store-title">酒廊</text>
       <text class="store-subtitle">精选古藤西拉、礼盒与会员酒款。</text>
     </view>

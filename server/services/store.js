@@ -401,6 +401,23 @@ function buildDefaultHomeContent(store) {
         body: '深色、木质与一抹金色只作为背景，让庄园本身成为主角。信息被压缩到必要的几句，余下交给画面。',
         image: winery.heroImage || '/assets/images/winery-vineyard-moon.jpg'
       }
+    ],
+    sections: [
+      {
+        eyebrow: '静界',
+        title: '先把世界留在门外',
+        body: '这不是一瓶为热闹场合准备的酒。开瓶的第一步，不是举杯，而是离场：把屏幕放下，把噪声关小，让感官重新回到自己身上。'
+      },
+      {
+        eyebrow: '老藤',
+        title: '红土里的百年根系',
+        body: '百年老藤穿过硬土与岩层，把更深的果味骨架、矿物感和稳定张力留进杯中。'
+      },
+      {
+        eyebrow: '时间',
+        title: '十八个月的慢慢收束',
+        body: '采收后的西拉并不急着表达。18个月橡木桶熟成让黑果、香料与木质感慢慢收束，换来克制、层次和后段的延展。'
+      }
     ]
   };
 }
@@ -443,7 +460,8 @@ function getResolvedHomeContent(store) {
     statementBody: getOptionalText(content.statementBody, defaults.statementBody),
     ageNote: getOptionalText(content.ageNote, defaults.ageNote),
     facts: normalizeStructuredList(content.facts, defaults.facts, ['label', 'value']),
-    chapters: normalizeStructuredList(content.chapters, defaults.chapters, ['eyebrow', 'title', 'body', 'image'])
+    chapters: normalizeStructuredList(content.chapters, defaults.chapters, ['eyebrow', 'title', 'body', 'image']),
+    sections: normalizeStructuredList(content.sections, defaults.sections, ['eyebrow', 'title', 'body'])
   };
 }
 
