@@ -1,24 +1,16 @@
 <view class="shell">
   <view class="redeem-page">
-    <image class="redeem-bg" src="/assets/images/vinyl-ode-bottle-vineyard.jpg" mode="aspectFill"></image>
+    <image class="redeem-bg" src="/assets/images/winery-vineyard-moon.jpg" mode="aspectFill"></image>
     <view class="redeem-mask"></view>
 
     <view class="redeem-copy">
-      <text class="eyebrow">提取码</text>
-      <text class="display-title redeem-title">567 古藤西拉</text>
-      <text class="muted-copy redeem-subtitle">输入瓶身标签上的六位提取码，进入专属内容。</text>
-    </view>
-
-    <view class="redeem-estate-panel">
-      <image class="redeem-estate-image" src="/assets/images/village-ancient-vine-sign.jpg" mode="aspectFill"></image>
-      <view class="redeem-estate-copy">
-        <text class="redeem-estate-title">南澳古藤 · 黑胶颂</text>
-        <text class="redeem-estate-meta">2022 · Shiraz · 14.3%vol</text>
-      </view>
+      <text class="eyebrow">专属入口</text>
+      <text class="display-title redeem-title">输入提取码</text>
+      <text class="muted-copy redeem-subtitle">请输入六位数字。</text>
     </view>
 
     <view class="redeem-card {{state === 'success' ? 'redeem-card-success' : ''}}">
-      <text class="eyebrow">{{state === 'idle' || state === 'error' ? '输入提取码' : state === 'success' ? '已解锁' : '正在验证'}}</text>
+      <text class="eyebrow">{{state === 'idle' || state === 'error' ? '六位数字' : state === 'success' ? '已解锁' : '正在验证'}}</text>
       <text class="section-title redeem-card-title">{{title}}</text>
       <text class="muted-copy line-clamp-3">{{message}}</text>
 

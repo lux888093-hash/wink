@@ -29,6 +29,7 @@ Page({
     estateFacts: [],
     estateSections: [],
     estateChapters: [],
+    storyModules: [],
     statementKicker: '',
     statementTitle: '',
     ageNote: '',
@@ -49,6 +50,8 @@ Page({
       const hero = payload.hero || {};
       const homeContent = payload.homeContent || {};
       const winery = payload.winery || {};
+      const estateSections = this.buildEstateSections(homeContent, winery);
+      const estateChapters = this.buildEstateChapters(winery, homeContent);
       getApp().setCartCount(payload.cartCount || 0);
 
       this.setData({
@@ -59,8 +62,9 @@ Page({
         winery,
         heroImage: this.resolveHeroImage(winery),
         estateFacts: this.buildEstateFacts(winery, homeContent),
-        estateSections: this.buildEstateSections(homeContent, winery),
-        estateChapters: this.buildEstateChapters(winery, homeContent),
+        estateSections,
+        estateChapters,
+        storyModules: this.buildStoryModules(winery, estateSections, estateChapters),
         statementKicker: homeContent.statementKicker || '酒庄档案',
         statementTitle: this.buildStatementTitle(homeContent),
         ageNote: homeContent.ageNote || hero.ambienceNote || '理性饮酒，拒绝酒驾。未成年人禁止饮酒。',
@@ -188,5 +192,30 @@ Page({
         body: homeContent.statementBody || ''
       }
     ].filter((item) => item.body);
+  },
+
+  buildStoryModules(winery, sections, chapters) {
+    if (!Array.isArray(sections) || !sections.length) {
+      return [];
+    }
+
+    const imagePool = [
+      (chapters[0] && chapters[0].image) || winery.heroImage || '/assets/images/village-ancient-vine-sign.jpg',
+      winery.harvestImage || (chapters[1] && chapters[1].image) || '/assets/images/village-ancient-vine-cellar.jpg',
+      winery.giftImage || '/assets/images/village-ancient-vine-packaging.jpg',
+      (chapters[2] && chapters[2].image) || winery.portraitImage || '/assets/images/eva-glaetzer-winemaker.jpg',
+      '/assets/images/winery-cottage-night.jpg',
+      winery.heroImage || '/assets/images/winery-vineyard-moon.jpg'
+    ];
+
+    return sections.slice(0, 6).map((section, index) => ({
+      key: section.key || `story-${index}`,
+      eyebrow: normalizeChapterEyebrow(section.eyebrow, `篇章 ${index + 1}`),
+      title: section.title,
+      body: section.body,
+      image: section.image || imagePool[index] || imagePool[imagePool.length - 1],
+      layoutClass: index % 2 === 0 ? 'is-odd' : 'is-even',
+      sizeClass: index === 0 ? 'is-hero' : index % 3 === 1 ? 'is-wide' : 'is-regular'
+    }));
   }
 });

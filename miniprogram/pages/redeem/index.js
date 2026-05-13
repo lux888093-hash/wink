@@ -63,7 +63,7 @@ Page({
   data: {
     state: 'idle',
     title: '输入提取码',
-    message: '输入六位数字提取码，进入专属内容。',
+    message: '请输入六位数字提取码。',
     codeBoxes: getCodeInputState('').codeBoxes,
     inputFocused: false,
     activeIndex: 0,
@@ -106,7 +106,7 @@ Page({
     this.setData({
       state: 'loading',
       title: '正在验证提取码',
-      message: '正在核验提取码。'
+      message: '请稍候。'
     });
 
     try {
@@ -136,7 +136,7 @@ Page({
     this.setData({
       state: 'idle',
       title: '输入提取码',
-      message: '输入六位数字提取码，进入专属内容。',
+      message: '请输入六位数字提取码。',
       codeBoxes: inputState.codeBoxes,
       inputFocused: true,
       activeIndex: inputState.activeIndex,

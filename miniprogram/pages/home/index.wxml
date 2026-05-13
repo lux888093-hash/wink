@@ -33,12 +33,15 @@
       <text wx:if="{{winery.story}}" class="estate-archive-body">{{winery.story}}</text>
     </view>
 
-    <view wx:if="{{estateSections.length}}" class="estate-chapter-list">
-      <text class="estate-chapter-list-kicker">静界篇章</text>
-      <view class="estate-copy-chapter" wx:for="{{estateSections}}" wx:key="title">
-        <text class="estate-copy-chapter-eyebrow">{{item.eyebrow}}</text>
-        <text class="estate-copy-chapter-title">{{item.title}}</text>
-        <text wx:if="{{item.body}}" class="estate-copy-chapter-body">{{item.body}}</text>
+    <view wx:if="{{storyModules.length}}" class="estate-storyflow">
+      <text class="estate-storyflow-kicker">庄园片段</text>
+      <view class="estate-story-module {{item.layoutClass}} {{item.sizeClass}}" wx:for="{{storyModules}}" wx:key="key">
+        <image class="estate-story-image" src="{{item.image}}" mode="aspectFill"></image>
+        <view class="estate-story-copy">
+          <text class="estate-story-eyebrow">{{item.eyebrow}}</text>
+          <text class="estate-story-title">{{item.title}}</text>
+          <text wx:if="{{item.body}}" class="estate-story-body">{{item.body}}</text>
+        </view>
       </view>
     </view>
 

@@ -25,14 +25,17 @@
       </view>
     </view>
 
-    <view wx:if="{{estateSections.length}}" class="cellar-chapters">
-      <view class="cellar-chapters-head">
-        <text class="cellar-chapters-kicker">静界篇章</text>
+    <view wx:if="{{storyModules.length}}" class="cellar-storyflow">
+      <view class="cellar-storyflow-head">
+        <text class="cellar-storyflow-kicker">庄园片段</text>
       </view>
-      <view class="cellar-chapter" wx:for="{{estateSections}}" wx:key="key">
-        <text class="cellar-chapter-eyebrow">{{item.eyebrow}}</text>
-        <text class="cellar-chapter-title">{{item.title}}</text>
-        <text class="cellar-chapter-body">{{item.body}}</text>
+      <view class="cellar-story-module {{item.layoutClass}} {{item.sizeClass}}" wx:for="{{storyModules}}" wx:key="key">
+        <image class="cellar-story-image" src="{{item.image}}" mode="aspectFill"></image>
+        <view class="cellar-story-copy">
+          <text class="cellar-story-eyebrow">{{item.eyebrow}}</text>
+          <text class="cellar-story-title">{{item.title}}</text>
+          <text class="cellar-story-body">{{item.body}}</text>
+        </view>
       </view>
     </view>
 

@@ -225,20 +225,20 @@
   letter-spacing: 0;
 }
 
-.cellar-chapters {
+.cellar-storyflow {
   margin: 0 -24rpx;
-  padding: 42rpx 30rpx 12rpx;
+  padding: 42rpx 0 16rpx;
   background:
     linear-gradient(180deg, rgba(28, 21, 19, 0.98), rgba(16, 13, 12, 1));
   border-top: 1rpx solid rgba(220, 185, 133, 0.08);
 }
 
-.cellar-chapters-head {
-  margin-bottom: 10rpx;
+.cellar-storyflow-head {
+  padding: 0 24rpx 20rpx;
 }
 
-.cellar-chapters-kicker,
-.cellar-chapter-eyebrow {
+.cellar-storyflow-kicker,
+.cellar-story-eyebrow {
   display: block;
   color: rgba(231, 200, 150, 0.74);
   font-size: 20rpx;
@@ -247,31 +247,52 @@
   letter-spacing: 0;
 }
 
-.cellar-chapter {
-  padding: 28rpx 0 30rpx;
-  border-top: 1rpx solid rgba(220, 185, 133, 0.1);
+.cellar-story-module {
+  padding: 0 0 52rpx;
 }
 
-.cellar-chapter:first-of-type {
-  border-top: 0;
+.cellar-story-image {
+  display: block;
+  width: 100%;
+  height: 480rpx;
+  border-radius: 0;
+  border-top: 1rpx solid rgba(220, 185, 133, 0.08);
+  border-bottom: 1rpx solid rgba(220, 185, 133, 0.08);
+  background: rgba(247, 236, 221, 0.04);
 }
 
-.cellar-chapter-title {
+.cellar-story-module.is-hero .cellar-story-image {
+  height: 660rpx;
+}
+
+.cellar-story-module.is-wide .cellar-story-image {
+  height: 560rpx;
+}
+
+.cellar-story-copy {
+  margin-top: 22rpx;
+  padding: 0 24rpx;
+  max-width: none;
+}
+
+.cellar-story-title {
   display: block;
   margin-top: 10rpx;
   color: rgba(255, 255, 255, 0.96);
-  font-size: 28rpx;
+  max-width: 620rpx;
+  font-size: 32rpx;
   font-weight: 600;
-  line-height: 1.32;
+  line-height: 1.3;
   letter-spacing: 0;
 }
 
-.cellar-chapter-body {
+.cellar-story-body {
   display: block;
   margin-top: 12rpx;
+  max-width: 660rpx;
   color: rgba(255, 246, 235, 0.72);
   font-size: 24rpx;
-  line-height: 1.7;
+  line-height: 1.68;
   letter-spacing: 0;
 }
 

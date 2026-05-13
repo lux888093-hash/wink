@@ -1,5 +1,11 @@
 const { getCurrentExperience } = require('../../utils/session');
 
+function normalizeEyebrow(value, fallback) {
+  const text = String(value || fallback || '').trim();
+  const parts = text.split('/');
+  return parts[parts.length - 1].trim() || text;
+}
+
 function buildScenes(wine, collection) {
   if (Array.isArray(collection) && collection.length) {
     return collection;
@@ -56,6 +62,7 @@ Page({
     wine: null,
     collection: [],
     estateSections: [],
+    storyModules: [],
     errorTitle: '',
     errorMessage: ''
   },
@@ -76,11 +83,15 @@ Page({
       return;
     }
 
+    const collection = buildScenes(experience.wine, experience.collection);
+    const estateSections = buildEstateSections(experience.wine);
+
     this.setData({
       ready: true,
       wine: experience.wine,
-      collection: buildScenes(experience.wine, experience.collection),
-      estateSections: buildEstateSections(experience.wine),
+      collection,
+      estateSections,
+      storyModules: this.buildStoryModules(experience.wine, estateSections, collection),
       errorTitle: '',
       errorMessage: ''
     });
@@ -102,5 +113,30 @@ Page({
 
   openDetail() {
     wx.redirectTo({ url: '/pages/detail/index' });
+  },
+
+  buildStoryModules(wine, estateSections, collection) {
+    if (!Array.isArray(estateSections) || !estateSections.length) {
+      return [];
+    }
+
+    const imagePool = [
+      (collection[0] && collection[0].image) || wine.estateHeroImage || '/assets/images/village-ancient-vine-sign.jpg',
+      (collection[1] && collection[1].image) || wine.harvestImage || '/assets/images/village-ancient-vine-cellar.jpg',
+      wine.giftImage || wine.posterImage || wine.bottleImage || '/assets/images/village-ancient-vine-packaging.jpg',
+      (collection[2] && collection[2].image) || wine.winemakerImage || wine.estatePortraitImage || '/assets/images/eva-glaetzer-winemaker.jpg',
+      (collection[3] && collection[3].image) || wine.posterImage || wine.bottleImage || '/assets/images/vinyl-ode-bottle-vineyard.jpg',
+      '/assets/images/winery-cottage-night.jpg'
+    ];
+
+    return estateSections.slice(0, 6).map((section, index) => ({
+      key: section.key || `story-${index}`,
+      eyebrow: normalizeEyebrow(section.eyebrow, `篇章 ${index + 1}`),
+      title: section.title,
+      body: section.body,
+      image: section.image || imagePool[index] || imagePool[imagePool.length - 1],
+      layoutClass: index % 2 === 0 ? 'is-odd' : 'is-even',
+      sizeClass: index === 0 ? 'is-hero' : index % 3 === 1 ? 'is-wide' : 'is-regular'
+    }));
   }
 });
