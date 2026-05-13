@@ -900,6 +900,22 @@ function createSeedStore() {
         firstUsedAt: null,
         firstUserId: null,
         sessionId: null
+      },
+      {
+        id: 'code_demo_permanent',
+        token: 'permanent_cellar_pass',
+        redeemCode: '999999',
+        label: '永久提取码',
+        wineId: 'soundless-a-quiet-world-2022',
+        trackId: 'track_moonlit_path',
+        batchNo: 'PERMANENT_BATCH',
+        status: 'ready',
+        isReusable: true,
+        createdAt: shiftDays(-1),
+        expiresAt: '2099-12-31T23:59:59.000Z',
+        firstUsedAt: null,
+        firstUserId: null,
+        sessionId: null
       }
     ],
     scanSessions: [

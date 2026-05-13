@@ -1193,6 +1193,45 @@ function createSeedCodeForReset(store) {
   return fallback;
 }
 
+function ensurePermanentRedeemCode(store) {
+  const existing = store.scanCodes.find((item) => item.redeemCode === '999999');
+  const wine = store.wines[0];
+  const track = getTrackForWine(store, wine.id);
+
+  if (existing) {
+    existing.wineId = existing.wineId || wine.id;
+    existing.trackId = existing.trackId || track.id;
+    existing.status = 'ready';
+    existing.label = existing.label || '永久提取码';
+    existing.isReusable = true;
+    existing.expiresAt = '2099-12-31T23:59:59.000Z';
+    existing.firstUsedAt = null;
+    existing.firstUserId = null;
+    existing.sessionId = null;
+    return existing;
+  }
+
+  const permanentCode = {
+    id: randomId('code'),
+    token: 'permanent_cellar_pass',
+    redeemCode: '999999',
+    label: '永久提取码',
+    wineId: wine.id,
+    trackId: track.id,
+    batchNo: 'PERMANENT_BATCH',
+    status: 'ready',
+    isReusable: true,
+    createdAt: nowIso(),
+    expiresAt: '2099-12-31T23:59:59.000Z',
+    firstUsedAt: null,
+    firstUserId: null,
+    sessionId: null
+  };
+
+  store.scanCodes.unshift(permanentCode);
+  return permanentCode;
+}
+
 function seedDemoData() {
   const store = createSeedStore();
   const code = createSeedCodeForReset(store);
@@ -1383,8 +1422,10 @@ function consumeOneTimeCode(redeemCodeValue, userId, requestMeta) {
   }
 
   const store = readStore();
+  ensurePermanentRedeemCode(store);
   const code = store.scanCodes.find((item) => item.redeemCode === redeemCode);
   const user = getUserById(store, userId);
+  const isReusable = Boolean(code && code.isReusable);
 
   if (!code) {
     logRedeemFailure(store, redeemCode, 'CODE_NOT_FOUND', requestMeta);
@@ -1405,7 +1446,7 @@ function consumeOneTimeCode(redeemCodeValue, userId, requestMeta) {
     throw createAppError('CODE_EXPIRED', 410, code);
   }
 
-  if (code.status === 'claimed' || code.firstUsedAt) {
+  if (!isReusable && (code.status === 'claimed' || code.firstUsedAt)) {
     logRedeemFailure(store, redeemCode, 'CODE_ALREADY_USED', requestMeta);
     writeStore(store);
     throw createAppError('CODE_ALREADY_USED', 410, code);
@@ -1426,11 +1467,13 @@ function consumeOneTimeCode(redeemCodeValue, userId, requestMeta) {
     expiredAt: plusMinutes(30)
   };
 
-  code.status = 'claimed';
+  code.status = isReusable ? 'ready' : 'claimed';
   code.trackId = track.id;
-  code.firstUsedAt = nowIso();
-  code.firstUserId = user.id;
-  code.sessionId = session.id;
+  if (!isReusable) {
+    code.firstUsedAt = nowIso();
+    code.firstUserId = user.id;
+    code.sessionId = session.id;
+  }
   store.scanSessions.unshift(session);
   writeAudit(store, 'code.redeemed', code.id, user.id);
   writeStore(store);
