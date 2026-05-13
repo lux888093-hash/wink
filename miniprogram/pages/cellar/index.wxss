@@ -119,8 +119,8 @@
 .cellar-statement {
   position: relative;
   margin: 0 -24rpx;
-  min-height: 300rpx;
-  padding: 52rpx 30rpx 58rpx;
+  min-height: 260rpx;
+  padding: 48rpx 30rpx 50rpx;
   display: flex;
   align-items: flex-start;
   overflow: hidden;
@@ -129,28 +129,12 @@
     linear-gradient(135deg, rgba(93, 31, 37, 0.24), rgba(93, 31, 37, 0) 58%),
     linear-gradient(180deg, rgba(31, 24, 21, 0.98), rgba(18, 14, 13, 1));
   border-top: 1rpx solid rgba(220, 185, 133, 0.1);
-  border-bottom: 1rpx solid rgba(220, 185, 133, 0.08);
 }
 
 .cellar-statement-copy {
   position: relative;
   flex: 1;
   min-width: 0;
-}
-
-.cellar-statement-head {
-  display: flex;
-  align-items: baseline;
-  gap: 16rpx;
-  margin-bottom: 18rpx;
-}
-
-.cellar-statement-sub {
-  color: rgba(255, 246, 235, 0.38);
-  font-size: 20rpx;
-  font-weight: 500;
-  line-height: 1.2;
-  letter-spacing: 0;
 }
 
 .cellar-statement-title {
@@ -164,16 +148,10 @@
   letter-spacing: 0;
 }
 
-.cellar-statement-rule {
-  width: 116rpx;
-  height: 1rpx;
-  margin: 24rpx 0 22rpx;
-  background: linear-gradient(90deg, rgba(220, 192, 138, 0.76), rgba(220, 192, 138, 0));
-}
-
 .cellar-statement-body {
   display: block;
   max-width: 570rpx;
+  margin-top: 16rpx;
   color: rgba(255, 246, 235, 0.72);
   font-size: 25rpx;
   font-weight: 500;
@@ -231,9 +209,9 @@
 
 .cellar-maker-sub {
   display: block;
-  margin-top: 8rpx;
+  margin-top: 10rpx;
   color: rgba(255, 246, 235, 0.56);
-  font-size: 21rpx;
+  font-size: 22rpx;
   line-height: 1.42;
   letter-spacing: 0;
 }
@@ -249,14 +227,14 @@
 
 .cellar-chapters {
   margin: 0 -24rpx;
-  padding: 42rpx 30rpx 18rpx;
+  padding: 42rpx 30rpx 12rpx;
   background:
     linear-gradient(180deg, rgba(28, 21, 19, 0.98), rgba(16, 13, 12, 1));
   border-top: 1rpx solid rgba(220, 185, 133, 0.08);
 }
 
 .cellar-chapters-head {
-  margin-bottom: 16rpx;
+  margin-bottom: 10rpx;
 }
 
 .cellar-chapters-kicker,
@@ -266,17 +244,6 @@
   font-size: 20rpx;
   font-weight: 600;
   line-height: 1.24;
-  letter-spacing: 0;
-}
-
-.cellar-chapters-title {
-  display: block;
-  max-width: 560rpx;
-  margin-top: 12rpx;
-  color: rgba(255, 250, 242, 0.94);
-  font-size: 34rpx;
-  font-weight: 600;
-  line-height: 1.2;
   letter-spacing: 0;
 }
 

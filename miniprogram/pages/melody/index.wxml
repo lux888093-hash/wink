@@ -5,13 +5,7 @@
     <view class="melody-bg-overlay"></view>
 
     <view class="melody-topbar">
-      <button class="topbar-button">
-        <image class="topbar-icon" src="/assets/icons/menu.svg" mode="aspectFit"></image>
-      </button>
-      <text class="topbar-title">THE CURATOR</text>
-      <button class="topbar-button">
-        <image class="topbar-icon" src="/assets/icons/search.svg" mode="aspectFit"></image>
-      </button>
+      <text class="topbar-title">私享配乐</text>
     </view>
 
     <view class="melody-stage">
@@ -19,9 +13,9 @@
         <image class="cover-image" src="{{currentTrack.cover || wine.posterImage || '/assets/images/melody-phone-cover.jpg'}}" mode="aspectFill"></image>
       </view>
 
-      <text class="eyebrow melody-kicker">{{currentTrack.mood || 'AMBIENT PAIRING'}}</text>
+      <text class="eyebrow melody-kicker">当前曲目</text>
       <text class="display-title melody-title">{{currentTrack.cnTitle || currentTrack.title}}</text>
-      <text class="muted-copy melody-description line-clamp-3">{{currentTrack.description}}</text>
+      <text class="muted-copy melody-description line-clamp-2">{{currentTrack.description}}</text>
       <text wx:if="{{gateMessage}}" class="gate-message">{{gateMessage}}</text>
 
       <view class="progress-wrap">
@@ -59,8 +53,8 @@
       </view>
 
       <view wx:if="{{currentTrack && currentTrack.access && !currentTrack.access.canPlayFull}}" class="melody-actions">
-        <button class="ghost-button melody-action" bindtap="openMember">开通会员</button>
-        <button class="primary-button melody-action" bindtap="unlockCurrentTrack">解锁 ¥{{currentTrack.access.unlockPrice}}</button>
+        <button class="ghost-button melody-action" bindtap="openMember">会员畅听</button>
+        <button class="primary-button melody-action" bindtap="unlockCurrentTrack">单曲 ¥{{currentTrack.access.unlockPrice}}</button>
       </view>
     </view>
 

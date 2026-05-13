@@ -8,14 +8,14 @@ function buildScenes(wine, collection) {
   return [
     {
       id: 'estate-hero',
-      vintage: 'ESTATE',
+      vintage: '酒庄',
       title: wine.estateTagline || wine.estateName || '鸿玖酒庄',
       note: wine.estateIntro || '',
       image: wine.estateHeroImage || wine.posterImage || wine.bottleImage
     },
     {
       id: 'estate-poster',
-      vintage: 'WINE',
+      vintage: '酒款',
       title: wine.name || '酒款',
       note: wine.subtitle || '',
       image: wine.posterImage || wine.estateHeroImage || wine.bottleImage
@@ -31,19 +31,19 @@ function buildEstateSections(wine) {
   return [
     {
       key: 'quiet',
-      eyebrow: '01 / 静界',
+      eyebrow: '静界',
       title: '先把世界留在门外',
       body: wine.story || wine.estateIntro || ''
     },
     {
       key: 'estate',
-      eyebrow: '02 / 风土',
+      eyebrow: '风土',
       title: '老藤、红土与桶中时间',
       body: wine.estatePhilosophy || ''
     },
     {
       key: 'maker',
-      eyebrow: '03 / 酿造',
+      eyebrow: '酿造',
       title: '让年份自己说话',
       body: wine.winemakerIntro || ''
     }

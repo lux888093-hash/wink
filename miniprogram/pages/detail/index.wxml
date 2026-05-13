@@ -27,12 +27,8 @@
 
     <view class="detail-statement">
       <view class="detail-statement-copy">
-        <view class="detail-statement-head">
-          <text class="detail-statement-kicker">酒款说明</text>
-          <text class="detail-statement-sub">Tasting note</text>
-        </view>
+        <text class="detail-statement-kicker">酒款说明</text>
         <text class="detail-statement-title">风味与结构</text>
-        <view class="detail-statement-rule"></view>
         <text class="detail-statement-body">{{wine.overview}}</text>
       </view>
     </view>
@@ -41,7 +37,7 @@
       <view class="detail-maker-copy">
         <text class="detail-section-kicker">酿酒师笔记</text>
         <text class="detail-maker-title">{{wine.winemakerCnName || wine.winemakerName}}</text>
-        <text class="detail-maker-sub">{{wine.winemakerName}} · {{wine.winemakerTitle}}</text>
+        <text wx:if="{{wine.winemakerTitle}}" class="detail-maker-sub">{{wine.winemakerTitle}}</text>
         <text class="detail-maker-body">{{wine.winemakerIntro}}</text>
       </view>
       <image class="detail-maker-image" src="{{wine.winemakerImage || wine.estatePortraitImage}}" mode="aspectFill"></image>
@@ -51,7 +47,6 @@
       <image class="detail-poster-image" src="{{wine.bottleImage || wine.posterImage}}" mode="aspectFill"></image>
       <view class="detail-poster-mask"></view>
       <view class="detail-quote">
-        <text class="detail-quote-mark">“</text>
         <text class="detail-quote-text line-clamp-3">{{wine.quote}}</text>
       </view>
     </view>
@@ -60,7 +55,6 @@
       <text class="detail-section-kicker">品鉴结构</text>
       <view class="detail-note" wx:for="{{wine.tasting}}" wx:key="key">
         <view class="detail-note-head">
-          <text class="detail-note-icon">{{item.icon || item.key}}</text>
           <text class="detail-note-title">{{item.key}}</text>
         </view>
         <text class="detail-note-copy">{{item.text}}</text>

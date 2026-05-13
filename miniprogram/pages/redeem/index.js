@@ -63,7 +63,7 @@ Page({
   data: {
     state: 'idle',
     title: '输入提取码',
-    message: '输入六位数字提取码，进入古藤村落酒庄专属内容。',
+    message: '输入六位数字提取码，进入专属内容。',
     codeBoxes: getCodeInputState('').codeBoxes,
     inputFocused: false,
     activeIndex: 0,
@@ -106,7 +106,7 @@ Page({
     this.setData({
       state: 'loading',
       title: '正在验证提取码',
-      message: '正在核验提取码并加载专属内容。'
+      message: '正在核验提取码。'
     });
 
     try {
@@ -114,7 +114,7 @@ Page({
       this.setData({
         state: 'success',
         title: '专属体验已解锁',
-        message: '正在打开古藤村落酒庄。'
+        message: '正在进入酒庄专属页。'
       });
 
       setTimeout(() => {
@@ -136,7 +136,7 @@ Page({
     this.setData({
       state: 'idle',
       title: '输入提取码',
-      message: '输入六位数字提取码，进入古藤村落酒庄专属内容。',
+      message: '输入六位数字提取码，进入专属内容。',
       codeBoxes: inputState.codeBoxes,
       inputFocused: true,
       activeIndex: inputState.activeIndex,

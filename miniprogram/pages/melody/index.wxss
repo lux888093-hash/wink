@@ -38,28 +38,15 @@
   z-index: 2;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 14rpx 34rpx 0;
-  min-height: 94rpx;
-}
-
-.topbar-button {
-  width: 48rpx;
-  height: 48rpx;
-  display: inline-flex;
-  align-items: center;
   justify-content: center;
-}
-
-.topbar-icon {
-  width: 32rpx;
-  height: 32rpx;
+  padding: 26rpx 34rpx 0;
+  min-height: 86rpx;
 }
 
 .topbar-title {
   color: #efe9e4;
   font-family: "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  font-size: 36rpx;
+  font-size: 28rpx;
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0;
@@ -74,7 +61,7 @@
   align-items: center;
   justify-content: flex-start;
   text-align: center;
-  padding: 92rpx 34rpx 0;
+  padding: 74rpx 34rpx 0;
 }
 
 .cover-shell {
@@ -101,7 +88,7 @@
 }
 
 .melody-kicker {
-  margin-top: 98rpx;
+  margin-top: 82rpx;
   margin-bottom: 14rpx;
   color: rgba(239, 208, 155, 0.86);
   font-size: 20rpx;
@@ -138,19 +125,17 @@
 .melody-title {
   margin-top: 0;
   color: #f7efe4;
-  font-size: 76rpx;
-  line-height: 0.98;
-  font-style: italic;
-  text-shadow: 0 8rpx 24rpx rgba(18, 15, 12, 0.24);
+  font-size: 56rpx;
+  line-height: 1.06;
+  font-style: normal;
 }
 
 .melody-description {
   max-width: 590rpx;
-  margin-top: 28rpx;
+  margin-top: 22rpx;
   color: rgba(255, 246, 235, 0.72);
-  font-size: 22rpx;
-  line-height: 1.72;
-  font-style: italic;
+  font-size: 23rpx;
+  line-height: 1.62;
 }
 
 .gate-message {
@@ -199,9 +184,9 @@
 .control-main {
   width: 86rpx;
   height: 86rpx;
-  border-radius: 14rpx;
+  border-radius: 18rpx;
   background: linear-gradient(180deg, #ead0a3 0%, #8f6a46 62%, #5d1f25 100%);
-  box-shadow: 0 16rpx 30rpx rgba(70, 45, 35, 0.22);
+  box-shadow: 0 10rpx 20rpx rgba(70, 45, 35, 0.18);
 }
 
 .control-touch-active {

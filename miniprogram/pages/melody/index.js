@@ -11,7 +11,7 @@ function trackGateMessage(track) {
     return '';
   }
 
-  return `当前为试听模式，可播放 ${track.access.previewSeconds || 12} 秒。开通会员或解锁曲目后可完整播放与下载。`;
+  return `当前为试听模式，可播放 ${track.access.previewSeconds || 12} 秒。解锁后可完整播放。`;
 }
 
 Page({

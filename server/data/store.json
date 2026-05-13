@@ -6,7 +6,7 @@
   },
   "settings": {
     "homeHero": {
-      "eyebrow": "Village Ancient Vine",
+      "eyebrow": "酒庄",
       "title": "古藤村落酒庄",
       "subtitle": "南澳古藤西拉、19首私享乐章与 567 价值坐标。",
       "ambienceNote": "理性饮酒，未成年人请勿饮酒。"
@@ -17,7 +17,7 @@
     },
     "homeContent": {
       "intro": "古藤村落酒庄把南澳红土、百年老藤、18个月橡木桶熟成与黑胶意象放进同一条叙事：一瓶酒，一组密钥，一段只属于独饮时刻的安静体验。",
-      "statementKicker": "庄园手册",
+      "statementKicker": "酒庄档案",
       "statementTitle": "老藤、时间与共振",
       "statementBody": "这里不靠喧闹渠道抬高身价，也不为销量牺牲体面。567 不是噱头，而是风土、工艺与价格之间的稳定坐标。",
       "ageNote": "理性饮酒，拒绝酒驾。未成年人禁止饮酒。",
@@ -37,19 +37,19 @@
       ],
       "chapters": [
         {
-          "eyebrow": "01 / PHILOSOPHY",
+          "eyebrow": "静界",
           "title": "静下来，再开瓶",
           "body": "这不是一瓶用来热闹分享的酒，而是一段把外界暂时关掉的独处仪式。",
           "image": "/assets/images/village-ancient-vine-sign.jpg"
         },
         {
-          "eyebrow": "02 / ORIGIN",
+          "eyebrow": "老藤",
           "title": "红土里的老藤",
           "body": "百年老藤扎根南澳红土，把矿物感、黑果张力和年份力量一起带进杯中。",
           "image": "/assets/images/village-ancient-vine-cellar.jpg"
         },
         {
-          "eyebrow": "03 / RESONANCE",
+          "eyebrow": "共振",
           "title": "密钥与乐章",
           "body": "瓶封上的专属密钥对应 Sam 写下的 19 首私享乐章，让酒香与旋律在同一时刻展开。",
           "image": "/assets/images/eva-glaetzer-winemaker.jpg"

@@ -33,7 +33,7 @@ function createSeedStore() {
     },
     settings: {
       homeHero: {
-        eyebrow: 'Village Ancient Vine',
+        eyebrow: '酒庄',
         title: '古藤村落酒庄',
         subtitle: '南澳古藤西拉、19首私享乐章与 567 价值坐标。',
         ambienceNote: '理性饮酒，未成年人请勿饮酒。'

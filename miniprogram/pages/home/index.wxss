@@ -165,6 +165,74 @@
   letter-spacing: 0;
 }
 
+.estate-archive,
+.estate-chapter-list {
+  margin: 0 -24rpx;
+  padding: 42rpx 30rpx;
+  background:
+    linear-gradient(180deg, rgba(28, 21, 19, 0.98), rgba(16, 13, 12, 1));
+  border-top: 1rpx solid rgba(220, 185, 133, 0.08);
+}
+
+.estate-archive-kicker,
+.estate-chapter-list-kicker,
+.estate-scenes-kicker,
+.estate-copy-chapter-eyebrow {
+  display: block;
+  color: rgba(231, 200, 150, 0.74);
+  font-size: 20rpx;
+  font-weight: 600;
+  line-height: 1.24;
+  letter-spacing: 0;
+}
+
+.estate-archive-title {
+  display: block;
+  margin-top: 12rpx;
+  color: rgba(255, 250, 242, 0.94);
+  font-size: 34rpx;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.estate-archive-body {
+  display: block;
+  margin-top: 16rpx;
+  color: rgba(255, 246, 235, 0.72);
+  font-size: 24rpx;
+  line-height: 1.68;
+  letter-spacing: 0;
+}
+
+.estate-copy-chapter {
+  padding: 28rpx 0 30rpx;
+  border-top: 1rpx solid rgba(220, 185, 133, 0.1);
+}
+
+.estate-copy-chapter:first-of-type {
+  margin-top: 10rpx;
+}
+
+.estate-copy-chapter-title {
+  display: block;
+  margin-top: 10rpx;
+  color: rgba(255, 255, 255, 0.96);
+  font-size: 28rpx;
+  font-weight: 600;
+  line-height: 1.32;
+  letter-spacing: 0;
+}
+
+.estate-copy-chapter-body {
+  display: block;
+  margin-top: 12rpx;
+  color: rgba(255, 246, 235, 0.72);
+  font-size: 24rpx;
+  line-height: 1.7;
+  letter-spacing: 0;
+}
+
 .estate-chapters {
   display: flex;
   flex-direction: column;
@@ -172,6 +240,13 @@
   margin: 0 -24rpx;
   padding: 0;
   background: var(--bg);
+}
+
+.estate-scenes-head {
+  padding: 40rpx 30rpx 12rpx;
+  background:
+    linear-gradient(180deg, rgba(28, 21, 19, 0.98), rgba(16, 13, 12, 1));
+  border-top: 1rpx solid rgba(220, 185, 133, 0.08);
 }
 
 .estate-chapter {

@@ -1,36 +1,28 @@
 .tabbar-shell {
   position: fixed;
-  left: 18rpx;
-  right: 18rpx;
-  bottom: 20rpx;
+  left: 24rpx;
+  right: 24rpx;
+  bottom: 24rpx;
   z-index: 999;
   display: flex;
-  gap: 6rpx;
+  gap: 8rpx;
   padding: 8rpx;
-  border-radius: 34rpx;
-  background:
-    linear-gradient(135deg, rgba(93, 31, 37, 0.22), rgba(24, 18, 17, 0) 58%),
-    linear-gradient(180deg, rgba(44, 38, 32, 0.86), rgba(18, 14, 13, 0.9)),
-    rgba(18, 14, 13, 0.78);
-  border: 1rpx solid rgba(239, 208, 155, 0.2);
-  box-shadow: 0 14rpx 34rpx rgba(18, 15, 12, 0.22);
-  backdrop-filter: saturate(180%) blur(26rpx);
-  -webkit-backdrop-filter: saturate(180%) blur(26rpx);
+  border-radius: 26rpx;
+  background: rgba(24, 18, 17, 0.92);
+  border: 1rpx solid rgba(220, 185, 133, 0.16);
 }
 
 .tabbar-item {
   flex: 1;
   min-width: 0;
-  min-height: 84rpx;
-  padding: 10rpx 6rpx;
-  border-radius: 24rpx;
+  min-height: 72rpx;
+  padding: 0 8rpx;
+  border-radius: 18rpx;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5rpx;
   color: rgba(255, 246, 235, 0.56);
-  transition: transform 0.18s ease, opacity 0.18s ease, color 0.18s ease;
+  transition: transform 0.18s ease, opacity 0.18s ease, color 0.18s ease, background-color 0.18s ease;
 }
 
 .tabbar-item:active {
@@ -39,22 +31,14 @@
 }
 
 .tabbar-press {
-  background: transparent;
+  background: rgba(247, 236, 221, 0.05);
   transform: scale(0.97);
   opacity: 0.86;
 }
 
-.tabbar-icon {
-  width: 32rpx;
-  height: 32rpx;
-  opacity: 0.48;
-  filter: brightness(0) invert(1);
-  transition: opacity 0.18s ease, filter 0.18s ease;
-}
-
 .tabbar-label {
   color: inherit;
-  font-size: 23rpx;
+  font-size: 22rpx;
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0;
@@ -63,10 +47,5 @@
 
 .is-active {
   color: #dcc08a;
-  transform: translateY(-2rpx);
-}
-
-.is-active .tabbar-icon {
-  opacity: 1;
-  filter: brightness(0) saturate(100%) invert(86%) sepia(22%) saturate(739%) hue-rotate(348deg) brightness(100%) contrast(91%);
+  background: rgba(247, 236, 221, 0.08);
 }

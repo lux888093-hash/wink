@@ -7,7 +7,6 @@
     hover-class="dock-press"
     hover-stay-time="80"
   >
-    <image class="dock-icon" src="/assets/icons/home-light.svg" mode="aspectFit"></image>
     <text class="dock-label">庄园</text>
   </button>
 
@@ -19,7 +18,6 @@
     hover-class="dock-press"
     hover-stay-time="80"
   >
-    <image class="dock-icon" src="/assets/icons/store-light.svg" mode="aspectFit"></image>
     <text class="dock-label">酒廊</text>
   </button>
 
@@ -31,7 +29,6 @@
     hover-class="dock-press"
     hover-stay-time="80"
   >
-    <image class="dock-icon" src="/assets/icons/member-light.svg" mode="aspectFit"></image>
     <text class="dock-label">会员</text>
   </button>
 
@@ -44,7 +41,6 @@
     hover-stay-time="80"
   >
     <view class="dock-badge" wx:if="{{cartCount > 0}}">{{badgeText}}</view>
-    <image class="dock-icon" src="/assets/icons/bag-light.svg" mode="aspectFit"></image>
     <text class="dock-label">购物袋</text>
   </button>
 </view>

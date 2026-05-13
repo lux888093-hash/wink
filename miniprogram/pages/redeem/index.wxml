@@ -4,26 +4,21 @@
     <view class="redeem-mask"></view>
 
     <view class="redeem-copy">
-      <text class="eyebrow">VILLAGE ANCIENT VINE</text>
+      <text class="eyebrow">提取码</text>
       <text class="display-title redeem-title">567 古藤西拉</text>
-      <text class="muted-copy redeem-subtitle">输入酒瓶标签上的六位提取码，开启这瓶酒的专属酒庄体验。</text>
+      <text class="muted-copy redeem-subtitle">输入瓶身标签上的六位提取码，进入专属内容。</text>
     </view>
 
     <view class="redeem-estate-panel">
       <image class="redeem-estate-image" src="/assets/images/village-ancient-vine-sign.jpg" mode="aspectFill"></image>
       <view class="redeem-estate-copy">
-        <text class="redeem-estate-kicker">A Quiet World</text>
         <text class="redeem-estate-title">南澳古藤 · 黑胶颂</text>
-        <view class="redeem-estate-meta">
-          <text>2022</text>
-          <text>Shiraz</text>
-          <text>14.3%vol</text>
-        </view>
+        <text class="redeem-estate-meta">2022 · Shiraz · 14.3%vol</text>
       </view>
     </view>
 
     <view class="redeem-card {{state === 'success' ? 'redeem-card-success' : ''}}">
-      <text class="eyebrow">{{state === 'idle' || state === 'error' ? '提取码验证' : state === 'success' ? 'ACCESS GRANTED' : title}}</text>
+      <text class="eyebrow">{{state === 'idle' || state === 'error' ? '输入提取码' : state === 'success' ? '已解锁' : '正在验证'}}</text>
       <text class="section-title redeem-card-title">{{title}}</text>
       <text class="muted-copy line-clamp-3">{{message}}</text>
 
@@ -67,7 +62,7 @@
         <view class="success-progress">
           <view class="success-progress-fill"></view>
         </view>
-        <text class="success-note">正在打开酒庄私享内容</text>
+        <text class="success-note">正在进入专属页</text>
       </view>
 
       <button wx:if="{{state === 'error'}}" class="ghost-button full-width" bindtap="clearInput">重新输入</button>
