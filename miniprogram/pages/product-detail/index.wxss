@@ -351,6 +351,67 @@
   gap: 16rpx;
 }
 
+.maker-card {
+  display: flex;
+  gap: 20rpx;
+  align-items: center;
+  padding: 12rpx;
+  border-radius: 22rpx;
+  background: rgba(247, 236, 221, 0.055);
+  border: 1rpx solid rgba(220, 185, 133, 0.12);
+}
+
+.maker-card-image {
+  flex: none;
+  width: 184rpx;
+  height: 246rpx;
+  border-radius: 16rpx;
+  background: rgba(247, 236, 221, 0.06);
+}
+
+.maker-card-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.maker-card-kicker {
+  display: block;
+  color: var(--gold);
+  font-size: 20rpx;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.maker-card-name {
+  display: block;
+  margin-top: 10rpx;
+  color: var(--ink);
+  font-family: "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 28rpx;
+  font-weight: 600;
+  line-height: 1.22;
+  letter-spacing: 0;
+}
+
+.maker-card-sub {
+  display: block;
+  margin-top: 6rpx;
+  color: var(--ink-faint);
+  font-size: 20rpx;
+  line-height: 1.38;
+  letter-spacing: 0;
+}
+
+.maker-card-body {
+  display: block;
+  margin-top: 12rpx;
+  color: var(--ink-soft);
+  font-size: 22rpx;
+  line-height: 1.52;
+  letter-spacing: 0;
+}
+
 .highlight-item {
   display: flex;
   align-items: flex-start;

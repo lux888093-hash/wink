@@ -78,6 +78,25 @@
         <text class="content-copy">{{product.story}}</text>
       </view>
 
+      <view wx:if="{{product.wine && product.wine.story}}" class="content-divider"></view>
+
+      <view wx:if="{{product.wine && product.wine.story}}" class="content-block">
+        <text class="content-title">{{product.wine.storyTitle || '酒款叙事'}}</text>
+        <text class="content-copy">{{product.wine.story}}</text>
+      </view>
+
+      <view wx:if="{{product.wine && product.wine.winemakerName}}" class="content-divider"></view>
+
+      <view wx:if="{{product.wine && product.wine.winemakerName}}" class="maker-card">
+        <image class="maker-card-image" src="{{product.wine.winemakerImage || product.wine.estatePortraitImage}}" mode="aspectFill"></image>
+        <view class="maker-card-copy">
+          <text class="maker-card-kicker">首席酿酒师</text>
+          <text class="maker-card-name">{{product.wine.winemakerCnName || product.wine.winemakerName}}</text>
+          <text class="maker-card-sub">{{product.wine.winemakerName}} · {{product.wine.winemakerTitle}}</text>
+          <text class="maker-card-body line-clamp-3">{{product.wine.winemakerIntro}}</text>
+        </view>
+      </view>
+
       <view wx:if="{{product.highlights && product.highlights.length}}" class="content-divider"></view>
 
       <view wx:if="{{product.highlights && product.highlights.length}}" class="content-block">
@@ -110,6 +129,10 @@
           <view class="meta-row">
             <text class="meta-label">酒精度</text>
             <text class="meta-value">{{product.wine.abv}}</text>
+          </view>
+          <view wx:if="{{product.wine.vintage}}" class="meta-row">
+            <text class="meta-label">年份</text>
+            <text class="meta-value">{{product.wine.vintage}}</text>
           </view>
           <view class="meta-row">
             <text class="meta-label">建议饮用</text>

@@ -182,6 +182,61 @@
   letter-spacing: 0;
 }
 
+.detail-maker {
+  display: flex;
+  gap: 24rpx;
+  align-items: center;
+  margin: 0 -24rpx;
+  padding: 42rpx 30rpx 48rpx;
+  background:
+    linear-gradient(135deg, rgba(93, 31, 37, 0.16), rgba(29, 23, 21, 0) 58%),
+    linear-gradient(180deg, rgba(35, 28, 24, 0.98), rgba(18, 14, 13, 1));
+  border-top: 1rpx solid rgba(220, 185, 133, 0.1);
+}
+
+.detail-maker-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.detail-maker-title {
+  display: block;
+  margin-top: 14rpx;
+  color: rgba(255, 255, 255, 0.96);
+  font-family: "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 34rpx;
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: 0;
+}
+
+.detail-maker-sub {
+  display: block;
+  margin-top: 8rpx;
+  color: rgba(255, 246, 235, 0.56);
+  font-size: 21rpx;
+  line-height: 1.42;
+  letter-spacing: 0;
+}
+
+.detail-maker-body {
+  display: block;
+  margin-top: 16rpx;
+  color: rgba(255, 246, 235, 0.72);
+  font-size: 23rpx;
+  line-height: 1.58;
+  letter-spacing: 0;
+}
+
+.detail-maker-image {
+  flex: none;
+  width: 216rpx;
+  height: 288rpx;
+  border-radius: 18rpx;
+  border: 1rpx solid rgba(220, 185, 133, 0.16);
+  background: rgba(247, 236, 221, 0.06);
+}
+
 .detail-poster {
   position: relative;
   min-height: 640rpx;

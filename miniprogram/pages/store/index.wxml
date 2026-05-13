@@ -3,6 +3,7 @@
     <view class="store-head">
       <text class="eyebrow">CURATED CELLAR</text>
       <text class="display-title store-title">酒廊</text>
+      <text class="store-subtitle">精选古藤西拉、礼盒与会员酒款。</text>
     </view>
 
     <view
@@ -16,6 +17,7 @@
       <view class="featured-copy">
         <text class="featured-kicker">{{featuredItem.badge}}</text>
         <text class="featured-title line-clamp-1">{{featuredItem.name}}</text>
+        <text wx:if="{{featuredItem.subtitle}}" class="featured-subtitle line-clamp-2">{{featuredItem.subtitle}}</text>
         <view class="featured-footer">
           <text class="featured-price">¥{{featuredItem.lowestPrice}}</text>
           <text class="featured-link">查看</text>

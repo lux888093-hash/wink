@@ -1,0 +1,709 @@
+﻿<!DOCTYPE html>
+<html lang="cn">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>小程序备案操作指引 | 微信开放文档</title>
+    <meta name="description" content="微信开发者平台文档">
+    <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="keywords" content="微信官方文档">
+  <link rel="shortcut icon" type="image/x-icon" href="https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico">
+  <link rel="mask-icon" color="#4C4C4C" href="https://res.wx.qq.com/a/wx_fed/assets/res/MjliNWVm.svg">
+  <link rel="apple-touch-icon-precomposed" href="https://res.wx.qq.com/a/wx_fed/assets/res/OTE0YTAw.png">
+  <script>
+(function () {
+  'use strict';
+
+  const SCRIPT_URLs = [
+      'https://dldir1.qq.com/WechatWebDev/devPlatform/px.min.js',
+      'https://dev.weixin.qq.com/platform-console/proxy/assets/tel/px.min.js',
+  ];
+  const param = {
+      maskMode: 'no-mask', // 隐私策略, all-mask 或 no-mask, 详见：https://dev.weixin.qq.com/docs/analysis/sdk/docs.html
+      recordCanvas: false,  // 若要采集canvas, 设为true
+      projectId: 'wxef34f91ddab0c534-0HLdQNKAk-dzsFsA', // 项目 ID，需替换为体验分析项目 ID
+      iframe: false, // 是否采集 iframe 页面
+      console: true, // 是否采集 console 输出的错误日志
+      network: true, // 是否采集网络错误
+  };
+  function loadScript(url) {
+      return new Promise((resolve, reject) => {
+          const scriptEle = document.createElement('script');
+          scriptEle.type = 'text/javascript';
+          scriptEle.async = true;
+          scriptEle.src = url;
+          scriptEle.onload = () => {
+              resolve(url);
+          };
+          scriptEle.onerror = () => {
+              reject(new Error('Script load error'));
+          };
+          document.head.appendChild(scriptEle);
+      });
+  }
+  async function main() {
+      try {
+          sessionStorage.setItem('wxobs_start_timestamp', String(Date.now()));
+          const fastestUrl = await Promise.race(SCRIPT_URLs.map(url => loadScript(url)));
+          window.__startPX && window.__startPX(param);
+      }
+      catch (error) {
+          console.error('Error loading scripts:', error);
+      }
+  }
+  main();
+
+})();
+        </script>
+    
+    <link rel="preload" href="https://res.wx.qq.com/wxdoc/dist/assets/css/0.styles.83ce5fe9.css" as="style"><link rel="preload" href="https://res.wx.qq.com/wxdoc/dist/assets/js/app.4baeb4e6.js" as="script"><link rel="preload" href="https://res.wx.qq.com/wxdoc/dist/assets/js/425.63758e18.js" as="script">
+    <link rel="stylesheet" href="https://res.wx.qq.com/wxdoc/dist/assets/css/0.styles.83ce5fe9.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><div class="theme-container"><header class="navbar navbar_with-link"><div class="navbar__left"><a href="/doc/" class="home-link"><div class="logo__wrp"><span class="logo__icon"></span></div></a> <span class="dot"></span> <div class="dropdown-wrapper"><a class="dropdown-title"><span class="title">小程序</span> <span class="arrow right"></span></a> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item selected"><!----> <a href="/miniprogram/dev/framework/" class="nav-link external">
+  小程序
+</a></li><li class="dropdown-item"><!----> <a href="/minigame/introduction/" class="nav-link external">
+  小游戏
+</a></li><li class="dropdown-item"><!----> <a href="/doc/subscription/guide/" class="nav-link external">
+  公众号
+</a></li><li class="dropdown-item"><!----> <a href="/doc/service/guide/" class="nav-link external">
+  服务号
+</a></li><li class="dropdown-item"><!----> <a href="/doc/oplatform/open/intro.html" class="nav-link external">
+  开放平台
+</a></li><li class="dropdown-item"><!----> <a href="https://work.weixin.qq.com/api/doc" class="nav-link external">
+  企业微信
+</a></li><li class="dropdown-item"><!----> <a href="https://pay.weixin.qq.com/doc/v3/merchant/4012062524" class="nav-link external">
+  微信支付
+</a></li><li class="dropdown-item"><!----> <a href="/doc/channels/" class="nav-link external">
+  视频号
+</a></li><li class="dropdown-item"><!----> <a href="/doc/store/shop/" class="nav-link external">
+  微信小店
+</a></li><li class="dropdown-item"><!----> <a href="/doc/aispeech/platform/INTRODUCTION.html" class="nav-link external">
+  智能对话
+</a></li><li class="dropdown-item"><!----> <a href="/doc/xwei/xiaowei-introduction/Introduction.html" class="nav-link external">
+  腾讯小微
+</a></li><li class="dropdown-item"><!----> <a href="/doc/edu/introduction.html" class="nav-link external">
+  教育平台
+</a></li></ul></div></div> <div class="navbar__center"><nav class="nav-links"><div class="nav-item"><a href="/miniprogram/dev/framework/" class="nav-link external">
+  开发
+</a></div><div class="nav-item"><a href="/miniprogram/introduction/" class="nav-link external">
+  介绍
+</a></div><div class="nav-item"><a href="/miniprogram/design/" class="nav-link external">
+  设计
+</a></div><div class="nav-item selected"><a href="/miniprogram/product/" class="nav-link external">
+  运营
+</a></div><div class="nav-item"><a href="/miniprogram/analysis/wedata/intro/" class="nav-link external">
+  数据
+</a></div><div class="nav-item"><a href="/miniprogram/security/basic/" class="nav-link external">
+  安全
+</a></div></nav></div> <div class="navbar__right"><nav class="nav-links"><div class="nav-item community-item"><a href="https://developers.weixin.qq.com/community/develop/mixflow" target="_blank" class="nav-link external">
+  社区
+</a></div><div class="nav-item community-item"><a href="https://developers.weixin.qq.com/community/business" target="_blank" class="nav-link external">
+  学堂
+</a></div></nav> <ul class="lang-tab"><li class="lang-tab__icon"><img src="https://res.wx.qq.com/t/components/icons/base/translate_regular.svg"></li></ul> <div class="search__wrp-flex"><div class="search__input"><div class="weui-desktop-search"><button class="weui-desktop-icon-btn weui-desktop-search__btn weui-desktop-icon-btn__width"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.4529 16.4014C14.2428 17.4001 12.6915 18 11 18C7.134 18 4 14.866 4 11C4 7.134 7.134 4 11 4C14.866 4 18 7.134 18 11C18 12.7425 17.3633 14.3363 16.3099 15.5614L20.4243 19.6757L19.5757 20.5243L15.4529 16.4014ZM16.8 11C16.8 14.2033 14.2033 16.8 11 16.8C7.79674 16.8 5.2 14.2033 5.2 11C5.2 7.79676 7.79674 5.20001 11 5.20001C14.2033 5.20001 16.8 7.79676 16.8 11Z" fill="black"></path></svg></button></div> <a href="javascript:;" class="search-back__btn">取消</a></div> <div class="reco-list__wrp" style="display:none;"><ul class="reco__list"></ul> <div class="show-more"><a href="/doc/search?source=more&amp;query=&amp;doc_type=miniprogram&amp;jumpbackUrl=%2Fdoc%2F" class="reco-item__link">查看更多 </a></div></div> <div class="reco-list__wrp" style="display:none;"><div class="show-more"><a href="/doc/search?source=more&amp;query=&amp;doc_type=miniprogram&amp;jumpbackUrl=%2Fdoc%2F" class="reco-item__link">在小程序下暂无结果，查看其它业务相关内容 &gt; </a></div></div></div></div></header> <div class="subnavbar"><ul class="subnavbar__list"><li class="subnavbar__item selected" style="display:;"><div class="dropdown-subnavbar-title"><a href="/miniprogram/product/" target="_self" class="router-link-active">
+          运营规范
+          </a> <!----></div> <!----></li><li class="subnavbar__item" style="display:;"><div class="dropdown-subnavbar-title"><a href="/miniprogram/product/reject" target="_self">
+          常见拒绝情形
+          </a> <!----></div> <!----></li><li class="subnavbar__item" style="display:;"><div class="dropdown-subnavbar-title"><a href="/miniprogram/product/service" target="_self">
+          服务条款
+          </a> <!----></div> <!----></li><li class="subnavbar__item" style="display:;"><div class="dropdown-subnavbar-title"><a href="/miniprogram/product/renzheng" target="_self">
+          微信认证指引
+          </a> <!----></div> <!----></li><li class="subnavbar__item" style="display:;"><div class="dropdown-subnavbar-title"><a href="/miniprogram/product/material/" target="_self">
+          开放的服务类目
+          </a> <!----></div> <!----></li><li class="subnavbar__item" style="display:;"><div class="dropdown-subnavbar-title"><a href="/miniprogram/product/record/guidelines" target="_self">
+          微信小程序备案
+          </a> <!----></div> <!----></li></ul></div> <div class="mobile-links__wrp"><div class="mobile-links_mobile"><a href="javascript:;" class="mobile-links__btn">运营</a></div> <div class="mobile-links__panel"><div class="links-panel__bd"><nav class="nav-links"><div class="nav-item"><a href="/miniprogram/dev/framework/" class="nav-link external">
+  开发
+</a></div><div class="nav-item"><a href="/miniprogram/introduction/" class="nav-link external">
+  介绍
+</a></div><div class="nav-item"><a href="/miniprogram/design/" class="nav-link external">
+  设计
+</a></div><div class="nav-item selected"><a href="/miniprogram/product/" class="nav-link external">
+  运营
+</a></div><div class="nav-item"><a href="/miniprogram/analysis/wedata/intro/" class="nav-link external">
+  数据
+</a></div><div class="nav-item"><a href="/miniprogram/security/basic/" class="nav-link external">
+  安全
+</a></div></nav></div> <div class="links-panel__ft"><ul class="lang-tab"><li class="lang-tab__icon"><img src="https://res.wx.qq.com/t/components/icons/base/translate_regular.svg"></li></ul></div></div> <div><div class="weui-mask" style="display:none;"></div> <div class="weui-actionsheet "><!----> <div class="weui-actionsheet__menu"><div class="weui-actionsheet__cell">中文</div><div class="weui-actionsheet__cell">EN</div></div> <div class="weui-actionsheet__action"><div class="weui-actionsheet__cell">取消</div></div></div></div></div> <a href="javascript:;" class="mobile-search-btn"></a> <div class="main-container" style="margin-top:144px;"><div class="main-contontaier__bd" style="min-height:0px;"><div class="sidebar__wrp"><div class="sidebar-cell_mobile"><li class="subnavbar__item selected"><a href="javascript:;" target="_self">运营规范</a></li></div> <aside class="sidebar" style="top:144px;"> <div class="TreeNavigation"><div class="NavigationLevel NavigationLevel--level-0"><ul><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#一、原则及相关说明" class="NavigationItem__router-link">
+      一、原则及相关说明
+    <!----></a> <!----> <!----></span></li><li><div class="NavigationLevel NavigationLevel--closed NavigationLevel--level-1"><div class="NavigationLevel__parent"><span class="NavigationToggle NavigationToggle--closed"><span class="NavigationToggle__icon NavigationToggle__icon--closed"></span></span> <span class="NavigationItem"><!----> <a href="/miniprogram/product/#二、具体运营规范" class="NavigationItem__router-link">
+      二、具体运营规范
+    <!----></a> <!----> <!----></span></div> <ul class="NavigationLevel__children"><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_1-注册提交规范" class="NavigationItem__router-link">
+      1. 注册提交规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_2-基本信息规范" class="NavigationItem__router-link">
+      2. 基本信息规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_3-功能设置规范" class="NavigationItem__router-link">
+      3. 功能设置规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_4-主体规范" class="NavigationItem__router-link">
+      4. 主体规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-行为规范" class="NavigationItem__router-link">
+      5. 行为规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-1-滥用分享行为" class="NavigationItem__router-link">
+      5.1 滥用分享行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-2-刷量行为" class="NavigationItem__router-link">
+      5.2 刷量行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-3-网赚行为" class="NavigationItem__router-link">
+      5.3 网赚行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-4-外挂行为" class="NavigationItem__router-link">
+      5.4 外挂行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-5-侵犯名誉-商誉-隐私-肖像行为" class="NavigationItem__router-link">
+      5.5 侵犯名誉/商誉/隐私/肖像行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-6-侵犯知识产权行为" class="NavigationItem__router-link">
+      5.6 侵犯知识产权行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-7-类目不符行为" class="NavigationItem__router-link">
+      5.7 类目不符行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-8-游戏测试行为" class="NavigationItem__router-link">
+      5.8 游戏测试行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-9-多级分销经营行为" class="NavigationItem__router-link">
+      5.9 多级分销经营行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-10-互推行为" class="NavigationItem__router-link">
+      5.10 互推行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-11-欺诈行为" class="NavigationItem__router-link">
+      5.11 欺诈行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-12-收集用户隐私行为" class="NavigationItem__router-link">
+      5.12 收集用户隐私行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-13-虚拟支付行为" class="NavigationItem__router-link">
+      5.13 虚拟支付行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-14-混淆行为" class="NavigationItem__router-link">
+      5.14 混淆行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-15-滥用接口能力行为" class="NavigationItem__router-link">
+      5.15 滥用接口能力行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-16-过度营销行为" class="NavigationItem__router-link">
+      5.16 过度营销行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-17-红包类账号" class="NavigationItem__router-link">
+      5.17 红包类账号
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-18-内容安全" class="NavigationItem__router-link">
+      5.18 内容安全
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-19-绕开、规避或对抗平台审核监管的行为" class="NavigationItem__router-link">
+      5.19 绕开、规避或对抗平台审核监管的行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-20-诱导下载行为" class="NavigationItem__router-link">
+      5.20 诱导下载行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-21-滥用订阅消息" class="NavigationItem__router-link">
+      5.21 滥用订阅消息
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-22-交易争议" class="NavigationItem__router-link">
+      5.22 交易争议    
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-23-违反平台运营规范的其他内容" class="NavigationItem__router-link">
+      5.23 违反平台运营规范的其他内容
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-24-有偿投票行为" class="NavigationItem__router-link">
+      5.24 有偿投票行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-25-提供未经安全验证的开发者程序下载服务行为" class="NavigationItem__router-link">
+      5.25 提供未经安全验证的开发者程序下载服务行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-26-保证金" class="NavigationItem__router-link">
+      5.26 保证金
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-27-明星应援行为" class="NavigationItem__router-link">
+      5.27 明星应援行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-28-分享场景频率限制" class="NavigationItem__router-link">
+      5.28 分享场景频率限制
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-29-无实质服务内容影响用户体验" class="NavigationItem__router-link">
+      5.29 无实质服务内容影响用户体验
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-30-支付完成跳转页" class="NavigationItem__router-link">
+      5.30 支付完成跳转页
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-31-特定类目管控" class="NavigationItem__router-link">
+      5.31 特定类目管控
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-32-特定行业管控" class="NavigationItem__router-link">
+      5.32 特定行业管控
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-33-微短剧/小说小程序绕开虚拟支付行为" class="NavigationItem__router-link">
+      5.33 微短剧/小说小程序绕开虚拟支付行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-34-小程序内广告页面中断用户正常使用体验行为" class="NavigationItem__router-link">
+      5.34 小程序内广告页面中断用户正常使用体验行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-35-未及时变更或注销小程序备案" class="NavigationItem__router-link">
+      5.35 未及时变更或注销小程序备案
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-36-小程序页面操作不符合用户预期行为" class="NavigationItem__router-link">
+      5.36 小程序页面操作不符合用户预期行为
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_6-信息内容规范" class="NavigationItem__router-link">
+      6. 信息内容规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_6-1-违反国家法律法规禁止的内容" class="NavigationItem__router-link">
+      6.1 违反国家法律法规禁止的内容
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_6-2-色情低俗内容" class="NavigationItem__router-link">
+      6.2 色情低俗内容
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_6-3-垃圾广告" class="NavigationItem__router-link">
+      6.3 垃圾广告
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_6-4-煽动夸大误导" class="NavigationItem__router-link">
+      6.4 煽动夸大误导
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_6-5-其他违反平台规则的信息" class="NavigationItem__router-link">
+      6.5 其他违反平台规则的信息
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_7-附近的小程序规范" class="NavigationItem__router-link">
+      7. 附近的小程序规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_8-微信小程序内嵌网页规范" class="NavigationItem__router-link">
+      8. 微信小程序内嵌网页规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_9-商标与商业外观" class="NavigationItem__router-link">
+      9. 商标与商业外观
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_10-用户产生内容规范" class="NavigationItem__router-link">
+      10. 用户产生内容规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_11-可用性和完整性规范" class="NavigationItem__router-link">
+      11. 可用性和完整性规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_12-技术实现规范" class="NavigationItem__router-link">
+      12. 技术实现规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_13-小程序UI规范" class="NavigationItem__router-link">
+      13. 小程序UI规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_14-小程序支付规范" class="NavigationItem__router-link">
+      14. 小程序支付规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_15-用户隐私和数据规范" class="NavigationItem__router-link">
+      15. 用户隐私和数据规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_16-微信小程序插件规范" class="NavigationItem__router-link">
+      16. 微信小程序插件规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_17-微信云开发服务规范" class="NavigationItem__router-link">
+      17. 微信云开发服务规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_18-微信小程序直播规范" class="NavigationItem__router-link">
+      18. 微信小程序直播规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_19-微信云托管服务规范" class="NavigationItem__router-link">
+      19. 微信云托管服务规范
+    <!----></a> <!----> <!----></span></li></ul></div></li><li><div class="NavigationLevel NavigationLevel--closed NavigationLevel--level-1"><div class="NavigationLevel__parent"><span class="NavigationToggle NavigationToggle--closed"><span class="NavigationToggle__icon NavigationToggle__icon--closed"></span></span> <span class="NavigationItem"><!----> <a href="/miniprogram/product/#三、小游戏特别规范" class="NavigationItem__router-link">
+      三、小游戏特别规范
+    <!----></a> <!----> <!----></span></div> <ul class="NavigationLevel__children"><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_1-游戏类目选择规范" class="NavigationItem__router-link">
+      1. 游戏类目选择规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_2-游戏内容规范" class="NavigationItem__router-link">
+      2. 游戏内容规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_3-小游戏虚拟道具支付规范" class="NavigationItem__router-link">
+      3. 小游戏虚拟道具支付规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_4-小游戏用户服务规范" class="NavigationItem__router-link">
+      4. 小游戏用户服务规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_5-小游戏主体信用分规范" class="NavigationItem__router-link">
+      5. 小游戏主体信用分规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_6-未成年人保护" class="NavigationItem__router-link">
+      6. 未成年人保护
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#_7-小游戏用户运营规范" class="NavigationItem__router-link">
+      7. 小游戏用户运营规范
+    <!----></a> <!----> <!----></span></li></ul></div></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#四、投诉与处罚规范" class="NavigationItem__router-link">
+      四、投诉与处罚规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#五、遵守当地法律监管" class="NavigationItem__router-link">
+      五、遵守当地法律监管
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#六、小程序平台运营规范免责声明" class="NavigationItem__router-link">
+      六、小程序平台运营规范免责声明
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/#七、动态文档" class="NavigationItem__router-link">
+      七、动态文档
+    <!----></a> <!----> <!----></span></li><li><div class="NavigationLevel NavigationLevel--closed NavigationLevel--level-1"><div class="NavigationLevel__parent"><span class="NavigationToggle NavigationToggle--closed"><span class="NavigationToggle__icon NavigationToggle__icon--closed"></span></span> <span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/" class="NavigationItem__router-link">
+      八、小商店特别规范
+    <!----></a> <!----> <!----></span></div> <ul class="NavigationLevel__children"><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/shoptypedifferences.html" class="NavigationItem__router-link">
+      小商店个人/企业/个体/事业单位/其他组织类型介绍
+    <!----></a> <!----> <!----></span></li><li><div class="NavigationLevel NavigationLevel--closed NavigationLevel--level-2"><div class="NavigationLevel__parent"><span class="NavigationToggle NavigationToggle--closed"><span class="NavigationToggle__icon NavigationToggle__icon--closed"></span></span> <span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/#一、微信小商店开放类目与资质要求" class="NavigationItem__router-link">
+      1. 微信小商店开放类目与资质要求
+    <!----></a> <!----> <!----></span></div> <ul class="NavigationLevel__children"><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/leimuzizhi/qiye.html" class="NavigationItem__router-link">
+      非个人主体小商店 开放类目
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/leimuzizhi/qiyeleimu.html" class="NavigationItem__router-link">
+      非个人主体小商店 开放类目行业资质要求
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/leimuzizhi/qiyeshangpin.html" class="NavigationItem__router-link">
+      非个人主体小商店 开放类目商品资质要求
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/leimuzizhi/geren.html" class="NavigationItem__router-link">
+      个人店 开放类目
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/leimuzizhi/gerenshangpinxin.html" class="NavigationItem__router-link">
+      个人开放类目商品资质要求
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/leimuzizhi/jinshoushangpin.html" class="NavigationItem__router-link">
+      禁售商品列表
+    <!----></a> <!----> <!----></span></li></ul></div></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/#二、微信小商店经营信息填写规则" class="NavigationItem__router-link">
+      2. 微信小商店经营信息填写规则
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/#三、微信小商店品牌开通规则" class="NavigationItem__router-link">
+      3. 微信小商店品牌开通规则
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/#四、微信小商店店铺名称命名规则" class="NavigationItem__router-link">
+      4. 微信小商店店铺名称命名规则
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/#五、微信小商店店铺商品标题规则" class="NavigationItem__router-link">
+      5. 微信小商店店铺商品标题规则
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/#六、微信小商店商品详情规则" class="NavigationItem__router-link">
+      6. 微信小商店商品详情规则
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/#七、微信小程序交易组件类目准入要求" class="NavigationItem__router-link">
+      7. 微信小程序交易组件类目准入要求
+    <!----></a> <!----> <!----></span></li><li><div class="NavigationLevel NavigationLevel--closed NavigationLevel--level-2"><div class="NavigationLevel__parent"><span class="NavigationToggle NavigationToggle--closed"><span class="NavigationToggle__icon NavigationToggle__icon--closed"></span></span> <span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/leimuzizhi/qiye.html" class="NavigationItem__router-link">
+      资质证照示例说明
+    <!----></a> <!----> <!----></span></div> <ul class="NavigationLevel__children"><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/yingyezhizhao/yingyezhizhao.html" class="NavigationItem__router-link">
+      提交营业执照/事业单位法人证书/其他登记证书
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/jiesuanzhanghu/jiesuanzhanghu.html" class="NavigationItem__router-link">
+      账户结算信息
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/pinpai/ziyou.html" class="NavigationItem__router-link">
+      品牌开通规则
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/pinpai/ziyou.html" class="NavigationItem__router-link">
+      自有品牌
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/pinpai/daili.html" class="NavigationItem__router-link">
+      代理品牌
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/pinpai/wupinpai.html" class="NavigationItem__router-link">
+      无品牌
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/shangdianming/butongleixingzizhi.html" class="NavigationItem__router-link">
+      不同类型店铺资质要求
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/yingyezhizhao/sanzhengheyi.html" class="NavigationItem__router-link">
+      三证合一类营业执照
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/yingyezhizhao/putong.html" class="NavigationItem__router-link">
+      普通营业执照
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/yingyezhizhao/sanzhengheyishiyedanwei.html" class="NavigationItem__router-link">
+      三证合一事业单位法人证书
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/yingyezhizhao/putongshiyedanwei.html" class="NavigationItem__router-link">
+      普通事业单位法人证书
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/yingyezhizhao/qitadengjizhengshu.html" class="NavigationItem__router-link">
+      其他组织登记证书
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/pinpai/zhengzhao/shangbiaozhuce.html" class="NavigationItem__router-link">
+      《商标注册证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/pinpai/zhengzhao/shenqingshouli.html" class="NavigationItem__router-link">
+      《商标注册申请受理通知书》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/pinpai/zhengzhao/shangbiaobiangeng.html" class="NavigationItem__router-link">
+      《商标变更证明》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/pinpai/zhengzhao/xvzhanzhengming.html" class="NavigationItem__router-link">
+      《商标续展证明》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/pinpai/zhengzhao/shangbiaozhuanrang.html" class="NavigationItem__router-link">
+      《商标转让证明》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/pinpai/zhengzhao/qiyebiangeng.html" class="NavigationItem__router-link">
+      《企业信息变更备案》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/3c/3c.html" class="NavigationItem__router-link">
+      商品3C标识
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/churujing/churujing.html" class="NavigationItem__router-link">
+      《进出口食品安全管理办法》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/dianxinshebei/dianxinshebei.html" class="NavigationItem__router-link">
+      《电信设备进网许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/dongwufangyi/dongwufangyi.html" class="NavigationItem__router-link">
+      《动物防疫条件合格证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/dongwujianyan/dongwujianyan.html" class="NavigationItem__router-link">
+      《动物检验合格证书》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/faka/yufuka.html" class="NavigationItem__router-link">
+      《单用途商业预付卡管理办法(试行)》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/feiliaochanpin/feiliaochanpin.html" class="NavigationItem__router-link">
+      《肥料登记管理办法》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/guochanfeite/guochanfeite.html" class="NavigationItem__router-link">
+      《国产非特殊用途化妆品信息备案》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/guochanteshu/guochanteshu.html" class="NavigationItem__router-link">
+      《国产特殊用途化妆品卫生许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/guojiaqiangzhi/guojiaqiangzhi.html" class="NavigationItem__router-link">
+      《国家强制性产品认证证书》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/3cziwosm/3cziwosm.html" class="NavigationItem__router-link">
+      《强制性认证产品符合自我声明》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/huazhuangpin/huazhuangpin.html" class="NavigationItem__router-link">
+      《化妆品生产许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/jinkoufei/jinkoufei.html" class="NavigationItem__router-link">
+      《非特殊用途化妆品的备案》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/jinkoushangde/jinkoushang.html" class="NavigationItem__router-link">
+      《进口商的进出口贸易资格证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/jinkoushouyao/jinkoushouyao.html" class="NavigationItem__router-link">
+      进口兽药注册资格
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/jinkousiliao/jinkousiliao.html" class="NavigationItem__router-link">
+      《进口饲料登记证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/lvseshipin/lvseshipin.html" class="NavigationItem__router-link">
+      《绿色食品标志使用证书管理办法》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/lvshizhiye/lvshizhiye.html" class="NavigationItem__router-link">
+      《律师执业资格证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/nongchanpindili/nongchanpindili.html" class="NavigationItem__router-link">
+      《农产品地理标志登记证书》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/nongyaodengji/nongyaodengji.html" class="NavigationItem__router-link">
+      《农药登记证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/nongyaojingying/nongyaojingying.html" class="NavigationItem__router-link">
+      《农药经营许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/nongyaoshengchan/nongyaoshengchan.html" class="NavigationItem__router-link">
+      《农药生产许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/nongzuowu/nongzuowu.html" class="NavigationItem__router-link">
+      《农作物种子生产许可证》/《林木种子生产许可证》/《种子经营许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/qingzhenshipin/qingzhenshipin.html" class="NavigationItem__router-link">
+      清真食品生产经营资质
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/quanguogongye/quanguogongye.html" class="NavigationItem__router-link">
+      《全国工业产品生产许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/shengzhu/shengzhu.html" class="NavigationItem__router-link">
+      生猪屠宰管理条例(修订草案征求意见稿)
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/shipinjingying&amp;shipinshengchan/shipinjingying.html" class="NavigationItem__router-link">
+      《食品经营许可管理办法》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/shipinjingying&amp;shipinshengchan/shipinshengchan.html" class="NavigationItem__router-link">
+      《食品生产许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/shouyaochanpin/shouyaochanpin.html" class="NavigationItem__router-link">
+      《兽药产品批准文号管理办法》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/shouyaoshengchan/shouyaoshengchan.html" class="NavigationItem__router-link">
+      《兽药生产许可证》或《兽药经营许可证》、兽药GMP证书
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/siliaoshengchan/siliaoshengchan.html" class="NavigationItem__router-link">
+      《饲料生产许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/tianjiaji/tianjiaji.html" class="NavigationItem__router-link">
+      《饲料添加剂生产许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/wugonghai/wugonghai.html" class="NavigationItem__router-link">
+      《无公害农产品认证证书》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/wuxian/wuxian.html" class="NavigationItem__router-link">
+      《无线电发射设备核准认证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/xiaodu/xiaodu.html" class="NavigationItem__router-link">
+      《消毒产品生产企业卫生许可证》 
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/yangchenghu/yangchenghu.html" class="NavigationItem__router-link">
+      《阳澄湖大闸蟹原产地域保护产品专营证书》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/yinyongshui/yinyongshui.html" class="NavigationItem__router-link">
+      《涉及饮用水卫生安全产品卫生许可批件》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/youjirenzheng/youjirenzheng.html" class="NavigationItem__router-link">
+      《有机产品认证证书》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/wangluoshouq/wangluoshouq.html" class="NavigationItem__router-link">
+      《网络销售与实名制授权书》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/churujing/churujing.html" class="NavigationItem__router-link">
+      出入境检验检疫证明或卫生证书
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/dongwuzl/dongwuzl.html" class="NavigationItem__router-link">
+      《动物诊疗许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/cishandj/cishandj.html" class="NavigationItem__router-link">
+      《慈善组织登记证书》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/cishanmj/cishanmj.html" class="NavigationItem__router-link">
+      《慈善组织公开募捐资质证书》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/shineizs/shineizs.html" class="NavigationItem__router-link">
+      室内装饰企业资质等级证书
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/gongcshej/gongcshej.html" class="NavigationItem__router-link">
+      工程设计与施工资质相应等级证书
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/jianzhuy/jianzhuy.html" class="NavigationItem__router-link">
+      建筑业企业资质证书
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/minbanxx/minbanxx.html" class="NavigationItem__router-link">
+      《民办学校办学许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/icpbeian/icpbeian.html" class="NavigationItem__router-link">
+      ICP备案或ICP许可证
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/feiyirz/feiyirz.html" class="NavigationItem__router-link">
+      非遗认证
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/lvxingsz/lvxingsz.html" class="NavigationItem__router-link">
+      《旅行社业务经营许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/yubaoz/yubaoz.html" class="NavigationItem__router-link">
+      《预包装食品销售备案凭证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/yingyex/yingyex.html" class="NavigationItem__router-link">
+      《营业性演出许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/dianyfx/dianyfx.html" class="NavigationItem__router-link">
+      《电影发行经营许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/dianyfy/dianyfy.html" class="NavigationItem__router-link">
+      《电影放映许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/weisz/weisz.html" class="NavigationItem__router-link">
+      《卫生许可证 》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/tezhongz/tezhongz.html" class="NavigationItem__router-link">
+      《特种行业许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/lvxingsd/lvxingsd.html" class="NavigationItem__router-link">
+      《旅行社责任险保险单》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/fensheb/fensheb.html" class="NavigationItem__router-link">
+      《分社备案登记证明》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/lvyoujq/lvyoujq.html" class="NavigationItem__router-link">
+      《旅游景区质量等级证书》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/lvyoupd/lvyoupd.html" class="NavigationItem__router-link">
+      旅游局景区等级评定
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/jidongcwx/jidongcwx.html" class="NavigationItem__router-link">
+      《机动车维修经营备案证明》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/gongxingb/gongxingb.html" class="NavigationItem__router-link">
+      《工信部道路机动车辆生产企业准入许可》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/gongghangk/gongghangk.html" class="NavigationItem__router-link">
+      《公共航空运输企业经营许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/fangdic/fangdic.html" class="NavigationItem__router-link">
+      房地产开发资质
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/baoxianfar/baoxianfar.html" class="NavigationItem__router-link">
+      《保险公司法人许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/baoxianyw/baoxianyw.html" class="NavigationItem__router-link">
+      《经营保险业务许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/baoxiandl/baoxiandl.html" class="NavigationItem__router-link">
+      《经营保险代理业务许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/baoxianjj/baoxianjj.html" class="NavigationItem__router-link">
+      《经营保险经纪业务许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/baoxianggz/baoxianggz.html" class="NavigationItem__router-link">
+      《经营保险公估业务许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/baoxianggb/baoxianggb.html" class="NavigationItem__router-link">
+      《经营保险公估业务备案》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/baoxianjy/baoxianjy.html" class="NavigationItem__router-link">
+      《保险兼业代理业务许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/chubanw/chubanw.html" class="NavigationItem__router-link">
+      《出版物经营许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/baozhicb/baozhicb.html" class="NavigationItem__router-link">
+      《报纸出版许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/zhijian/zhijian.html" class="NavigationItem__router-link">
+      质检报告
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/wangluoyy/wangluoyy.html" class="NavigationItem__router-link">
+      《网络预约出租汽车经营许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/daoluyuns/daoluyuns.html" class="NavigationItem__router-link">
+      《道路运输经营许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/baoguand/baoguand.html" class="NavigationItem__router-link">
+      进口报关单据
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/qikancb/qikancb.html" class="NavigationItem__router-link">
+      《期刊出版许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/dianxinyw/dianxinyw.html" class="NavigationItem__router-link">
+      《电信业务经营许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/shipinjy/shipinjy.html" class="NavigationItem__router-link">
+      《食品小经营店登记证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/shipinba/shipinba.html" class="NavigationItem__router-link">
+      《食品小经营店（食品销售）备案证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/beijshiza/beijshiza.html" class="NavigationItem__router-link">
+      《北京市小食杂店备案卡/证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/shipyaop/shipyaop.html" class="NavigationItem__router-link">
+      《食品药品经营许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/shipshengc/shipshengc.html" class="NavigationItem__router-link">
+      《食品生产经营登记证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/xiaocany/xiaocany.html" class="NavigationItem__router-link">
+      小餐饮信息公示卡
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/shipint/shipint.html" class="NavigationItem__router-link">
+      食品摊点信息公示卡
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/xiaocanyz/xiaocanyz.html" class="NavigationItem__router-link">
+      《小餐饮登记证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/shipinsc/shipinsc.html" class="NavigationItem__router-link">
+      《食品生产加工小作坊登记》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/shipinlt/shipinlt.html" class="NavigationItem__router-link">
+      《食品流通许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/shipinzf/shipinzf.html" class="NavigationItem__router-link">
+      《食品小作坊登记证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/shangpinfys/shangpinfys.html" class="NavigationItem__router-link">
+      《商品房预售许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/shangpinfxs/shangpinfxs.html" class="NavigationItem__router-link">
+      《商品房销售许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/yangzhizm/yangzhizm.html" class="NavigationItem__router-link">
+      养殖证明
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/soudiangs/soudiangs.html" class="NavigationItem__router-link">
+      《售电公司信用承诺书》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/gongchengjl/gongchengjl.html" class="NavigationItem__router-link">
+      《工程监理资质证书》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/lvshishiwus/lvshishiwus.html" class="NavigationItem__router-link">
+      《律师事务所执业许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/baoxianxukez/baoxianxukez.html" class="NavigationItem__router-link">
+      《保险许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/baoxianzhongj/baoxianzhongj.html" class="NavigationItem__router-link">
+      《保险中介许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/mucaijiand/mucaijiand.html" class="NavigationItem__router-link">
+      《木材鉴定证书》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/chanpinjingy/chanpinjingy.html" class="NavigationItem__router-link">
+      《产品经营说明书》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/gaoweixianx/gaoweixianx.html" class="NavigationItem__router-link">
+      《高危险性体育项目许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/ggweishengxuke/ggweishengxuke.html" class="NavigationItem__router-link">
+      《公共场所卫生许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/yulejingyingxuke/yulejingyingxuke.html" class="NavigationItem__router-link">
+      《娱乐经营许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/minbanfeiqiyedanweidengji/minbanfeiqiyedanweidengji.html" class="NavigationItem__router-link">
+      《民办非企业单位法人证书》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/lvxingshefenshebeian/lvxingshefenshebeian.html" class="NavigationItem__router-link">
+      《旅行社分社备案登记证明》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/cheliangyingyun/cheliangyingyun.html" class="NavigationItem__router-link">
+      《车辆营运证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/zengzhidianxinyewuxuke/zengzhidianxinyewuxuke.html" class="NavigationItem__router-link">
+      《增值电信业务许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/yinshuajingyingxuke/yinshuajingyingxuke.html" class="NavigationItem__router-link">
+      《印刷经营许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/jidongchejiashipeixunxuke/jidongchejiashipeixunxuke.html" class="NavigationItem__router-link">
+      《机动车驾驶培训许可证》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/shipinanquanqiyebiaozhunbeian/shipinanquanqiyebiaozhunbeian.html" class="NavigationItem__router-link">
+      《食品安全企业标准备案登记表》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/teshuyixueyongtupeifang/teshuyixueyongtupeifang.html" class="NavigationItem__router-link">
+      《特殊医学用途配方食品批准证书》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/yingerpeifangrufen/yingerpeifangrufen.html" class="NavigationItem__router-link">
+      《婴儿配方乳粉注册证书》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/yanguang/yanguang.html" class="NavigationItem__router-link">
+      《验光人员职业资格证书》
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/mini-store/zizhizhengzhao/zizhi/yanguangyijian/yanguangyijian.html" class="NavigationItem__router-link">
+      《验光仪的年度检定证书》
+    <!----></a> <!----> <!----></span></li></ul></div></li></ul></div></li><li><div class="NavigationLevel NavigationLevel--closed NavigationLevel--level-1"><div class="NavigationLevel__parent"><span class="NavigationToggle NavigationToggle--closed"><span class="NavigationToggle__icon NavigationToggle__icon--closed"></span></span> <span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/yunyingguifan.html" class="NavigationItem__router-link">
+      九、交易类小程序运营规范
+    <!----></a> <!----> <!----></span></div> <ul class="NavigationLevel__children"><li><div class="NavigationLevel NavigationLevel--closed NavigationLevel--level-2"><div class="NavigationLevel__parent"><span class="NavigationToggle NavigationToggle--closed"><span class="NavigationToggle__icon NavigationToggle__icon--closed"></span></span> <span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/yunyingguifan.html#实物电商类小程序运营规范" class="NavigationItem__router-link">
+      1. 实物电商类小程序运营规范
+    <!----></a> <!----> <!----></span></div> <ul class="NavigationLevel__children"><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/yunyingguifan.html#_1-1-类目规范" class="NavigationItem__router-link">
+      1.1 类目规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/yunyingguifan.html#_1-2-商品规范" class="NavigationItem__router-link">
+      1.2 商品规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/yunyingguifan.html#_1-3-发货规范" class="NavigationItem__router-link">
+      1.3 发货规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/yunyingguifan.html#_1-4-交易争议处理" class="NavigationItem__router-link">
+      1.4 交易争议处理
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/yunyingguifan.html#_1-5-资金结算" class="NavigationItem__router-link">
+      1.5 资金结算
+    <!----></a> <!----> <!----></span></li></ul></div></li><li><div class="NavigationLevel NavigationLevel--closed NavigationLevel--level-2"><div class="NavigationLevel__parent"><span class="NavigationToggle NavigationToggle--closed"><span class="NavigationToggle__icon NavigationToggle__icon--closed"></span></span> <span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/yunyingguifan.html#B2b小程序运营规范" class="NavigationItem__router-link">
+      2. B2b小程序运营规范
+    <!----></a> <!----> <!----></span></div> <ul class="NavigationLevel__children"><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/yunyingguifan.html#_2-1-适用范围" class="NavigationItem__router-link">
+      2.1 适用范围
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/yunyingguifan.html#_2-2-行业管理规范" class="NavigationItem__router-link">
+      2.2 行业管理规范
+    <!----></a> <!----> <!----></span></li></ul></div></li><li><div class="NavigationLevel NavigationLevel--closed NavigationLevel--level-2"><div class="NavigationLevel__parent"><span class="NavigationToggle NavigationToggle--closed"><span class="NavigationToggle__icon NavigationToggle__icon--closed"></span></span> <span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/fuwuweigui93.html" class="NavigationItem__router-link">
+      3. 交易争议管理规范
+    <!----></a> <!----> <!----></span></div> <ul class="NavigationLevel__children"><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/yonghuzhiyin931.html" class="NavigationItem__router-link">
+      3.1 用户发起投诉流程指引
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/shangjiazhiyin932.html" class="NavigationItem__router-link">
+      3.2 开发者处理投诉流程指引
+    <!----></a> <!----> <!----></span></li><li><div class="NavigationLevel NavigationLevel--closed NavigationLevel--level-3"><div class="NavigationLevel__parent"><span class="NavigationToggle NavigationToggle--closed"><span class="NavigationToggle__icon NavigationToggle__icon--closed"></span></span> <span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/qitianwuliyou9331.html" class="NavigationItem__router-link">
+      3.3 交易投诉各场景细则
+    <!----></a> <!----> <!----></span></div> <ul class="NavigationLevel__children"><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/qitianwuliyou9331.html" class="NavigationItem__router-link">
+      七天无理由退换货场景
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/jiamaoweilie9333.html" class="NavigationItem__router-link">
+      假冒伪劣商品
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/biaomianbuyizhi9334.html" class="NavigationItem__router-link">
+      表面不一致商品
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/fuwuzhiliang9335.html" class="NavigationItem__router-link">
+      服务质量问题
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/shoufeizhengyi9336.html" class="NavigationItem__router-link">
+      收费争议问题
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/yajintuihuan9337.html" class="NavigationItem__router-link">
+      余额/押金退还问题
+    <!----></a> <!----> <!----></span></li></ul></div></li><li><div class="NavigationLevel NavigationLevel--closed NavigationLevel--level-3"><div class="NavigationLevel__parent"><span class="NavigationToggle NavigationToggle--closed"><span class="NavigationToggle__icon NavigationToggle__icon--closed"></span></span> <span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/xunifuwuxize9341.html" class="NavigationItem__router-link">
+      3.4 交易投诉各类目细则
+    <!----></a> <!----> <!----></span></div> <ul class="NavigationLevel__children"><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/xunifuwuxize9341.html" class="NavigationItem__router-link">
+      虚拟服务类目
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/manghexize9342.html" class="NavigationItem__router-link">
+      盲盒类
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/zulinxize9343.html" class="NavigationItem__router-link">
+      租赁商品类
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/fushixize9344.html" class="NavigationItem__router-link">
+      服装配饰类
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/shipinyinliaoxize9345.html" class="NavigationItem__router-link">
+      食品饮料类
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/piaowuxize9346.html" class="NavigationItem__router-link">
+      票务类
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/meizhuangxize9347.html" class="NavigationItem__router-link">
+      美妆护肤类
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/yiliaoxize9348.html" class="NavigationItem__router-link">
+      医疗保健类
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/shumaxize9349.html" class="NavigationItem__router-link">
+      数码产品类
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/duanjuxize93410.html" class="NavigationItem__router-link">
+      微短剧类
+    <!----></a> <!----> <!----></span></li></ul></div></li><li><div class="NavigationLevel NavigationLevel--closed NavigationLevel--level-3"><div class="NavigationLevel__parent"><span class="NavigationToggle NavigationToggle--closed"><span class="NavigationToggle__icon NavigationToggle__icon--closed"></span></span> <span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/hejiechuliguize9351.html" class="NavigationItem__router-link">
+      3.5 交易投诉举证标准
+    <!----></a> <!----> <!----></span></div> <ul class="NavigationLevel__children"><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/hejiechuliguize9351.html" class="NavigationItem__router-link">
+      和解期处理规则
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/pingtaijieruguize9352.html" class="NavigationItem__router-link">
+      平台介入期处理规则
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/shensuguize9353.html" class="NavigationItem__router-link">
+      申诉期处理规则
+    <!----></a> <!----> <!----></span></li></ul></div></li></ul></div></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/weiyuejintiyanfen94.html" class="NavigationItem__router-link">
+      4. 违约金&amp;交易体验分管理规范
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/bangzhengjin95.html" class="NavigationItem__router-link">
+      5. 保证金管理规范
+    <!----></a> <!----> <!----></span></li><li><div class="NavigationLevel NavigationLevel--closed NavigationLevel--level-2"><div class="NavigationLevel__parent"><span class="NavigationToggle NavigationToggle--closed"><span class="NavigationToggle__icon NavigationToggle__icon--closed"></span></span> <span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/baozhangbiao961.html" class="NavigationItem__router-link">
+      6. 保障标/旗舰标机制
+    <!----></a> <!----> <!----></span></div> <ul class="NavigationLevel__children"><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/baozhangbiao961.html" class="NavigationItem__router-link">
+      6.1 交易保障标产品说明
+    <!----></a> <!----> <!----></span></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/jiaoyilei/qijianbiao962.html" class="NavigationItem__router-link">
+      6.2 官方旗舰标产品说明
+    <!----></a> <!----> <!----></span></li></ul></div></li></ul></div></li><li><span class="NavigationItem"><!----> <a href="/miniprogram/product/duanju.html" class="NavigationItem__router-link">
+      十、平台短剧推广计划合作协议
+    <!----></a> <!----> <!----></span></li></ul></div></div> </aside></div> <div class="page__wrp"><main class="page"><div class="page-inner" style="min-height:0px;"> <div id="docContent"><div class="Breadcrumb"></div> <div class="content custom"><h1 id="小程序备案操作指引"><a href="#小程序备案操作指引" class="header-anchor">#</a> 小程序备案操作指引</h1> <h2 id="一、小程序备案法律法规参考"><a href="#一、小程序备案法律法规参考" class="header-anchor">#</a> 一、小程序备案法律法规参考</h2> <p>1、《中华人民共和国反电信网络诈骗法》
+第二十三条 设立移动互联网应用程序应当按照国家有关规定向电信主管部门办理许可或者备案手续。</p><p></p><p>2、《互联网信息服务管理办法》
+第四条 国家对经营性互联网信息服务实行许可制度；对非经营性互联网信息服务实行备案制度。未取得许可或者未履行备案手续的，不得从事互联网信息服务。<br>
+第五条 从事新闻、出版、教育、医疗保健、药品和医疗器械等互联网信息服务，依照法律、行政法规以及国家有关规定须经有关主管部门审核同意的，在申请经营许可或者履行备案手续前，应当依法经有关主管部门审核同意。<br></p><p></p><p>3、《非经营性互联网信息服务备案管理办法》
+第五条 在中华人民共和国境内提供非经营性互联网信息服务，应当依法履行备案手续。未经备案，不得在中华人民共和国境内从事非经营性互联网信息服务。<br>
+第十一条 拟从事新闻、出版、教育、医疗保健、药品和医疗器械、文化、广播电影电视节目等互联网信息服务，根据法律、行政法规以及国家有关规定应经有关主管部门审核同意的，在履行备案手续时，还应向其住所所在地省通信管理局提交相关主管部门审核同意的文件。<br>
+第十三条 非经营性互联网信息服务提供者应当在其网站开通时在主页底部的中央位置标明其备案编号，并在备案编号下方按要求链接信息产业部备案管理系统网址，供公众查询核对。<br>
+  非经营性互联网信息服务提供者应当在其网站开通时，按照信息产业部备案管理系统的要求，将备案电子验证标识放置在其网站的指定目录下。<br></p><p></p><h2 id="二、备案前准备"><a href="#二、备案前准备" class="header-anchor">#</a> 二、备案前准备</h2> <h3 id="（一）备案入口"><a href="#（一）备案入口" class="header-anchor">#</a> （一）备案入口</h3> <ul><li>新增（未上架）小程序于2023年9月4日开放备案入口</li> <li>存量小程序备案入口已开放，开发者可以通过设置页备案入口和首页的吸顶提示进行备案，服务商备案api也同步支持存量小程序备案。为保证开发者备案体验，存量小程序提交量有动态额度调整，若当日配额消耗完毕，备案入口及提交时均会有相关提示，次日早十点会刷新配额。</li></ul> <p>1、未上架小程序
+</p><p>开发者可在小程序首页点击【去备案】即可进入备案流程</p><p><img src="https://res.wx.qq.com/op_res/zuiMxK963RZVkrLEIPDnjt9I9s9LC6Uz3MaB4Q4F2wUJ-lNadO3Ev3T4VDwQ0azTkYfMe96sObXrl_AjUdxW1w" width="78%" alt="未上架去备案.jpg"></p> <p>2、已上架小程序<br> <a href="https://mp.weixin.qq.com/" target="_blank" rel="noopener noreferrer">小程序管理后台<span></span></a>顶部会提示“小程序需补充备案信息”的提醒，点击【去备案】即可进入备案流程<br> <img src="https://res.wx.qq.com/op_res/9m_eul2OeSo_zaPDMZU8ZyH3c7IdtL1PDKFcYv06wC3V45work6GgN2nv066xrW9Ne38fXB36-TniM3kxqjETA" width="78%" alt="已上架去备案.jpg"><br>
+也可以在小程序管理后台设置模块-小程序备案，点击【去备案】进入备案流程<br> <img src="https://res.wx.qq.com/op_res/9m_eul2OeSo_zaPDMZU8ZwR1f81lWbRAgBIskqsxpKdZiedPN6mP3SqfLSZU4m2ZpE45k5-u-JcIQf4jtha3PQ" width="78%" alt="设置去备案.jpg"></p> <h3 id="（二）备案类型"><a href="#（二）备案类型" class="header-anchor">#</a> （二）备案类型</h3> <p>新增备案（首次备案）：主体（个人、单位）首次向省通信管理局提出备案申请<br>
+变更备案：更新已经完成备案的主体、小程序信息<br>
+注销备案：注销已经完成备案的备案记录，包括注销主体、注销小程序和注销微信小程序<br></p> <h3 id="（三）备案材料准备"><a href="#（三）备案材料准备" class="header-anchor">#</a> （三）备案材料准备</h3> <h4 id="_1、小程序备案材料"><a href="#_1、小程序备案材料" class="header-anchor">#</a> 1、小程序备案材料</h4> <div class="table-wrp"><table><thead><tr><th><strong>小程序备案材料</strong></th> <th><strong>提供方式</strong></th></tr></thead> <tbody><tr><td>主办单位证件</td> <td>开发者准备</td></tr> <tr><td>主体负责人证件</td> <td>开发者准备</td></tr> <tr><td>小程序负责人证件</td> <td>开发者准备</td></tr> <tr><td>前置审批/专项审批</td> <td>开发者准备</td></tr> <tr><td>补充材料：根据规则提供包括但不限于授权书、党建证明、居住证、情况说明、承诺书等</td> <td>开发者准备</td></tr> <tr><td>小程序负责人核验现场拍摄照片电子件</td> <td>开发者在平台操作备案时完成</td></tr> <tr><td>互联网信息服务承诺书</td> <td>开发者在平台操作备案时阅读确认</td></tr> <tr><td>小程序备案真实性核验单</td> <td>平台提供</td></tr></tbody></table></div><h4 id="_2、前置审批材料"><a href="#_2、前置审批材料" class="header-anchor">#</a> 2、前置审批材料</h4> <p>如你的小程序从事新闻、出版、药品和医疗器械、网约车等需经有关主管部门审核同意的互联网信息服务，在履行备案手续时，应提供业务对应前置审批文件。相关类目参考如下：
+</p><div class="table-wrp"><table class="table-rowspan table-border-right"><thead><th width="60">前置审批类目</th> <th width="149">对应材料</th> <th>办理部门（参考）</th> <th>法律法规依据（参考）</th></thead> <tbody><tr><td width="149" valign="center" rowspan="2">出版</td> <td valign="center">【游戏】<br>
+根据国家新闻出版署和省、自治区、直辖市出版行政主管部门的规范要求，提供相关材料。<br></td><td valign="center">国家新闻出版署 <br> 省级新闻出版部门</td> <td valign="center">《网络出版服务管理规定》<br> 第二十七条 网络游戏上网出版前，必须向所在地省、自治区、直辖市出版行政主管部门提出申请，经审核同意后，报国家新闻出版广电总局审批。</td></tr> <tr><td valign="center">【网络出版】<br>网络出版服务许可证</td> <td valign="center">国家新闻出版署<br>省级新闻出版部门
+</td> <td valign="center">《网络出版服务管理规定》<br>第七条 从事网络出版服务，必须依法经过出版行政主管部门批准，取得《网络出版服务许可证》。</td></tr> <tr><td valign="center">广播电影电视节目<br>网络视听节目</td> <td valign="center">信息网络传播视听节目许可证</td> <td valign="center">国家广播电视总局<br>地方人民政府广播电影电视主管部门</td> <td valign="center">《互联网视听节目服务管理规定》<br>
+第七条 从事互联网视听节目服务，应当依照本规定取得广播电影电视主管部门颁发的《信息网络传播视听节目许可证》（以下简称《许可证》）或履行备案手续。<br>
+未按照本规定取得广播电影电视主管部门颁发的《许可证》或履行备案手续，任何单位和个人不得从事互联网视听节目服务。</td></tr> <tr><td valign="center">药品和医疗器械</td> <td valign="center">互联网药品信息服务资格证书</td> <td valign="center">省级药品监督管理局</td> <td valign="center">《互联网药品信息服务管理办法》<br>
+第五条 拟提供互联网药品信息服务的网站，应当在向国务院信息产业主管部门或者省级电信管理机构申请办理经营许可证或者办理备案手续之前，按照属地监督管理的原则，向该网站主办单位所在地省、自治区、直辖市食品药品监督管理部门提出申请，经审核同意后取得提供互联网药品信息服务的资格。</td></tr> <tr><td valign="center">文化</td> <td valign="center">网络文化经营许可证</td> <td valign="center">省级文化和旅游部门</td> <td valign="center">《互联网文化管理暂行规定》<br>
+第六条  文化部负责制定互联网文化发展与管理的方针、政策和规划，监督管理全国互联网文化活动。<br>
+省、自治区、直辖市人民政府文化行政部门对申请从事经营性互联网文化活动的单位进行审批，对从事非经营性互联网文化活动的单位进行备案。</td></tr> <tr><td valign="center">新闻</td> <td valign="center">互联网新闻服务许可证</td> <td valign="center">国家互联网信息办公室<br>省级互联网信息办公室</td> <td valign="center">《互联网新闻信息服务管理规定》<br>
+第五条 通过互联网站、应用程序、论坛、博客、微博客、公众账号、即时通信工具、网络直播等形式向社会公众提供互联网新闻信息服务，应当取得互联网新闻信息服务许可，禁止未经许可或超越许可范围开展互联网新闻信息服务活动。<br>
+前款所称互联网新闻信息服务，包括互联网新闻信息采编发布服务、转载服务、传播平台服务。</td></tr><tr><td valign="center">网络预约车</td> <td valign="center">网络预约出租汽车经营许可证</td> <td valign="center">省级交通运输主管部门</td> <td valign="center">《网络预约出租汽车经营服务管理暂行办法》<br>
+第十条 网约车平台公司应当在取得相应《网络预约出租汽车经营许可证》并向企业注册地省级通信主管部门申请互联网信息服务备案后，方可开展相关业务。备案内容包括经营者真实身份信息、接入信息、出租汽车行政主管部门核发的《网络预约出租汽车经营许可证》等。涉及经营电信业务的，还应当符合电信管理的相关规定。<br>
+网约车平台公司应当自网络正式联通之日起30日内，到网约车平台公司管理运营机构所在地的省级人民政府公安机关指定的受理机关办理备案手续。</td></tr><tr><td valign="center">校外培训</td> <td valign="center">教育部门允许开展校外培训的审批文件</td> <td valign="center">省级教育部门</td> <td valign="center">《关于进一步减轻义务教育阶段学生作业负担和校外培训负担的意见》<br>
+四、坚持从严治理，全面规范校外培训行为<br>
+坚持从严审批机构。各地不再审批新的面向义务教育阶段学生的学科类校外培训机构，现有学科类培训机构统一登记为非营利性机构。对原备案的线上学科类培训机构，改为审批制。各省（自治区、直辖市）要对已备案的线上学科类培训机构全面排查，并按标准重新办理审批手续。未通过审批的，取消原有备案登记和互联网信息服务业务经营许可证（ICP）。对非学科类培训机构，各地要区分体育、文化艺术、科技等类别，明确相应主管部门，分类制定标准、严格审批。依法依规严肃查处不具备相应资质条件、未经审批多址开展培训的校外培训机构。</td></tr><tr><td valign="center">宗教</td> <td valign="center">省级以上人民政府宗教事务部门审核同意文件</td> <td valign="center">省级宗教事务部门</td> <td valign="center"> 《互联网宗教信息服务管理办法》<br>
+第六条 通过互联网站、应用程序、论坛、博客、微博客、公众账号、即时通信工具、网络直播等形式，以文字、图片、音视频等方式向社会公众提供宗教教义教规、宗教知识、宗教文化、宗教活动等信息的服务，应当取得互联网宗教信息服务许可。</td></tr><tr><td valign="center">互联网金融</td> <td valign="center">金融监管部门审批许可文件</td> <td valign="center">省级金融监管部门</td> <td valign="center">《关于促进互联网金融健康发展的指导意见》<br>
+（十三）互联网行业管理。任何组织和个人开设网站从事互联网金融业务的，除应按规定履行相关金融监管程序外，还应依法向电信主管部门履行网站备案手续，否则不得开展互联网金融业务。工业和信息化部负责对互联网金融业务涉及的电信业务进行监管，国家互联网信息办公室负责对金融信息服务、互联网信息内容等业务进行监管，两部门按职责制定相关监管细则。</td></tr></tbody></table></div><p></p> <h4 id="_3、个人备案"><a href="#_3、个人备案" class="header-anchor">#</a> 3、个人备案</h4> <ul><li>必需材料：个人有效身份证件。</li></ul> <div class="table-wrp"><table class="table-rowspan table-border-right"><thead><th>资料类型</th> <th>单位性质</th> <th>证件类型</th></thead> <tbody><tr><td width="149" valign="center" rowspan="7">
+          主体证件、负责人证件
+        </td> <td width="100" valign="center" rowspan="7">
+          个人
+        </td> <td width="400" valign="center">
+         居民身份证
+        </td></tr> <tr><td width="400" valign="center">
+         护照
+        </td></tr> <tr><td width="400" valign="center">
+         台湾居民来往大陆通行证
+          </td></tr> <tr><td width="400" valign="center">
+        港澳居民来往内地通行证
+        </td></tr> <tr><td width="300" valign="center">
+          外国人永久居留身份证
+        </td></tr> <tr><td width="300" valign="center">
+          港澳居民居住证
+        </td></tr> <tr><td width="300" valign="center">
+          台湾居民居住证
+        </td></tr></tbody></table></div> <h4 id="_4、非个人备案"><a href="#_4、非个人备案" class="header-anchor">#</a> 4、非个人备案</h4> <ul><li>必需材料：单位有效证件、个人有效身份证件。</li></ul> <div class="table-wrp"><table class="table-rowspan table-border-right"><thead><th>资料类型</th> <th>单位性质</th> <th>证件类型</th></thead> <tbody><tr><td width="149" valign="center" rowspan="24">主体证件</td> <td valign="center" rowspan="2">企业</td> <td valign="center">营业执照（个人或企业）</td></tr> <tr><td valign="center">外国企业常驻代表机构登记证</td></tr> <tr><td valign="center" rowspan="2">政府机关</td> <td valign="center">统一社会信用代码证书</td></tr> <tr><td valign="center">组织机构代码证</td></tr> <tr><td valign="center" rowspan="2">事业单位</td> <td valign="center">事业单位法人证书</td></tr> <tr><td valign="center">组织机构代码证</td></tr> <tr><td valign="center" rowspan="2">社会团体</td> <td valign="center">社会团体法人登记证书</td></tr> <tr><td valign="center">组织机构代码证</td></tr> <tr><td valign="center" rowspan="2">民办非企业单位</td> <td valign="center">民办非企业单位登记证书</td></tr> <tr><td valign="center">社会服务机构登记证书</td></tr> <tr><td valign="center">公证机构</td> <td valign="center">公证机构执业证</td></tr> <tr><td valign="center" rowspan="2">国防机构</td> <td valign="center">部队代号</td></tr> <tr><td valign="center">军队单位对外有偿服务许可证
+            </td></tr> <tr><td valign="center">基金会</td> <td valign="center">基金会法人登记证书</td></tr> <tr><td valign="center">集体经济</td> <td valign="center">农村集体经济组织登记证</td></tr> <tr><td valign="center">境外机构</td> <td valign="center">境外机构证件</td></tr> <tr><td valign="center">律师执业机构</td> <td valign="center">律师事务所执业许可证</td></tr> <tr><td valign="center">群众性团体组织</td> <td valign="center">统一社会信用代码证书</td></tr> <tr><td valign="center">司法鉴定机构</td> <td valign="center">司法鉴定许可证</td></tr> <tr><td valign="center" rowspan="3">外国在华文化中心</td> <td valign="center">外国在华文化中心登记证</td></tr> <tr><td valign="center">外国政府旅游部门常驻代表机构批准登记证</td></tr> <tr><td valign="center">北京市外国驻华使馆人员子女学校办学许可证</td></tr> <tr><td valign="center">仲裁机构</td> <td valign="center">仲裁委员会登记证</td></tr> <tr><td valign="center">宗教团体</td> <td valign="center">宗教活动场所登记证</td></tr> <tr><td width="149" valign="center" rowspan="7">负责人证件</td> <td valign="center" rowspan="7">个人</td> <td valign="center">居民身份证</td></tr> <tr><td valign="center">护照</td></tr> <tr><td valign="center">台湾居民来往大陆通行证</td></tr> <tr><td valign="center">港澳居民来往内地通行证</td></tr> <tr><td valign="center">外国人永久居留身份证</td></tr> <tr><td valign="center">港澳居民居住证</td></tr> <tr><td valign="center">台湾居民居住证</td></tr></tbody></table></div> <ul><li>其他材料：根据各省通信管理局要求，上传对应补充材料。</li></ul> <h2 id="三、备案整体流程"><a href="#三、备案整体流程" class="header-anchor">#</a> 三、备案整体流程</h2> <p>备案整体流程总共分为五个环节：备案信息填写、平台初审、工信部短信核验、通管局审核和备案成功。</p> <p><strong>小程序备案整体流程</strong><br> <img src="https://res.wx.qq.com/op_res/2RllVMQgw5mniTsKgY9L1Ey9SQOp6PaXFeezF2U5njvP-Ddvre8UiXddnA9C-9JaZZitXxfDPbls0zRIEgIHsw" width="78%" alt></p> <h3 id="（一）备案信息填写"><a href="#（一）备案信息填写" class="header-anchor">#</a> （一）备案信息填写</h3> <h4 id="_1、主体信息填写"><a href="#_1、主体信息填写" class="header-anchor">#</a> 1、主体信息填写</h4> <p>非个人主体：<br> <img src="https://res.wx.qq.com/op_res/JWh9uZsm2Zd-svXdV06BylOSDCV9BtK2RTPbunuN3xTQqXAzm97sifnskP73fcWyYwCZWdGwXZTDiZehoMJ4lw" width="60%" alt></p> <img src="https://res.wx.qq.com/op_res/JWh9uZsm2Zd-svXdV06ByncUkwV73qgDcu4BzWLBtjAUmgtLzdb7hqR5e3iVEWoy8KSQpYEoE2WndrBeLZxlzw" width="60%" alt> <p>个人主体：<br> <img src="https://res.wx.qq.com/op_res/JWh9uZsm2Zd-svXdV06Byq_BUmrmqHIRPqMJi_x8Dxiyh56GvRUYLwPCwdFtZNNMiqnG2YzftozCCevnT66V6g" width="60%" alt></p> <img src="https://res.wx.qq.com/op_res/JWh9uZsm2Zd-svXdV06Byohf1N_1cux8uDiNCV0eDqZ1bCK2O9T1xItgCUyEFRLLMjzOiJhVyfAZQl5dwLihbA" width="60%" alt> <p>提示：选择地区、详细地址，请填写实际通讯地址。<br>
+上传有效证件原件的彩色扫描件或拍照件，请保持图片清晰完整、不遮挡关键信息/图像、边角齐全，证件有效期大于1个月。<br>
+请对照证件信息如实选择、填写备案信息。<br></p> <h4 id="_2、主体负责人信息填写"><a href="#_2、主体负责人信息填写" class="header-anchor">#</a> 2、主体负责人信息填写</h4> <p>非个人主体：<br> <img src="https://res.wx.qq.com/op_res/OYWH4JbY-LXk-gxexDCRq1NraG92Wc9p2GKJH5_DALPxLOHGzh1ZdUTu-omQtgaOmbdtiTqiCnHA5aFF1fQPyg" width="60%" alt><br></p> <p>注意：若主体负责人与主办单位法定代表人不一致，各地管局要求可能有所不同，请点击参考<a href="https://developers.weixin.qq.com/miniprogram/product/record/record_material.html#%E5%9B%9B%E3%80%81%E4%B8%BB%E4%BD%93%E8%B4%9F%E8%B4%A3%E4%BA%BA%E6%8E%88%E6%9D%83%E4%B9%A6" target="_blank" rel="noopener noreferrer">文档<span></span></a>以获取具体要求。</p> <p>个人主体：<br> <img src="https://res.wx.qq.com/op_res/OYWH4JbY-LXk-gxexDCRq2qCXPc--UPzuAOzJ-NG8F3Km_umUCA14fkTC-0w5jJ5dI9fkrDHdVWI6TBg4O02vA" width="60%" alt><br></p> <p>提示：手机号码请填写主体负责人、应急联系人本人使用的有效手机号码，需保持电话畅通，不同人不能使用同一个号码。</p> <h4 id="_3、小程序信息填写"><a href="#_3、小程序信息填写" class="header-anchor">#</a> 3、小程序信息填写</h4> <img src="https://res.wx.qq.com/op_res/JWh9uZsm2Zd-svXdV06ByuV3MHl7cDQDTd6-o0BbPmBuSMxoMVKup-JoQ2O72y5ZnMrC-qQoS39wnd-147BFfg" width="60%" alt> <p>提示：如你的小程序内容涉及前置审批相关信息，请上传有效前置审批文件并填写审批号/文件名。</p> <h4 id="_4、小程序负责人信息填写及人脸核身"><a href="#_4、小程序负责人信息填写及人脸核身" class="header-anchor">#</a> 4、小程序负责人信息填写及人脸核身</h4> <p>非个人主体-手动填写小程序负责人信息<br> <img src="https://res.wx.qq.com/op_res/OYWH4JbY-LXk-gxexDCRqzVxTtgI8OZbbQsVKnocCfp64njckKaodxqE33JmwtlJneD_dMpgRCpL9n30LbASXw" width="60%" alt><br></p> <p>注意：当小程序管理员（小程序负责人）与主办单位法定代表人不一致，各地管局要求可能有所不同，请点击参考<a href="https://developers.weixin.qq.com/miniprogram/product/record/record_material.html#%E4%BA%94%E3%80%81%E5%B0%8F%E7%A8%8B%E5%BA%8F%E8%B4%9F%E8%B4%A3%E4%BA%BA%E6%8E%88%E6%9D%83%E4%B9%A6" target="_blank" rel="noopener noreferrer">文档<span></span></a>以获取具体要求。</p> <p>个人主体-默认复用主体负责人信息<br> <img src="https://res.wx.qq.com/op_res/OYWH4JbY-LXk-gxexDCRq5IjmFcMsZ4w4jJDdmJ7Wwl9mSzLM2YVuaQdkQXQBh0SjMunVHzFFD4uakMWaje9dw" width="60%" alt><br></p> <p>提示：进行核验时需选择白色或浅色的干净背景，不要有杂物或他人入镜；核验人不能裸露上半身，不能戴帽子、耳机、口罩等遮挡面部的物品，保持表情自然、无闭眼。<br></p> <p>若需查看更多备案信息填写详情，可参考<a href="https://developers.weixin.qq.com/community/minihome/article/doc/000aca82d841f035b351e114f6b013" target="_blank" rel="noopener noreferrer">微信开放社区-小程序备案专区文档<span></span></a>。</p> <h3 id="（二）平台初审"><a href="#（二）平台初审" class="header-anchor">#</a> （二）平台初审</h3> <p>开发者在微信公众平台提交小程序备案信息后，平台将会在1-2个工作日内完成初审（具体请以实际审核时间为准），审核结果将以站内信、模板消息等形式通知管理员。
+在平台初审的过程中，请备案相关人员保持电话畅通，以便平台对你提交的备案信息进行核验。</p> <p>提示：你可在微信公众平台内查看备案进度。</p> <h3 id="（三）工信部短信核验"><a href="#（三）工信部短信核验" class="header-anchor">#</a> （三）工信部短信核验</h3> <p>根据工信部要求，小程序备案需完成短信核验。你的备案初审通过后，会收到工信部发送的验证短信（发送号码：12381），请根据<a href="https://developers.weixin.qq.com/miniprogram/product/record/sms_verification.html#_7%E3%80%81%E5%B7%A5%E4%BF%A1%E9%83%A8%E6%A0%A1%E9%AA%8C%E7%9F%AD%E4%BF%A1%E6%98%AF%E5%8F%91%E5%B0%8F%E7%A8%8B%E5%BA%8F%E8%B4%9F%E8%B4%A3%E4%BA%BA%E6%89%8B%E6%9C%BA%E9%87%8C%E5%90%97%EF%BC%9F%E8%BF%98%E6%98%AF%E5%8F%91%E9%80%81%E5%88%B0%E4%B8%BB%E4%BD%93%E8%B4%9F%E8%B4%A3%E4%BA%BA%E6%89%8B%E6%9C%BA%E9%87%8C%EF%BC%9F" target="_blank" rel="noopener noreferrer">小程序备案类型<span></span></a>留意主体负责人和小程序管理员（负责人）手机短信，若收到短信请在24小时内登录工信部备案官网首页完成短信核验（网址：<a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">https://beian.miit.gov.cn/<span></span></a>， 手机端、PC端均可），短信核验成功后备案申请进入通管局审核流程。<br>
+若核验时提示验证码错误或无效，你可触发一次短信重发；24小时内未核验成功，备案将被工信部系统自动驳回，你需到微信公众平台重新提交备案申请。<br><br> <img src="https://res.wx.qq.com/op_res/lO1ll2OF3Ssv3Wu_mVBhcIuBMj8ycRiNPqgsb7QyN1hmy9iLK1I5mH0wTsFErcTdKTWGv0iyh_TAJqZOM7Ag3g" width alt><br> <img src="https://res.wx.qq.com/op_res/6hdUcFVxSeh8aI9B0LPR4rAPXlA283mpqdxCGwRtU799BzNHcj5ok7NcHlSoKGy67gJpx2gCBAZYJGezYda8Mg" width="78%" alt></p> <h3 id="（四）通管局审核"><a href="#（四）通管局审核" class="header-anchor">#</a> （四）通管局审核</h3> <p>各省通信管理局将在1-20个工作日内（具体以实际审核时间为准）完成审核，审核结果以站内信、模板消息、短信等形式通知。</p> <h3 id="（五）备案成功"><a href="#（五）备案成功" class="header-anchor">#</a> （五）备案成功</h3> <p>管局审核通过后，将下发的小程序备案号，代表你的小程序已完成备案，可以进入下一步版本发布等流程。<br> <img src="https://res.wx.qq.com/op_res/lO1ll2OF3Ssv3Wu_mVBhcFSh4XRBRik8jrEFoTxGhDNq0hU38yU774ZRUBEfbAQtWzgM3UZA8vwfJkcWJfMvgA" width alt></p> <h3 id="（六）备案号悬挂"><a href="#（六）备案号悬挂" class="header-anchor">#</a> （六）备案号悬挂</h3> <p>小程序成功发布上线后，小程序备案号将自动展示在小程序更多资料页，无需开发者自行悬挂。示例如下：
+<img src="https://res.wx.qq.com/op_res/Fmz68wL3jf5DVJIZXbK43caXgm6R8XMO7-3RPZzomuOHyyq-fpEowzHuBxMiUXdcuX77BG5R4TP_HrNVrhoDoQ" width="60%" alt></p></div> <div class="fixed-translate" style="display:none;"><span>The translations are provided by WeChat Translation and are for reference only. In case of any inconsistency and discrepancy between the Chinese version and the English version, the Chinese version shall prevail.Incorrect translation. <a href="javascript:;" class="fixed-translate-btn">Tap to report.</a></span></div></div> <!----> <div class="related"><!----> <!----></div> <footer class="page-edit"><!----></footer>  <footer class="footer"><ul class="footer-links"><li class="footer-link"><a href="http://www.tencent.com/zh-cn/index.shtml" target="_blank">关于腾讯</a></li> <li class="footer-link"><a href="https://mp.weixin.qq.com/debug/wxadoc/introduction/index.html?t=1484641676" target="_blank">文档中心</a></li> <li class="footer-link"><a href="https://kf.qq.com/faq/17030722muuu170307MFBny2.html" target="_blank">辟谣中心</a></li> <li class="footer-link"><a href="http://kf.qq.com/faq/120911VrYVrA1509086vyumm.html" target="_blank">客服中心</a></li></ul> <p class="copyright">Copyright © 2012-<span>2026</span> Tencent. All Rights Reserved.</p></footer></div></main></div> <!----></div></div> <div id="popoverWrapId" class="pop-links__wrp popover_hide"><ul class="pop-links__list"><li class="pop-links__item"><button class="pop-link">复制</button></li> <li class="pop-links__item"><button class="pop-link">问题反馈</button></li></ul></div> <div class="fixed-btns"><a href="javascript:;" class="fixed-btn fixed-btn__feedback"><div class="fixed-btn__inner"><span class="fixed-btn__icon"></span> <span class="fixed-btn__text">反馈</span></div></a> <a href="javascript:;" class="fixed-btn fixed-btn__top" style="display:none;"><div class="fixed-btn__inner"><span class="fixed-btn__icon"></span></div></a></div></div></div></div>
+    <script src="https://res.wx.qq.com/wxdoc/dist/assets/js/app.4baeb4e6.js" defer></script><script src="https://res.wx.qq.com/wxdoc/dist/assets/js/425.63758e18.js" defer></script>
+  </body>
+</html>
+

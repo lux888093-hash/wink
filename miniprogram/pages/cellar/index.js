@@ -23,11 +23,39 @@ function buildScenes(wine, collection) {
   ].filter((item) => item.image);
 }
 
+function buildEstateSections(wine) {
+  if (Array.isArray(wine.estateSections) && wine.estateSections.length) {
+    return wine.estateSections.filter((item) => item && item.title && item.body);
+  }
+
+  return [
+    {
+      key: 'quiet',
+      eyebrow: '01 / 静界',
+      title: '先把世界留在门外',
+      body: wine.story || wine.estateIntro || ''
+    },
+    {
+      key: 'estate',
+      eyebrow: '02 / 风土',
+      title: '老藤、红土与桶中时间',
+      body: wine.estatePhilosophy || ''
+    },
+    {
+      key: 'maker',
+      eyebrow: '03 / 酿造',
+      title: '让年份自己说话',
+      body: wine.winemakerIntro || ''
+    }
+  ].filter((item) => item.body);
+}
+
 Page({
   data: {
     ready: false,
     wine: null,
     collection: [],
+    estateSections: [],
     errorTitle: '',
     errorMessage: ''
   },
@@ -52,6 +80,7 @@ Page({
       ready: true,
       wine: experience.wine,
       collection: buildScenes(experience.wine, experience.collection),
+      estateSections: buildEstateSections(experience.wine),
       errorTitle: '',
       errorMessage: ''
     });

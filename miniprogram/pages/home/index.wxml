@@ -21,6 +21,7 @@
       <view class="estate-statement-copy">
         <text class="estate-statement-kicker">{{statementKicker}}</text>
         <text class="estate-statement-title">{{statementTitle}}</text>
+        <text wx:if="{{homeContent.statementBody}}" class="estate-statement-body">{{homeContent.statementBody}}</text>
       </view>
     </view>
 
@@ -31,6 +32,7 @@
         <view class="estate-chapter-copy">
           <text class="estate-chapter-eyebrow">{{item.eyebrow}}</text>
           <text class="estate-chapter-title">{{item.title}}</text>
+          <text wx:if="{{item.body}}" class="estate-chapter-body line-clamp-2">{{item.body}}</text>
         </view>
       </view>
     </view>

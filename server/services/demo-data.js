@@ -28,14 +28,14 @@ function createSeedStore() {
   return {
     meta: {
       version: 2,
-      brandName: '鸿玖酒庄 Hongjiu Estate',
+      brandName: '古藤村落酒庄 Village Ancient Vine',
       initializedAt: new Date().toISOString()
     },
     settings: {
       homeHero: {
-        eyebrow: 'Hongjiu Estate',
-        title: '鸿玖酒庄',
-        subtitle: '月色葡萄园、木屋灯光与庄园礼盒。',
+        eyebrow: 'Village Ancient Vine',
+        title: '古藤村落酒庄',
+        subtitle: '南澳古藤西拉、19首私享乐章与 567 价值坐标。',
         ambienceNote: '理性饮酒，未成年人请勿饮酒。'
       },
       loungeCopy: {
@@ -46,58 +46,97 @@ function createSeedStore() {
     wineries: [
       {
         id: wineryId,
-        name: '鸿玖酒庄',
-        englishName: 'Hongjiu Estate',
-        tagline: 'Moonlit Vineyard Residency',
+        name: '古藤村落酒庄',
+        englishName: 'Village Ancient Vine',
+        tagline: '在安静中听见灵魂',
         intro:
-          '鸿玖酒庄以月光、葡萄藤与木盒礼序为品牌主线，强调“酒庄叙事 + 单瓶体验 + 会员内容”三层结构。',
+          '古藤村落酒庄位于南澳巴罗萨谷古藤产区，以红土、老藤、石屋和橡木桶酒窖构成核心场景。',
         story:
-          '品牌叙事不是单独卖一瓶酒，而是把酒庄、包装、扫码内容和配乐做成同一条体验线。用户第一次扫码进入的是专属故事，之后从常规入口看到的是会员与商城世界。',
-        heroImage: '/assets/images/winery-vineyard-moon.jpg',
-        portraitImage: '/assets/images/winery-cottage-night.jpg',
-        harvestImage: '/assets/images/harvest-under-moon.jpg',
-        giftImage: '/assets/images/wine-gift-set.jpg'
+          '它不追求喧闹传播，而是把酒、音乐和独处时刻做成一条完整体验线：开瓶、输入密钥、进入只属于这一瓶酒的安静空间。',
+        heroImage: '/assets/images/village-ancient-vine-sign.jpg',
+        portraitImage: '/assets/images/eva-glaetzer-winemaker.jpg',
+        harvestImage: '/assets/images/village-ancient-vine-cellar.jpg',
+        giftImage: '/assets/images/village-ancient-vine-packaging.jpg'
       }
     ],
     wines: [
       {
         id: 'soundless-a-quiet-world-2022',
         wineryId,
-        brand: 'Hongjiu Estate',
+        brand: 'Village Ancient Vine',
         eyebrow: '扫码限定',
-        title: 'Soundless A Quiet World',
-        name: '静夜序曲',
-        subtitle: '庄园旗舰干红',
-        vintage: '2022 Estate Edition',
-        region: '宁夏贺兰山东麓',
-        country: 'China',
-        grapes: '赤霞珠 60% / 马瑟兰 40%',
-        abv: '14.5% vol',
+        title: 'A Quiet World · Voice of the Soul',
+        name: '567 黑胶颂·古藤西拉',
+        subtitle: '2022 南澳古藤西拉干红',
+        vintage: '2022 Vintage',
+        region: '南澳巴罗萨谷古藤产区',
+        country: 'Australia',
+        grapes: '古藤西拉 Shiraz',
+        abv: '14.3% vol',
         style: '干红',
-        serving: '16-18°C · 醒酒 20 分钟',
-        quote: '月光、橡木与一扇亮着的窗，让节奏慢下来。',
+        serving: '16-18°C · 醒酒 30-45 分钟',
+        quote: '当世界安静下来，酒液、旋律与自我才会真正对上频率。',
         overview:
-          '这支酒不是用冲击力去记忆，而是用秩序感。前段是沉静的黑果和木质气息，中段开始出现花香与细腻单宁，尾段保持克制。',
-        storyTitle: '从酒庄到礼盒',
+          '这支 2022 古藤西拉来自南澳深层红土。黑果、紫罗兰、香料与橡木的层次在 18 个月熟成后收束成深邃结构，入口克制，随后释放出老藤西拉的力量。',
+        storyTitle: '静界的入口',
         story:
-          '这支旗舰酒承担的是“扫码即进入”的第一印象，因此强调礼盒打开、酒标出现、音乐起势三个瞬间彼此连在一起，形成完整记忆点。',
+          '这支酒把开瓶、听歌和独饮连成同一条路径。酒标上的微光小屋不是装饰，而是提醒你暂时离开外界噪声。',
         moodLine: '把灯光压低，再开始倒酒。',
-        estateName: '鸿玖月庭酒庄',
-        estateTagline: '月色、葡萄藤与一盏留亮的窗',
+        estateName: '古藤村落酒庄',
+        estateTagline: '老藤、时间与一段私享乐章',
         estateIntro:
-          '鸿玖月庭酒庄坐落在夜色葡萄园之间，以月光、木质长廊和留灯小屋构成第一印象。',
+          '酒庄位于南澳巴罗萨谷古藤产区。红土、石屋、老藤与橡木桶酒窖，共同定义它的第一印象。',
         estatePhilosophy:
-          '这里的叙事只关于庄园本身：葡萄藤的秩序、夜收的节奏、木屋窗光与低照度的酒窖气息。',
-        estateHeroImage: '/assets/images/winery-vineyard-moon.jpg',
-        estatePortraitImage: '/assets/images/winery-cottage-night.jpg',
-        harvestImage: '/assets/images/harvest-under-moon.jpg',
-        bottleImage: '/assets/images/wine-bottle-estate.jpg',
-        posterImage: '/assets/images/wine-bottle-poster.jpg',
-        giftImage: '/assets/images/wine-gift-set.jpg',
+          '我们相信一瓶好酒不需要靠喧闹证明自己。老藤的根系、18个月桶中时间与克制定价，共同完成这瓶酒的结构和体面。',
+        estateStatementTitle: '老藤、时间与安静的秩序',
+        estateHeroImage: '/assets/images/village-ancient-vine-sign.jpg',
+        estatePortraitImage: '/assets/images/eva-glaetzer-winemaker.jpg',
+        harvestImage: '/assets/images/village-ancient-vine-cellar.jpg',
+        bottleImage: '/assets/images/vinyl-ode-bottle-vineyard.jpg',
+        posterImage: '/assets/images/vinyl-ode-bottle-vineyard.jpg',
+        giftImage: '/assets/images/village-ancient-vine-packaging.jpg',
         estateStats: [
-          { label: '所属产区', value: '宁夏贺兰山东麓' },
-          { label: '庄园景观', value: '月色葡萄藤、留灯小屋、夜收葡萄' },
-          { label: '空间气质', value: '静谧、克制、木质与暗红光线' }
+          { label: '所属产区', value: '南澳巴罗萨谷' },
+          { label: '核心葡萄', value: '古藤西拉 Shiraz' },
+          { label: '私享内容', value: '16位密钥 · 19首乐章' }
+        ],
+        estateSections: [
+          {
+            key: 'chapter-quiet',
+            eyebrow: '01 / 静界',
+            title: '先把世界留在门外',
+            body: '开瓶的第一步，不是社交，而是离场。把屏幕放下，把噪声关小，让这一杯酒重新变成与自己对话的入口。'
+          },
+          {
+            key: 'chapter-vine',
+            eyebrow: '02 / 老藤',
+            title: '红土里的百年根系',
+            body: '南澳古藤把岁月压进根系。它穿过硬土与岩层，留下更深的果味骨架、矿物感和稳定张力。'
+          },
+          {
+            key: 'chapter-time',
+            eyebrow: '03 / 时间',
+            title: '十八个月的慢慢收束',
+            body: '采收后的西拉并不急着表达。18个月橡木桶熟成，让黑果、香料和木质感慢慢收束，换来克制后的爆发力。'
+          },
+          {
+            key: 'chapter-creed',
+            eyebrow: '04 / 价值',
+            title: '567 只是把价值说清楚',
+            body: '法兰克福大赛金奖只是注脚。真正重要的是，它在盲品里靠结构感说服评审，也让 567 成为不随热度起伏的价格坐标。'
+          },
+          {
+            key: 'chapter-resonance',
+            eyebrow: '05 / 共振',
+            title: '一组密钥，十九首乐章',
+            body: '瓶封上的专属密钥连接 Sam 写下的 19 首私享作品。开瓶、醒酒、落针，酒香与旋律在同一时刻展开。'
+          },
+          {
+            key: 'chapter-covenant',
+            eyebrow: '06 / 契约',
+            title: '不同频，也保留体面',
+            body: '如果风味与当下心境不能共振，请停止饮用。按规则保留原瓶退回，我们愿意把选择权和体面一起留给你。'
+          }
         ],
         tasting: [
           {
@@ -133,27 +172,40 @@ function createSeedStore() {
           {
             id: 'moon-arch',
             vintage: 'ESTATE',
-            title: '月下长廊',
-            note: '进入专属体验时首先出现的场景，负责建立品牌的静谧气质。',
-            image: '/assets/images/winery-vineyard-moon.jpg'
+            title: '古藤村落入口',
+            note: '南澳古藤葡萄园的第一眼，是红土、石屋与写着 Village Ancient Vine 的木牌。',
+            image: '/assets/images/village-ancient-vine-sign.jpg'
           },
           {
-            id: 'lamp-house',
-            vintage: 'HOUSE',
-            title: '留灯小屋',
-            note: '暖色窗光带来温度，避免奢华页面只剩冷感和距离感。',
-            image: '/assets/images/winery-cottage-night.jpg'
+            id: 'oak-cellar',
+            vintage: 'AGING',
+            title: '橡木桶中的十八个月',
+            note: '西拉的野性在微氧黑暗中慢慢收束，留下克制之后的爆发力。',
+            image: '/assets/images/village-ancient-vine-cellar.jpg'
           },
           {
-            id: 'night-harvest',
-            vintage: 'HARVEST',
-            title: '夜收',
-            note: '人与葡萄同时出现，让酒庄故事回到真实劳作，而不是纯概念图。',
-            image: '/assets/images/harvest-under-moon.jpg'
+            id: 'eva-glaetzer',
+            vintage: 'MAKER',
+            title: 'Eva Glaetzer',
+            note: '第六代家族传人，以直觉判断古藤西拉的采收与单宁成熟度。',
+            image: '/assets/images/eva-glaetzer-winemaker.jpg'
+          },
+          {
+            id: 'vinyl-ode-label',
+            vintage: '567',
+            title: '黑胶颂酒标',
+            note: '黑胶唱片、微光小屋与 567 共同构成这瓶酒的识别记忆。',
+            image: '/assets/images/vinyl-ode-bottle-vineyard.jpg'
           }
         ],
         trackIds: ['track_moonlit_path', 'track_harvest_whisper', 'track_quiet_world'],
-        productId: 'product_estate_moon_box'
+        productId: 'product_estate_moon_box',
+        winemakerName: 'Eva Glaetzer',
+        winemakerCnName: '伊娃·格雷策',
+        winemakerTitle: '首席酿酒师 · 第六代家族传人',
+        winemakerImage: '/assets/images/eva-glaetzer-winemaker.jpg',
+        winemakerIntro:
+          'Eva Glaetzer 是家族第六代酿酒师。她更相信老藤自身的节奏，以直觉判断成熟度，让土地与年份自己说话。'
       },
       {
         id: 'amber-nocturne-reserve-2021',

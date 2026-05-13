@@ -37,6 +37,16 @@
       </view>
     </view>
 
+    <view wx:if="{{wine.winemakerName}}" class="detail-maker">
+      <view class="detail-maker-copy">
+        <text class="detail-section-kicker">酿酒师笔记</text>
+        <text class="detail-maker-title">{{wine.winemakerCnName || wine.winemakerName}}</text>
+        <text class="detail-maker-sub">{{wine.winemakerName}} · {{wine.winemakerTitle}}</text>
+        <text class="detail-maker-body">{{wine.winemakerIntro}}</text>
+      </view>
+      <image class="detail-maker-image" src="{{wine.winemakerImage || wine.estatePortraitImage}}" mode="aspectFill"></image>
+    </view>
+
     <view class="detail-poster">
       <image class="detail-poster-image" src="{{wine.bottleImage || wine.posterImage}}" mode="aspectFill"></image>
       <view class="detail-poster-mask"></view>

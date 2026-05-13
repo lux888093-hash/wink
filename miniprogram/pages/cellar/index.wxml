@@ -23,9 +23,31 @@
           <text class="cellar-statement-kicker">酒庄档案</text>
           <text class="cellar-statement-sub">Estate file</text>
         </view>
-        <text class="cellar-statement-title">风土与夜色的秩序</text>
+        <text class="cellar-statement-title">{{wine.estateStatementTitle || '老藤、时间与安静的秩序'}}</text>
         <view class="cellar-statement-rule"></view>
         <text class="cellar-statement-body">{{wine.estatePhilosophy}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{estateSections.length}}" class="cellar-chapters">
+      <view class="cellar-chapters-head">
+        <text class="cellar-chapters-kicker">静界篇章</text>
+        <text class="cellar-chapters-title">把长故事压缩成几段值得慢读的话</text>
+      </view>
+      <view class="cellar-chapter" wx:for="{{estateSections}}" wx:key="key">
+        <text class="cellar-chapter-eyebrow">{{item.eyebrow}}</text>
+        <text class="cellar-chapter-title">{{item.title}}</text>
+        <text class="cellar-chapter-body">{{item.body}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{wine.winemakerName}}" class="cellar-maker">
+      <image class="cellar-maker-image" src="{{wine.winemakerImage || wine.estatePortraitImage}}" mode="aspectFill"></image>
+      <view class="cellar-maker-copy">
+        <text class="cellar-maker-kicker">首席酿酒师</text>
+        <text class="cellar-maker-name">{{wine.winemakerCnName || wine.winemakerName}}</text>
+        <text class="cellar-maker-sub">{{wine.winemakerName}} · {{wine.winemakerTitle}}</text>
+        <text class="cellar-maker-body">{{wine.winemakerIntro}}</text>
       </view>
     </view>
 

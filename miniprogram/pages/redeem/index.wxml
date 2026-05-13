@@ -1,12 +1,25 @@
 <view class="shell">
   <view class="redeem-page">
-    <image class="redeem-bg" src="/assets/images/winery-vineyard-moon.jpg" mode="aspectFill"></image>
+    <image class="redeem-bg" src="/assets/images/vinyl-ode-bottle-vineyard.jpg" mode="aspectFill"></image>
     <view class="redeem-mask"></view>
 
     <view class="redeem-copy">
-      <text class="eyebrow">EXCLUSIVE ENTRY</text>
-      <text class="display-title redeem-title">专属入口</text>
-      <text class="muted-copy redeem-subtitle">输入酒瓶标签上的六位提取码，开启这瓶酒的专属体验。</text>
+      <text class="eyebrow">VILLAGE ANCIENT VINE</text>
+      <text class="display-title redeem-title">567 古藤西拉</text>
+      <text class="muted-copy redeem-subtitle">输入酒瓶标签上的六位提取码，开启这瓶酒的专属酒庄体验。</text>
+    </view>
+
+    <view class="redeem-estate-panel">
+      <image class="redeem-estate-image" src="/assets/images/village-ancient-vine-sign.jpg" mode="aspectFill"></image>
+      <view class="redeem-estate-copy">
+        <text class="redeem-estate-kicker">A Quiet World</text>
+        <text class="redeem-estate-title">南澳古藤 · 黑胶颂</text>
+        <view class="redeem-estate-meta">
+          <text>2022</text>
+          <text>Shiraz</text>
+          <text>14.3%vol</text>
+        </view>
+      </view>
     </view>
 
     <view class="redeem-card {{state === 'success' ? 'redeem-card-success' : ''}}">

@@ -14,9 +14,18 @@
   margin: 4rpx 0 0;
 }
 
+.store-subtitle {
+  display: block;
+  margin-top: 10rpx;
+  color: var(--ink-soft);
+  font-size: 23rpx;
+  line-height: 1.45;
+  letter-spacing: 0;
+}
+
 .featured-card {
   position: relative;
-  min-height: 420rpx;
+  min-height: 468rpx;
   overflow: hidden;
   border-radius: 16rpx;
   border: 1rpx solid var(--panel-line);
@@ -69,6 +78,16 @@
   font-family: Baskerville, Georgia, "Times New Roman", serif;
   font-size: 34rpx;
   line-height: 1.12;
+  letter-spacing: 0;
+}
+
+.featured-subtitle {
+  display: block;
+  max-width: 560rpx;
+  color: rgba(255, 246, 235, 0.72);
+  font-size: 23rpx;
+  font-weight: 500;
+  line-height: 1.42;
   letter-spacing: 0;
 }
 
