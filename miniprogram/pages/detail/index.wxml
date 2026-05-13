@@ -33,21 +33,14 @@
       </view>
     </view>
 
-    <view wx:if="{{wine.winemakerName}}" class="detail-maker">
-      <view class="detail-maker-copy">
-        <text class="detail-section-kicker">酿酒师笔记</text>
-        <text class="detail-maker-title">{{wine.winemakerCnName || wine.winemakerName}}</text>
-        <text wx:if="{{wine.winemakerTitle}}" class="detail-maker-sub">{{wine.winemakerTitle}}</text>
-        <text class="detail-maker-body">{{wine.winemakerIntro}}</text>
-      </view>
-      <image class="detail-maker-image" src="{{wine.winemakerImage || wine.estatePortraitImage}}" mode="aspectFill"></image>
-    </view>
-
-    <view class="detail-poster">
-      <image class="detail-poster-image" src="{{wine.bottleImage || wine.posterImage}}" mode="aspectFill"></image>
-      <view class="detail-poster-mask"></view>
-      <view class="detail-quote">
-        <text class="detail-quote-text line-clamp-3">{{wine.quote}}</text>
+    <view wx:if="{{editorialSections.length}}" class="detail-editorial">
+      <view class="detail-editorial-module {{item.imageClass}}" wx:for="{{editorialSections}}" wx:key="key">
+        <image class="detail-editorial-image" src="{{item.image}}" mode="aspectFill"></image>
+        <view class="detail-editorial-copy">
+          <text class="detail-editorial-eyebrow">{{item.eyebrow}}</text>
+          <text class="detail-editorial-title">{{item.title}}</text>
+          <text class="detail-editorial-body">{{item.body}}</text>
+        </view>
       </view>
     </view>
 
@@ -57,7 +50,7 @@
         <view class="detail-note-head">
           <text class="detail-note-title">{{item.key}}</text>
         </view>
-        <text class="detail-note-copy">{{item.text}}</text>
+        <text class="detail-note-copy line-clamp-2">{{item.text}}</text>
         <view wx:if="{{item.meter}}" class="detail-note-meter">
           <view class="detail-note-meter-fill" style="width: {{item.meter}}%;"></view>
         </view>

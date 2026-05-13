@@ -73,47 +73,16 @@
     </view>
 
     <view class="product-content">
-      <view class="content-block">
-        <text class="content-title">商品介绍</text>
-        <text class="content-copy">{{product.story}}</text>
-      </view>
-
-      <image wx:if="{{storyImagePrimary}}" class="product-story-image" src="{{storyImagePrimary}}" mode="aspectFill"></image>
-
-      <view wx:if="{{product.wine && product.wine.story}}" class="content-divider"></view>
-
-      <view wx:if="{{product.wine && product.wine.story}}" class="content-block">
-        <text class="content-title">{{product.wine.storyTitle || '酒款叙事'}}</text>
-        <text class="content-copy">{{product.wine.story}}</text>
-      </view>
-
-      <image wx:if="{{storyImageSecondary}}" class="product-story-image" src="{{storyImageSecondary}}" mode="aspectFill"></image>
-
-      <view wx:if="{{product.wine && product.wine.winemakerName}}" class="content-divider"></view>
-
-      <view wx:if="{{product.wine && product.wine.winemakerName}}" class="maker-card">
-        <image class="maker-card-image" src="{{product.wine.winemakerImage || product.wine.estatePortraitImage}}" mode="aspectFill"></image>
-        <view class="maker-card-copy">
-          <text class="maker-card-kicker">首席酿酒师</text>
-          <text class="maker-card-name">{{product.wine.winemakerCnName || product.wine.winemakerName}}</text>
-          <text class="maker-card-sub">{{product.wine.winemakerName}} · {{product.wine.winemakerTitle}}</text>
-          <text class="maker-card-body line-clamp-3">{{product.wine.winemakerIntro}}</text>
-        </view>
-      </view>
-
-      <view wx:if="{{product.highlights && product.highlights.length}}" class="content-divider"></view>
-
-      <view wx:if="{{product.highlights && product.highlights.length}}" class="content-block">
-        <text class="content-title">礼盒亮点</text>
-        <view class="highlight-list">
-          <view class="highlight-item" wx:for="{{product.highlights}}" wx:key="*this">
-            <text class="highlight-bullet"></text>
-            <text class="highlight-text">{{item}}</text>
+      <view wx:if="{{editorialSections.length}}" class="product-editorial">
+        <view class="product-editorial-module {{item.imageClass}}" wx:for="{{editorialSections}}" wx:key="key">
+          <image class="product-editorial-image" src="{{item.image}}" mode="aspectFill"></image>
+          <view class="product-editorial-copy">
+            <text class="product-editorial-eyebrow">{{item.eyebrow}}</text>
+            <text class="product-editorial-title">{{item.title}}</text>
+            <text class="product-editorial-body">{{item.body}}</text>
           </view>
         </view>
       </view>
-
-      <image wx:if="{{storyImageTertiary}}" class="product-story-image" src="{{storyImageTertiary}}" mode="aspectFill"></image>
 
       <view class="content-divider"></view>
 

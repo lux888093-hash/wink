@@ -1,11 +1,47 @@
 const { request } = require('../../utils/api');
 const { getCurrentExperience } = require('../../utils/session');
 
+function buildEditorialSections(wine) {
+  if (!wine) {
+    return [];
+  }
+
+  return [
+    {
+      key: 'overview',
+      eyebrow: '风味',
+      title: '先看结构，再读说明',
+      body: wine.overview || '',
+      image: wine.harvestImage || wine.estateHeroImage || wine.posterImage || wine.bottleImage || '',
+      imageClass: 'is-tall'
+    },
+    {
+      key: 'story',
+      eyebrow: '酒款',
+      title: wine.storyTitle || '静界的入口',
+      body: wine.story || wine.quote || '',
+      image: wine.posterImage || wine.bottleImage || wine.estateHeroImage || '',
+      imageClass: 'is-wide'
+    },
+    wine.winemakerIntro
+      ? {
+          key: 'maker',
+          eyebrow: '酿造',
+          title: wine.winemakerCnName || wine.winemakerName || '酿酒师',
+          body: wine.winemakerIntro,
+          image: wine.winemakerImage || wine.estatePortraitImage || wine.harvestImage || '',
+          imageClass: 'is-portrait'
+        }
+      : null
+  ].filter((item) => item && item.body && item.image);
+}
+
 Page({
   data: {
     ready: false,
     experience: null,
     wine: null,
+    editorialSections: [],
     showMall: true,
     errorTitle: '',
     errorMessage: ''
@@ -49,6 +85,7 @@ Page({
         ready: true,
         experience,
         wine: experience.wine,
+        editorialSections: buildEditorialSections(experience.wine),
         showMall: experience.access.showMall,
         errorTitle: '',
         errorMessage: ''

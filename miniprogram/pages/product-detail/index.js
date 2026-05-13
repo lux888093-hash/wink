@@ -21,6 +21,52 @@ function buildStoryImages(galleryImages = []) {
   return galleryImages.slice(1, 4);
 }
 
+function buildEditorialSections(product, storyImages = []) {
+  const wine = (product && product.wine) || {};
+  const highlights = Array.isArray(product && product.highlights) ? product.highlights.slice(0, 3).join('，') : '';
+
+  return [
+    {
+      key: 'product',
+      eyebrow: '礼盒',
+      title: '先看包装，再读定位',
+      body: product.story || '',
+      image: storyImages[0] || product.coverImage || '',
+      imageClass: 'is-tall'
+    },
+    wine.story
+      ? {
+          key: 'wine',
+          eyebrow: '酒款',
+          title: wine.storyTitle || '酒款叙事',
+          body: wine.story,
+          image: storyImages[1] || wine.posterImage || wine.bottleImage || '',
+          imageClass: 'is-wide'
+        }
+      : null,
+    wine.winemakerIntro
+      ? {
+          key: 'maker',
+          eyebrow: '酿造',
+          title: wine.winemakerCnName || wine.winemakerName || '酿酒师',
+          body: wine.winemakerIntro,
+          image: wine.winemakerImage || wine.estatePortraitImage || storyImages[2] || '',
+          imageClass: 'is-portrait'
+        }
+      : null,
+    highlights
+      ? {
+          key: 'highlights',
+          eyebrow: '亮点',
+          title: '把信息压缩成必要的几句',
+          body: highlights,
+          image: storyImages[2] || wine.giftImage || product.coverImage || '',
+          imageClass: 'is-wide'
+        }
+      : null
+  ].filter((item) => item && item.body && item.image);
+}
+
 function formatStockText(sku) {
   if (!sku || !sku.id) {
     return '暂无规格';
@@ -49,6 +95,7 @@ Page({
     storyImagePrimary: '',
     storyImageSecondary: '',
     storyImageTertiary: '',
+    editorialSections: [],
     wineMetaLine: '',
     selectedSkuId: '',
     selectedSku: emptySku(),
@@ -102,6 +149,7 @@ Page({
         storyImagePrimary: storyImages[0] || '',
         storyImageSecondary: storyImages[1] || '',
         storyImageTertiary: storyImages[2] || '',
+        editorialSections: buildEditorialSections(product, storyImages),
         wineMetaLine: buildWineMetaLine(product),
         selectedSkuId: selectedSku.id || '',
         selectedSku,
