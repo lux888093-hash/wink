@@ -15,9 +15,7 @@
               <span class="brand-mark-letter">H</span>
             </div>
           </div>
-          <p class="eyebrow-label brand-kicker">HONGJIU ESTATE</p>
           <h1 class="brand-title">鸿玖酒庄</h1>
-          <p class="brand-copy">运营控制台</p>
         </div>
 
         <nav class="nav-stack" aria-label="主导航">
@@ -26,31 +24,23 @@
           <button class="nav-item" data-view="codes">提取码管理</button>
         </nav>
 
-        <div class="nav-note">
-          <p>支持按关键词搜索酒款。</p>
-          <p>支持按批次和状态查看提取码。</p>
-        </div>
-
         <div class="rail-profile">
           <div class="rail-avatar">A</div>
           <div class="rail-user-meta">
             <strong class="rail-user-name">Admin</strong>
-            <span class="rail-user-role">管理员</span>
           </div>
-          <span class="rail-profile-arrow" aria-hidden="true">›</span>
         </div>
       </aside>
 
       <main class="workspace">
         <header class="topbar">
           <div class="topbar-copy">
-            <p class="eyebrow-label topbar-kicker">运营控制台</p>
             <h2 class="topbar-title" id="view-title">运营概览</h2>
-            <p class="topbar-description" id="view-description">查看酒款、提取码和品牌资料。</p>
+            <p class="topbar-description" id="view-description" hidden></p>
           </div>
 
           <div class="topbar-actions">
-            <div class="session-pill" id="session-pill">未登录</div>
+            <div class="session-pill" id="session-pill" hidden>未登录</div>
             <button class="outline-button" id="refresh-button" type="button">刷新数据</button>
             <button class="outline-button" id="logout-button" type="button">退出登录</button>
           </div>
@@ -59,51 +49,14 @@
         <div class="status-banner" id="status-banner" aria-live="polite"></div>
 
         <section class="view is-active" id="view-overview">
-          <section class="hero-surface">
-            <div class="hero-copy">
-              <p class="eyebrow-label">概览</p>
-              <h3 class="hero-title">内容与提取码概览</h3>
-              <p class="hero-description">查看酒款数量、提取码状态和近期使用情况。</p>
-              <div class="hero-actions">
-                <button class="primary-button" type="button" data-view-target="wines">进入酒款管理</button>
-                <button class="outline-button" type="button" data-view-target="codes">进入提取码管理</button>
-              </div>
-            </div>
-            <div class="metric-grid" id="overview-metrics"></div>
-          </section>
-
-          <div class="overview-grid">
-            <section class="surface">
-              <div class="surface-head">
-                <div>
-                  <p class="eyebrow-label">常用操作</p>
-                  <h3 class="surface-title">快捷操作</h3>
-                </div>
-              </div>
-              <div class="surface-body" id="overview-focus"></div>
-            </section>
-
-            <section class="surface">
-              <div class="surface-head">
-                <div>
-                  <p class="eyebrow-label">资料</p>
-                  <h3 class="surface-title">品牌资料</h3>
-                </div>
-              </div>
-              <div class="surface-body" id="overview-fixed-content"></div>
-            </section>
-          </div>
+          <div class="overview-canvas" id="overview-canvas"></div>
         </section>
 
         <section class="view" id="view-wines">
-          <div class="workspace-grid wines-grid">
-            <section class="surface list-surface">
-              <div class="surface-head">
-                <div>
-                  <p class="eyebrow-label">酒款管理</p>
-                  <h3 class="surface-title">酒款目录</h3>
-                </div>
-                <button class="primary-button" id="open-create-wine" type="button">新增酒款</button>
+          <div class="workspace-grid wines-grid wines-grid-compact">
+            <section class="surface list-surface list-surface-wide">
+              <div class="surface-head surface-head-actions-only">
+                <button class="primary-button" id="open-create-wine" type="button">新增</button>
               </div>
 
               <div class="toolbar wine-toolbar">
@@ -121,96 +74,19 @@
                 </div>
               </div>
 
-              <div class="collection-summary" id="wines-summary"></div>
               <div class="selection-list" id="wines-collection"></div>
-            </section>
-
-            <section class="surface editor-surface">
-              <div class="surface-body" id="wine-editor"></div>
             </section>
           </div>
         </section>
 
         <section class="view" id="view-codes">
-          <div class="workspace-grid codes-grid">
-            <section class="surface side-surface">
-              <div class="surface-head">
-                <div>
-                  <p class="eyebrow-label">批量生成</p>
-                  <h3 class="surface-title">批量生成提取码</h3>
-                </div>
-              </div>
-              <div class="surface-body">
-                <form id="batch-form" class="stack-form">
-                  <label class="form-row">
-                    <span class="form-row-label">酒款</span>
-                    <div class="form-row-control">
-                      <select id="batch-wine"></select>
-                    </div>
-                  </label>
-                  <label class="form-row">
-                    <span class="form-row-label">数量</span>
-                    <div class="form-row-control">
-                      <input id="batch-quantity" type="number" min="1" max="500" value="24" />
-                      <span class="form-hint">建议按单个批次统一管理，便于追踪。</span>
-                    </div>
-                  </label>
-                  <label class="form-row">
-                    <span class="form-row-label">批次号</span>
-                    <div class="form-row-control">
-                      <input id="batch-batch-no" type="text" placeholder="留空则自动生成" />
-                      <span class="form-hint">可自定义批次号，便于线下物料归档。</span>
-                    </div>
-                  </label>
-                  <label class="form-row">
-                    <span class="form-row-label">有效期</span>
-                    <div class="form-row-control">
-                      <input id="batch-expire-at" type="datetime-local" />
-                      <span class="form-hint">从生成日起计算有效期。</span>
-                    </div>
-                  </label>
-                  <button class="primary-button batch-submit-button" type="submit">生成提取码</button>
-                </form>
-
-                <div class="fixed-code-block">
-                  <div>
-                    <p class="eyebrow-label">入口码</p>
-                    <h4 class="minor-title">固定小程序码</h4>
-                  </div>
-                  <p class="minor-copy">用于用户扫码进入提取页，线下物料可重复投放。</p>
-                  <div class="fixed-code-layout">
-                    <div class="fixed-qrcode-preview" id="fixed-qrcode-preview">
-                      <div class="fixed-qrcode-placeholder">待生成</div>
-                    </div>
-                    <div class="fixed-code-actions">
-                      <button class="outline-button" id="fixed-qrcode-button" type="button">生成固定入口码</button>
-                      <a class="outline-button" id="fixed-qrcode-download" href="#" download hidden>下载二维码</a>
-                      <button class="text-button" id="fixed-qrcode-copy" type="button" hidden>复制链接</button>
-                    </div>
-                  </div>
-                  <p class="inline-feedback" id="fixed-qrcode-result"></p>
-                </div>
-
-                <div class="fail-log-block">
-                  <div class="panel-head-inline">
-                    <div>
-                      <p class="eyebrow-label">失败记录</p>
-                      <h4 class="minor-title">最近验证失败</h4>
-                    </div>
-                    <span class="panel-meta-text">最近 6 条</span>
-                  </div>
-                  <div id="codes-fail-logs"></div>
-                </div>
-              </div>
-            </section>
-
-            <section class="surface table-surface">
-              <div class="surface-head">
-                <div>
-                  <p class="eyebrow-label">状态列表</p>
-                  <h3 class="surface-title">提取码列表</h3>
-                </div>
-                <button class="outline-button" id="export-codes-button" type="button">导出 CSV</button>
+          <div class="workspace-grid codes-grid codes-grid-compact">
+            <section class="surface table-surface table-surface-wide">
+              <div class="surface-head surface-head-actions-only code-head-actions">
+                <button class="outline-button" id="open-batch-dialog" type="button">生成</button>
+                <button class="outline-button" id="open-fixed-dialog" type="button">固定码</button>
+                <button class="outline-button" id="open-fail-dialog" type="button">异常</button>
+                <button class="outline-button" id="export-codes-button" type="button">导出</button>
               </div>
 
               <div class="codes-workspace-head">
@@ -250,13 +126,33 @@
       </main>
     </div>
 
-    <dialog class="sheet-dialog" id="create-wine-dialog">
-      <form class="sheet-form" id="create-wine-form" method="dialog">
+    <dialog class="sheet-dialog overview-dialog" id="overview-detail-dialog">
+      <div class="sheet-form overview-detail-sheet">
         <div class="sheet-head">
           <div>
-            <p class="eyebrow-label">新增酒款</p>
-            <h3 class="surface-title">新增酒款</h3>
+            <h3 class="surface-title" id="overview-detail-title">详情</h3>
           </div>
+          <button class="ghost-icon-button" type="button" data-action="close-overview-detail" aria-label="关闭">×</button>
+        </div>
+        <div class="overview-detail-body" id="overview-detail-body"></div>
+      </div>
+    </dialog>
+
+    <dialog class="sheet-dialog side-sheet-dialog" id="wine-editor-dialog">
+      <div class="sheet-form side-sheet-form">
+        <div class="sheet-head">
+          <div>
+            <h3 class="surface-title">酒款</h3>
+          </div>
+          <button class="ghost-icon-button" type="button" data-action="close-wine-editor" aria-label="关闭">×</button>
+        </div>
+        <div class="side-sheet-body" id="wine-editor"></div>
+      </div>
+    </dialog>
+
+    <dialog class="sheet-dialog side-sheet-dialog" id="create-wine-dialog">
+      <form class="sheet-form side-sheet-form" id="create-wine-form" method="dialog">
+        <div class="sheet-head sheet-head-actions-only">
           <button class="ghost-icon-button" type="button" data-action="close-create-wine" aria-label="关闭">×</button>
         </div>
 
@@ -298,12 +194,92 @@
       </form>
     </dialog>
 
+    <dialog class="sheet-dialog side-sheet-dialog" id="batch-dialog">
+      <form class="sheet-form side-sheet-form" id="batch-form" method="dialog">
+        <div class="sheet-head">
+          <div>
+            <h3 class="surface-title">生成提取码</h3>
+          </div>
+          <button class="ghost-icon-button" type="button" data-action="close-batch-dialog" aria-label="关闭">×</button>
+        </div>
+
+        <div class="stack-form">
+          <label class="form-row">
+            <span class="form-row-label">酒款</span>
+            <div class="form-row-control">
+              <select id="batch-wine"></select>
+            </div>
+          </label>
+          <label class="form-row">
+            <span class="form-row-label">数量</span>
+            <div class="form-row-control">
+              <input id="batch-quantity" type="number" min="1" max="500" value="24" />
+            </div>
+          </label>
+          <label class="form-row">
+            <span class="form-row-label">批次号</span>
+            <div class="form-row-control">
+              <input id="batch-batch-no" type="text" placeholder="留空自动生成" />
+            </div>
+          </label>
+          <label class="form-row">
+            <span class="form-row-label">有效期</span>
+            <div class="form-row-control">
+              <input id="batch-expire-at" type="datetime-local" />
+            </div>
+          </label>
+        </div>
+
+        <div class="sheet-actions">
+          <button class="outline-button" type="button" data-action="close-batch-dialog">取消</button>
+          <button class="primary-button" type="submit">生成</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="sheet-dialog side-sheet-dialog" id="fixed-dialog">
+      <div class="sheet-form side-sheet-form">
+        <div class="sheet-head">
+          <div>
+            <h3 class="surface-title">固定码</h3>
+          </div>
+          <button class="ghost-icon-button" type="button" data-action="close-fixed-dialog" aria-label="关闭">×</button>
+        </div>
+
+        <div class="fixed-code-block fixed-code-block-dialog">
+          <div class="fixed-code-layout">
+            <div class="fixed-qrcode-preview" id="fixed-qrcode-preview">
+              <div class="fixed-qrcode-placeholder">待生成</div>
+            </div>
+            <div class="fixed-code-actions">
+              <button class="outline-button" id="fixed-qrcode-button" type="button">生成</button>
+              <a class="outline-button" id="fixed-qrcode-download" href="#" download hidden>下载</a>
+              <button class="text-button" id="fixed-qrcode-copy" type="button" hidden>复制</button>
+            </div>
+          </div>
+          <p class="inline-feedback" id="fixed-qrcode-result"></p>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog class="sheet-dialog side-sheet-dialog" id="fail-logs-dialog">
+      <div class="sheet-form side-sheet-form">
+        <div class="sheet-head">
+          <div>
+            <h3 class="surface-title">验证异常</h3>
+          </div>
+          <button class="ghost-icon-button" type="button" data-action="close-fail-dialog" aria-label="关闭">×</button>
+        </div>
+        <div class="fail-log-block fail-log-block-dialog" id="codes-fail-block">
+          <div id="codes-fail-logs"></div>
+        </div>
+      </div>
+    </dialog>
+
     <div class="login-overlay" id="login-overlay">
       <div class="login-card">
         <div class="login-visual">
-          <p class="eyebrow-label">管理员登录</p>
           <h2 class="login-title">鸿玖酒庄运营台</h2>
-          <p class="login-subtitle">登录后可维护酒款资料、生成提取码并查看使用状态。</p>
         </div>
 
         <form id="login-form" class="login-form">

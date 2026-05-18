@@ -38,15 +38,15 @@ const state = {
 const viewMeta = {
   overview: {
     title: '运营概览',
-    description: '查看酒款、提取码和品牌资料。'
+    description: ''
   },
   wines: {
     title: '酒款管理',
-    description: '用搜索和筛选定位酒款，在右侧完成介绍和图片编辑。'
+    description: ''
   },
   codes: {
     title: '提取码管理',
-    description: '按酒款生成提取码，并查看是否已使用、过期或停用。'
+    description: ''
   }
 };
 
@@ -83,30 +83,40 @@ const els = {
   viewTitle: document.getElementById('view-title'),
   viewDescription: document.getElementById('view-description'),
   sessionPill: document.getElementById('session-pill'),
+  railAvatar: document.querySelector('.rail-avatar'),
+  railUserName: document.querySelector('.rail-user-name'),
   statusBanner: document.getElementById('status-banner'),
   refreshButton: document.getElementById('refresh-button'),
   logoutButton: document.getElementById('logout-button'),
-  overviewMetrics: document.getElementById('overview-metrics'),
-  overviewFocus: document.getElementById('overview-focus'),
-  overviewFixedContent: document.getElementById('overview-fixed-content'),
+  overviewCanvas: document.getElementById('overview-canvas'),
+  overviewDetailDialog: document.getElementById('overview-detail-dialog'),
+  overviewDetailTitle: document.getElementById('overview-detail-title'),
+  overviewDetailBody: document.getElementById('overview-detail-body'),
   wineSearch: document.getElementById('wine-search'),
   wineStatusTabs: document.getElementById('wine-status-tabs'),
   winesSummary: document.getElementById('wines-summary'),
   winesCollection: document.getElementById('wines-collection'),
+  wineEditorDialog: document.getElementById('wine-editor-dialog'),
   wineEditor: document.getElementById('wine-editor'),
   openCreateWine: document.getElementById('open-create-wine'),
   createWineDialog: document.getElementById('create-wine-dialog'),
   createWineForm: document.getElementById('create-wine-form'),
+  openBatchDialog: document.getElementById('open-batch-dialog'),
+  batchDialog: document.getElementById('batch-dialog'),
   batchForm: document.getElementById('batch-form'),
   batchWine: document.getElementById('batch-wine'),
   batchQuantity: document.getElementById('batch-quantity'),
   batchBatchNo: document.getElementById('batch-batch-no'),
   batchExpireAt: document.getElementById('batch-expire-at'),
+  openFixedDialog: document.getElementById('open-fixed-dialog'),
+  fixedDialog: document.getElementById('fixed-dialog'),
   fixedQrcodeButton: document.getElementById('fixed-qrcode-button'),
   fixedQrcodePreview: document.getElementById('fixed-qrcode-preview'),
   fixedQrcodeResult: document.getElementById('fixed-qrcode-result'),
   fixedQrcodeDownload: document.getElementById('fixed-qrcode-download'),
   fixedQrcodeCopy: document.getElementById('fixed-qrcode-copy'),
+  openFailDialog: document.getElementById('open-fail-dialog'),
+  failLogsDialog: document.getElementById('fail-logs-dialog'),
   codeSearch: document.getElementById('code-search'),
   codeStatusFilter: document.getElementById('code-status-filter'),
   codeWineFilter: document.getElementById('code-wine-filter'),
@@ -114,6 +124,7 @@ const els = {
   codesTable: document.getElementById('codes-table'),
   codesFooter: document.getElementById('codes-footer'),
   codesFailLogs: document.getElementById('codes-fail-logs'),
+  codesFailBlock: document.getElementById('codes-fail-block'),
   exportCodesButton: document.getElementById('export-codes-button'),
   views: {
     overview: document.getElementById('view-overview'),
@@ -265,9 +276,16 @@ function toggleLogin(visible) {
 }
 
 function updateSessionPill() {
-  const persistence = state.health && state.health.persistence ? state.health.persistence.mode : '未连接';
-  const role = state.user && state.user.roleName ? ` · ${state.user.roleName}` : '';
-  els.sessionPill.textContent = state.user ? `${state.user.displayName}${role} · ${persistence}` : persistence;
+  const sidebarName = state.user ? 'Admin' : '未登录';
+  els.sessionPill.textContent = state.user ? '已登录' : '未登录';
+
+  if (els.railUserName) {
+    els.railUserName.textContent = sidebarName;
+  }
+
+  if (els.railAvatar) {
+    els.railAvatar.textContent = sidebarName.slice(0, 1) || 'A';
+  }
 }
 
 function getFirstAllowedView() {
@@ -289,10 +307,17 @@ function setView(view) {
     return;
   }
 
+  closeOverviewDetailDialog();
+  closeWineEditorDialog();
+  closeBatchDialog();
+  closeFixedDialog();
+  closeFailLogsDialog();
+
   state.activeView = view;
   const meta = viewMeta[view];
   els.viewTitle.textContent = meta.title;
   els.viewDescription.textContent = meta.description;
+  els.viewDescription.hidden = !meta.description;
 
   els.navItems.forEach((item) => {
     item.classList.toggle('is-active', item.dataset.view === view);
@@ -361,6 +386,14 @@ function formatShortDate(value) {
 
 function formatNumber(value) {
   return new Intl.NumberFormat('zh-CN').format(Number(value) || 0);
+}
+
+function formatCurrency(value) {
+  return new Intl.NumberFormat('zh-CN', {
+    style: 'currency',
+    currency: 'CNY',
+    maximumFractionDigits: 0
+  }).format(Number(value) || 0);
 }
 
 function renderStatusPill(status) {
@@ -650,134 +683,357 @@ function getIncompleteWines(items = getEnrichedWines()) {
   );
 }
 
+function showDialog(dialog) {
+  if (!dialog || dialog.hasAttribute('open')) {
+    return;
+  }
+
+  if (typeof dialog.showModal === 'function') {
+    dialog.showModal();
+  } else {
+    dialog.setAttribute('open', 'open');
+  }
+}
+
+function hideDialog(dialog) {
+  if (!dialog || !dialog.hasAttribute('open')) {
+    return;
+  }
+
+  if (typeof dialog.close === 'function') {
+    dialog.close();
+  } else {
+    dialog.removeAttribute('open');
+  }
+}
+
+function openOverviewDetailDialog(title, html) {
+  if (!els.overviewDetailDialog || !els.overviewDetailTitle || !els.overviewDetailBody) {
+    return;
+  }
+
+  els.overviewDetailTitle.textContent = title;
+  els.overviewDetailBody.innerHTML = html;
+  showDialog(els.overviewDetailDialog);
+}
+
+function closeOverviewDetailDialog() {
+  hideDialog(els.overviewDetailDialog);
+}
+
+function openWineEditorDialog() {
+  if (!els.wineEditorDialog) {
+    return;
+  }
+
+  showDialog(els.wineEditorDialog);
+}
+
+function closeWineEditorDialog() {
+  hideDialog(els.wineEditorDialog);
+}
+
+function openCreateWineDialog() {
+  if (!els.createWineDialog) {
+    return;
+  }
+
+  els.createWineForm.reset();
+  showDialog(els.createWineDialog);
+}
+
+function closeCreateWineDialog() {
+  hideDialog(els.createWineDialog);
+}
+
+function openBatchDialog() {
+  showDialog(els.batchDialog);
+}
+
+function closeBatchDialog() {
+  hideDialog(els.batchDialog);
+}
+
+function openFixedDialog() {
+  showDialog(els.fixedDialog);
+}
+
+function closeFixedDialog() {
+  hideDialog(els.fixedDialog);
+}
+
+function openFailLogsDialog() {
+  showDialog(els.failLogsDialog);
+}
+
+function closeFailLogsDialog() {
+  hideDialog(els.failLogsDialog);
+}
+
 function renderOverview() {
   const wines = getEnrichedWines();
-  const codeSummary = getCodeSummary();
-  const activeWines = wines.filter((wine) => (wine.status || 'active') === 'active').length;
-  const successRate =
-    state.dashboard && state.dashboard.metrics && state.dashboard.metrics.codeSuccessRate !== undefined
-      ? `${state.dashboard.metrics.codeSuccessRate}%`
-      : '--';
-
-  const metricCards = [
+  const dashboard = state.dashboard || {};
+  const metrics = dashboard.metrics || {};
+  const incompleteWines = getIncompleteWines(wines).slice(0, 4);
+  const winery = getFixedWinery();
+  const track = getFixedTrack();
+  const recentOrders = (dashboard.recentOrders || []).filter(Boolean).slice(0, 5);
+  const hotProducts = (dashboard.hotProducts || []).filter(Boolean).slice(0, 3);
+  const summaryCards = (dashboard.cards || []).slice(0, 3);
+  const heroImage = (winery && winery.heroImage) || '/assets/images/village-ancient-vine-sign.jpg';
+  const pendingCount = incompleteWines.length + state.redeemFailLogs.length;
+  const detailCards = [
     {
-      label: '酒款总数',
-      value: wines.length,
-      sub: `${activeWines} 款处于启用中`
+      type: 'pending',
+      label: '待处理',
+      value: formatNumber(pendingCount),
+      copy: '资料与验证异常'
     },
     {
-      label: '待使用提取码',
-      value: codeSummary.ready,
-      sub: '可继续投放到线下物料'
+      type: 'orders',
+      label: '订单',
+      value: formatNumber(recentOrders.length),
+      copy: '查看最新成交'
     },
     {
-      label: '已使用提取码',
-      value: codeSummary.claimed,
-      sub: `${codeSummary.total} 个提取码累计`
+      type: 'products',
+      label: '商品',
+      value: formatNumber(hotProducts.length),
+      copy: '查看主推礼盒'
     },
     {
-      label: '验证成功率',
-      value: successRate,
-      sub: `${state.redeemFailLogs.length} 条近期失败记录`
+      type: 'brand',
+      label: '品牌',
+      value: formatNumber(wines.length),
+      copy: '酒庄、音乐、会员'
     }
   ];
 
-  els.overviewMetrics.innerHTML = metricCards
-    .map(
-      (card) => `
-        <article class="metric-card">
-          <p class="metric-label">${escapeHtml(card.label)}</p>
-          <p class="metric-value">${escapeHtml(card.value)}</p>
-          <p class="metric-sub">${escapeHtml(card.sub)}</p>
-        </article>
-      `
-    )
-    .join('');
+  els.overviewCanvas.innerHTML = `
+    <div class="overview-shell overview-shell-compact">
+      <section class="surface overview-stage">
+        <div class="overview-stage-copy">
+          <span class="overview-stage-label">概览</span>
+          <h3 class="overview-stage-title">先处理待办，再看订单、商品和品牌。</h3>
+          <div class="overview-stage-actions">
+            <button class="primary-button" type="button" data-view-target="codes">提取码</button>
+            <button class="outline-button" type="button" data-view-target="wines">酒款</button>
+          </div>
+          <div class="overview-stage-metrics">
+            ${
+              summaryCards.length
+                ? summaryCards
+                    .map(
+                      (card) => `
+                        <article class="overview-stage-metric">
+                          <span>${escapeHtml(card.label || '')}</span>
+                          <strong>${escapeHtml(card.value || '--')}</strong>
+                        </article>
+                      `
+                    )
+                    .join('')
+                : `
+                  <article class="overview-stage-metric">
+                    <span>订单转化</span>
+                    <strong>${escapeHtml(`${metrics.orderRate || 0}%`)}</strong>
+                  </article>
+                  <article class="overview-stage-metric">
+                    <span>会员转化</span>
+                    <strong>${escapeHtml(`${metrics.memberRate || 0}%`)}</strong>
+                  </article>
+                  <article class="overview-stage-metric">
+                    <span>24h 下载</span>
+                    <strong>${escapeHtml(formatNumber(metrics.downloads24h || 0))}</strong>
+                  </article>
+                `
+            }
+          </div>
+        </div>
+        <button class="overview-stage-brand" type="button" data-overview-detail="brand">
+          <img class="overview-stage-image" src="${escapeHtml(heroImage)}" alt="${escapeHtml((winery && winery.name) || '酒庄场景')}" />
+          <div class="overview-stage-brand-copy">
+            <span>${escapeHtml((winery && winery.tagline) || '酒庄')}</span>
+            <strong>${escapeHtml((winery && winery.name) || '未设置')}</strong>
+            <em>${escapeHtml((track && (track.cnTitle || track.title)) || '查看资料')}</em>
+          </div>
+        </button>
+      </section>
 
-  const incompleteWines = getIncompleteWines(wines).slice(0, 4);
-  const topWines = wines.slice(0, 4);
-  els.overviewFocus.innerHTML = `
-    <div class="focus-grid">
-      <article class="task-card">
-        <p class="eyebrow-label">酒款</p>
-        <h4 class="task-title">管理酒款资料</h4>
-        <p class="task-copy">按关键词或状态筛选酒款，在右侧修改介绍、引言和图片。</p>
-        <button class="primary-button" type="button" data-view-target="wines">查看酒款</button>
-      </article>
-      <article class="task-card">
-        <p class="eyebrow-label">提取码</p>
-        <h4 class="task-title">生成提取码批次</h4>
-        <p class="task-copy">按酒款设置数量、批次号和有效期，生成后可直接查看状态。</p>
-        <button class="outline-button" type="button" data-view-target="codes">查看提取码</button>
-      </article>
-    </div>
-    <div class="insight-columns">
-      <div class="insight-panel">
-        <p class="minor-label">待补充介绍</p>
-        ${
-          incompleteWines.length
-            ? incompleteWines
-                .map(
-                  (wine) => `
-                    <button class="insight-row" type="button" data-view-target="wines" data-wine-id="${escapeHtml(wine.id)}">
-                      <span>${escapeHtml(wine.name)}</span>
-                      <span>${escapeHtml(wine.codeTotal)} 个码</span>
-                    </button>
-                  `
-                )
-                .join('')
-            : '<p class="empty-inline">暂无待补充的酒款介绍。</p>'
-        }
-      </div>
-      <div class="insight-panel">
-        <p class="minor-label">最近常用酒款</p>
-        ${
-          topWines.length
-            ? topWines
-                .map(
-                  (wine) => `
-                    <button class="insight-row" type="button" data-view-target="wines" data-wine-id="${escapeHtml(wine.id)}">
-                      <span>${escapeHtml(wine.name)}</span>
-                      <span>已用 ${escapeHtml(wine.claimedCodeTotal)} 个</span>
-                    </button>
-                  `
-                )
-                .join('')
-            : '<p class="empty-inline">暂无酒款数据。</p>'
-        }
-      </div>
+      <section class="overview-launch-grid">
+        ${detailCards
+          .map(
+            (card) => `
+              <button class="surface overview-launch-card" type="button" data-overview-detail="${escapeHtml(card.type)}">
+                <span class="overview-launch-label">${escapeHtml(card.label)}</span>
+                <strong class="overview-launch-value">${escapeHtml(card.value)}</strong>
+                <span class="overview-launch-copy">${escapeHtml(card.copy)}</span>
+                <em class="overview-launch-cta">查看</em>
+              </button>
+            `
+          )
+          .join('')}
+      </section>
     </div>
   `;
+}
 
+function renderOverviewDetail(type) {
+  const wines = getEnrichedWines();
+  const dashboard = state.dashboard || {};
+  const metrics = dashboard.metrics || {};
+  const codeSummary = dashboard.codeSummary || getCodeSummary();
+  const recentOrders = (dashboard.recentOrders || []).filter(Boolean);
+  const hotProducts = (dashboard.hotProducts || []).filter(Boolean);
+  const incompleteWines = getIncompleteWines(wines);
   const winery = getFixedWinery();
   const track = getFixedTrack();
-  els.overviewFixedContent.innerHTML = `
-    <div class="fixed-content-grid">
-      <article class="fixed-card">
-        <p class="minor-label">酒庄</p>
-        <h4 class="task-title">${escapeHtml((winery && winery.name) || '未设置')}</h4>
-        <p class="task-copy">${escapeHtml((winery && winery.intro) || '暂无酒庄资料。')}</p>
-      </article>
-      <article class="fixed-card">
-        <p class="minor-label">音乐</p>
-        <h4 class="task-title">${escapeHtml((track && (track.cnTitle || track.title)) || '未设置')}</h4>
-        <p class="task-copy">${escapeHtml((track && track.description) || '用于当前展示。')}</p>
-      </article>
-    </div>
-  `;
+  const deliveryStatusCopy = {
+    delivering: '配送中',
+    shipped: '已发货',
+    completed: '已完成',
+    paid: '已支付'
+  };
+
+  if (type === 'pending') {
+    openOverviewDetailDialog(
+      '待处理',
+      `
+        <div class="overview-detail-stack">
+          <section class="overview-detail-section">
+            <h4>待补资料</h4>
+            ${
+              incompleteWines.length
+                ? incompleteWines
+                    .map(
+                      (wine) => `
+                        <button class="overview-detail-row" type="button" data-view-target="wines" data-wine-id="${escapeHtml(wine.id)}" data-action="close-overview-detail">
+                          <span>${escapeHtml(wine.name)}</span>
+                          <span>待补资料</span>
+                        </button>
+                      `
+                    )
+                    .join('')
+                : '<div class="overview-empty">当前没有待补资料</div>'
+            }
+          </section>
+          <section class="overview-detail-section">
+            <h4>验证异常</h4>
+            ${
+              state.redeemFailLogs.length
+                ? state.redeemFailLogs
+                    .slice(0, 8)
+                    .map(
+                      (log) => `
+                        <button class="overview-detail-row" type="button" data-view-target="codes" data-action="close-overview-detail">
+                          <span>${escapeHtml(getShortCode(log.code))}</span>
+                          <span>${escapeHtml(REASON_COPY[log.reason] || '验证失败')}</span>
+                        </button>
+                      `
+                    )
+                    .join('')
+                : '<div class="overview-empty">当前没有验证异常</div>'
+            }
+          </section>
+          <section class="overview-detail-grid">
+            <article><span>待使用</span><strong>${escapeHtml(formatNumber(codeSummary.ready || 0))}</strong></article>
+            <article><span>已使用</span><strong>${escapeHtml(formatNumber(codeSummary.claimed || 0))}</strong></article>
+            <article><span>停用</span><strong>${escapeHtml(formatNumber(codeSummary.disabled || 0))}</strong></article>
+            <article><span>过期</span><strong>${escapeHtml(formatNumber(codeSummary.expired || 0))}</strong></article>
+          </section>
+        </div>
+      `
+    );
+    return;
+  }
+
+  if (type === 'orders') {
+    openOverviewDetailDialog(
+      '近期订单',
+      `
+        <div class="overview-detail-stack">
+          ${
+            recentOrders.length
+              ? recentOrders
+                  .map((order) => {
+                    const firstItem = order.items && order.items[0];
+                    return `
+                      <article class="overview-detail-order">
+                        <div>
+                          <strong>${escapeHtml(firstItem ? firstItem.productName : order.orderNo)}</strong>
+                          <p>${escapeHtml(order.addressSummary || '未填写地址')}</p>
+                        </div>
+                        <div>
+                          <strong>${escapeHtml(formatCurrency(order.payAmount || order.amount || 0))}</strong>
+                          <p>${escapeHtml(deliveryStatusCopy[order.deliveryStatus] || deliveryStatusCopy[order.status] || '处理中')}</p>
+                        </div>
+                      </article>
+                    `;
+                  })
+                  .join('')
+              : '<div class="overview-empty">当前没有订单数据</div>'
+          }
+        </div>
+      `
+    );
+    return;
+  }
+
+  if (type === 'products') {
+    openOverviewDetailDialog(
+      '主推礼盒',
+      `
+        <div class="overview-detail-card-grid">
+          ${
+            hotProducts.length
+              ? hotProducts
+                  .map(
+                    (product) => `
+                      <article class="overview-detail-product">
+                        <img src="${escapeHtml(product.coverImage || '/assets/images/wine-gift-set.jpg')}" alt="${escapeHtml(product.name || 'product')}" />
+                        <div>
+                          <strong>${escapeHtml(product.name || '未设置')}</strong>
+                          <p>${escapeHtml(product.subtitle || product.story || '')}</p>
+                          <span>${escapeHtml(formatCurrency(product.lowestPrice || 0))}</span>
+                        </div>
+                      </article>
+                    `
+                  )
+                  .join('')
+              : '<div class="overview-empty">当前没有商品数据</div>'
+          }
+        </div>
+      `
+    );
+    return;
+  }
+
+  openOverviewDetailDialog(
+    '品牌与会员',
+    `
+      <div class="overview-detail-stack">
+        <section class="overview-detail-brand">
+          <strong>${escapeHtml((winery && winery.name) || '未设置')}</strong>
+          <p>${escapeHtml((winery && winery.intro) || '未设置')}</p>
+        </section>
+        <section class="overview-detail-grid">
+          <article><span>会员</span><strong>${escapeHtml(formatNumber(metrics.activeMembers || 0))}</strong></article>
+          <article><span>用户</span><strong>${escapeHtml(formatNumber(metrics.totalUsers || 0))}</strong></article>
+          <article><span>下载</span><strong>${escapeHtml(formatNumber(metrics.totalDownloads || 0))}</strong></article>
+          <article><span>酒款</span><strong>${escapeHtml(formatNumber(wines.length))}</strong></article>
+        </section>
+        <section class="overview-detail-brand secondary">
+          <strong>${escapeHtml((track && (track.cnTitle || track.title)) || '未设置')}</strong>
+          <p>${escapeHtml((track && track.description) || '未设置')}</p>
+        </section>
+      </div>
+    `
+  );
 }
 
 function renderWines() {
   const allWines = getEnrichedWines();
   const filteredWines = getFilteredWines(allWines);
   const selectedWine = ensureSelectedWine();
-
-  els.winesSummary.innerHTML = `
-    <span>共 ${allWines.length} 款酒</span>
-    <span>筛选结果 ${filteredWines.length} 款</span>
-    <span>启用中 ${allWines.filter((wine) => (wine.status || 'active') === 'active').length} 款</span>
-    <span>有提取码 ${allWines.filter((wine) => wine.codeTotal > 0).length} 款</span>
-  `;
 
   els.winesCollection.innerHTML = filteredWines.length
     ? `
@@ -814,7 +1070,7 @@ function renderWines() {
     : '<div class="empty-state">没有匹配的酒款，试试更换关键词或状态筛选。</div>';
 
   if (!selectedWine) {
-    els.wineEditor.innerHTML = '<div class="empty-state">暂无酒款，请先创建一款新的酒。</div>';
+    els.wineEditor.innerHTML = '<div class="empty-state">暂无酒款。</div>';
     return;
   }
 
@@ -824,7 +1080,6 @@ function renderWines() {
     <form id="wine-editor-form" class="editor-form" data-wine-id="${escapeHtml(selectedWine.id)}">
       <div class="editor-hero">
         <div class="editor-hero-copy">
-          <p class="eyebrow-label">当前酒款</p>
           <h3 class="editor-title">${escapeHtml(selectedWine.name)}</h3>
           <p class="editor-subtitle">${escapeHtml(selectedWine.subtitle || '未填写副标题')}</p>
         </div>
@@ -846,12 +1101,6 @@ function renderWines() {
 
       <div class="editor-layout">
         <section class="editor-section editor-section-basic">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow-label">基础资料</p>
-              <h4 class="section-title">基础信息</h4>
-            </div>
-          </div>
           <div class="form-grid">
             <label>
               <span>酒款名称</span>
@@ -884,12 +1133,6 @@ function renderWines() {
         </section>
 
         <section class="editor-section editor-section-copy">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow-label">文案内容</p>
-              <h4 class="section-title">酒款介绍</h4>
-            </div>
-          </div>
           <div class="form-stack">
             <label>
               <span>酒款概述</span>
@@ -907,12 +1150,6 @@ function renderWines() {
         </section>
 
         <section class="editor-section editor-section-media">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow-label">展示图片</p>
-              <h4 class="section-title">展示图片</h4>
-            </div>
-          </div>
           <div class="form-stack">
             ${renderImageField({
               label: '瓶身图',
@@ -939,15 +1176,9 @@ function renderWines() {
         </section>
 
         <section class="editor-section editor-note">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow-label">关联资料</p>
-              <h4 class="section-title">关联资料</h4>
-            </div>
-          </div>
           <div class="tag-row">
-            <span class="tag">酒庄：${escapeHtml((winery && winery.name) || '未设置')}</span>
-            <span class="tag">音乐：${escapeHtml((track && (track.cnTitle || track.title)) || '未设置')}</span>
+            <span class="tag">${escapeHtml((winery && winery.name) || '未设置')}</span>
+            <span class="tag">${escapeHtml((track && (track.cnTitle || track.title)) || '未设置')}</span>
           </div>
         </section>
       </div>
@@ -998,7 +1229,7 @@ function renderFixedQrcodePanel() {
 
   if (!state.fixedQrcode || !state.fixedQrcode.path) {
     els.fixedQrcodePreview.innerHTML = '<div class="fixed-qrcode-placeholder">待生成</div>';
-    els.fixedQrcodeResult.textContent = '生成后可下载二维码或复制访问链接。';
+    els.fixedQrcodeResult.textContent = '';
     els.fixedQrcodeDownload.hidden = true;
     els.fixedQrcodeDownload.removeAttribute('href');
     els.fixedQrcodeCopy.hidden = true;
@@ -1082,7 +1313,13 @@ function renderCodes() {
           `
         )
         .join('')
-    : '<div class="empty-inline">最近没有验证失败记录。</div>';
+    : '';
+  if (els.codesFailBlock) {
+    els.codesFailBlock.hidden = !state.redeemFailLogs.length;
+  }
+  if (els.openFailDialog) {
+    els.openFailDialog.hidden = !state.redeemFailLogs.length;
+  }
 
   els.codesTable.innerHTML = `
     <thead>
@@ -1092,10 +1329,7 @@ function renderCodes() {
         </th>
         <th>提取码</th>
         <th>酒款</th>
-        <th>批次</th>
         <th>状态</th>
-        <th>使用记录</th>
-        <th>有效期</th>
         <th>操作</th>
       </tr>
     </thead>
@@ -1126,14 +1360,10 @@ function renderCodes() {
                         ${escapeHtml((code.wine && code.wine.name) || '未绑定酒款')}
                       </button>
                     </td>
-                    <td>${escapeHtml(code.batchNo || '未分批')}</td>
-                    <td>${renderStatusPill(code.status || 'ready')}</td>
                     <td>
-                      <div class="table-primary">${escapeHtml(code.firstUsedAt ? getMaskedUserId(code.firstUserId) : '未使用')}</div>
-                      <div class="table-secondary">${escapeHtml(code.firstUsedAt ? formatDateTime(code.firstUsedAt) : '暂无使用记录')}</div>
-                    </td>
-                    <td>
-                      <div class="table-primary">${escapeHtml(formatDate(code.expiresAt))}</div>
+                      ${renderStatusPill(code.status || 'ready')}
+                      <div class="table-secondary">${escapeHtml(code.batchNo || '未分批')}</div>
+                      <div class="table-secondary">${escapeHtml(code.firstUsedAt ? formatDateTime(code.firstUsedAt) : formatDate(code.expiresAt))}</div>
                     </td>
                     <td class="table-action-cell">
                       <div class="table-actions">
@@ -1151,7 +1381,7 @@ function renderCodes() {
               .join('')
           : `
             <tr>
-              <td colspan="8">
+              <td colspan="5">
                 <div class="empty-state empty-state-inline">没有匹配的提取码记录。</div>
               </td>
             </tr>
@@ -1229,31 +1459,6 @@ function toIsoDateTime(value) {
   }
 
   return date.toISOString();
-}
-
-function openCreateWineDialog() {
-  if (!els.createWineDialog) {
-    return;
-  }
-
-  els.createWineForm.reset();
-  if (typeof els.createWineDialog.showModal === 'function') {
-    els.createWineDialog.showModal();
-  } else {
-    els.createWineDialog.setAttribute('open', 'open');
-  }
-}
-
-function closeCreateWineDialog() {
-  if (!els.createWineDialog) {
-    return;
-  }
-
-  if (typeof els.createWineDialog.close === 'function') {
-    els.createWineDialog.close();
-  } else {
-    els.createWineDialog.removeAttribute('open');
-  }
 }
 
 async function loadData() {
@@ -1342,6 +1547,7 @@ async function handleWineSave(form) {
   }
 
   state.selectedWineId = wineId;
+  closeWineEditorDialog();
   await loadData();
   setView('wines');
 }
@@ -1386,6 +1592,7 @@ async function handleWineDelete(wineId) {
   }
 
   state.selectedWineId = '';
+  closeWineEditorDialog();
   await loadData();
   setView('wines');
   showStatus(payload.result.mode === 'deleted' ? '酒款已删除。' : '酒款已归档。', 'success');
@@ -1413,6 +1620,7 @@ async function handleBatchCreate(event) {
 
   els.batchBatchNo.value = '';
   els.batchExpireAt.value = '';
+  closeBatchDialog();
   state.codePage = 1;
   await loadData();
   setView('codes');
@@ -1493,6 +1701,9 @@ function wireStaticEvents() {
   });
   els.logoutButton.addEventListener('click', handleLogout);
   els.openCreateWine.addEventListener('click', openCreateWineDialog);
+  els.openBatchDialog.addEventListener('click', openBatchDialog);
+  els.openFixedDialog.addEventListener('click', openFixedDialog);
+  els.openFailDialog.addEventListener('click', openFailLogsDialog);
   els.batchForm.addEventListener('submit', handleBatchCreate);
   els.fixedQrcodeButton.addEventListener('click', handleFixedQrcode);
   els.exportCodesButton.addEventListener('click', () => {
@@ -1535,10 +1746,22 @@ function wireStaticEvents() {
       if (wineId) {
         state.selectedWineId = wineId;
       }
+      if (viewButton.dataset.action === 'close-overview-detail') {
+        closeOverviewDetailDialog();
+      }
       setView(viewButton.dataset.viewTarget);
       if (viewButton.dataset.viewTarget === 'wines') {
         renderWines();
+        if (wineId) {
+          openWineEditorDialog();
+        }
       }
+      return;
+    }
+
+    const overviewDetailButton = event.target.closest('[data-overview-detail]');
+    if (overviewDetailButton) {
+      renderOverviewDetail(overviewDetailButton.dataset.overviewDetail);
       return;
     }
 
@@ -1587,6 +1810,7 @@ function wireStaticEvents() {
     if (selectWineButton) {
       state.selectedWineId = selectWineButton.dataset.selectWine;
       renderWines();
+      openWineEditorDialog();
       return;
     }
 
@@ -1607,6 +1831,36 @@ function wireStaticEvents() {
     const closeDialogButton = event.target.closest('[data-action="close-create-wine"]');
     if (closeDialogButton) {
       closeCreateWineDialog();
+      return;
+    }
+
+    const closeWineEditorButton = event.target.closest('[data-action="close-wine-editor"]');
+    if (closeWineEditorButton) {
+      closeWineEditorDialog();
+      return;
+    }
+
+    const closeBatchButton = event.target.closest('[data-action="close-batch-dialog"]');
+    if (closeBatchButton) {
+      closeBatchDialog();
+      return;
+    }
+
+    const closeFixedButton = event.target.closest('[data-action="close-fixed-dialog"]');
+    if (closeFixedButton) {
+      closeFixedDialog();
+      return;
+    }
+
+    const closeFailButton = event.target.closest('[data-action="close-fail-dialog"]');
+    if (closeFailButton) {
+      closeFailLogsDialog();
+      return;
+    }
+
+    const closeOverviewDetailButton = event.target.closest('[data-action="close-overview-detail"]');
+    if (closeOverviewDetailButton) {
+      closeOverviewDetailDialog();
       return;
     }
 
