@@ -39,6 +39,7 @@ const state = {
     codeSearch: '',
     codeStatus: 'all',
     codeWine: 'all',
+    codeBatch: 'all',
     shippingSearch: '',
     shippingStatus: 'all'
   },
@@ -157,6 +158,7 @@ const els = {
 
 let statusTimer = 0;
 let toastSeq = 0;
+let sessionClockTimer = 0;
 
 function can(permission) {
   if (!permission || !state.user || !Array.isArray(state.user.permissions) || !state.user.permissions.length) {
@@ -346,13 +348,17 @@ function updateSessionPill() {
   const displayName = (state.user && state.user.displayName) || '未登录';
   const roleName = (state.user && state.user.roleName) || '未登录';
   const sessionLabel = state.user ? `${state.user.username || 'admin'} · ${roleName}` : '未登录';
-  const onlineLabel = state.user
-    ? `在线 · ${state.lastLoadedAt ? formatShortDate(state.lastLoadedAt) : '刚刚更新'}`
-    : '离线';
+  const nowLabel = new Intl.DateTimeFormat('zh-CN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  }).format(new Date());
+  const onlineLabel = state.user ? `当前时间 · ${nowLabel}` : '离线';
 
   if (els.sessionPill) {
     els.sessionPill.hidden = !state.user;
     els.sessionPill.textContent = onlineLabel;
+    els.sessionPill.title = state.lastLoadedAt ? `最近刷新 ${formatShortDate(state.lastLoadedAt)}` : '';
   }
 
   if (els.sidebarUser) {
@@ -376,6 +382,17 @@ function updateSessionPill() {
     const redis = state.health && state.health.capabilities && state.health.capabilities.redis;
     els.sidebarHealth.textContent = redis ? `${env} · 在线` : `${env} · 连接中`;
   }
+}
+
+function startSessionClock() {
+  if (sessionClockTimer) {
+    window.clearInterval(sessionClockTimer);
+  }
+  sessionClockTimer = window.setInterval(() => {
+    if (state.user) {
+      updateSessionPill();
+    }
+  }, 30000);
 }
 
 function getFirstAllowedView() {
@@ -649,6 +666,52 @@ function getCodeStatusGuide(status) {
     }
   };
   return guides[status] || guides.ready;
+}
+
+function getCodeStatusImpacts(status) {
+  const impacts = {
+    ready: [
+      { label: '扫码结果', value: '可正常核销' },
+      { label: '用户侧反馈', value: '展示可用入口' },
+      { label: '统计归类', value: '计入待使用' }
+    ],
+    claimed: [
+      { label: '扫码结果', value: '视为已完成使用' },
+      { label: '用户侧反馈', value: '不再重复核销' },
+      { label: '统计归类', value: '计入已使用' }
+    ],
+    expired: [
+      { label: '扫码结果', value: '阻止继续核销' },
+      { label: '用户侧反馈', value: '提示已过期' },
+      { label: '统计归类', value: '计入已过期' }
+    ],
+    disabled: [
+      { label: '扫码结果', value: '立即停用入口' },
+      { label: '用户侧反馈', value: '提示不可使用' },
+      { label: '统计归类', value: '计入停用 / 作废' }
+    ]
+  };
+  return impacts[status] || impacts.ready;
+}
+
+function renderCodeStatusNote(status) {
+  const guide = getCodeStatusGuide(status);
+  return `
+    <strong>${escapeHtml(guide.title)}</strong>
+    <p>${escapeHtml(guide.body)}</p>
+    <div class="action-well-list">
+      ${getCodeStatusImpacts(status)
+        .map(
+          (item) => `
+            <div class="action-well-list-row">
+              <span>${escapeHtml(item.label)}</span>
+              <strong>${escapeHtml(item.value)}</strong>
+            </div>
+          `
+        )
+        .join('')}
+    </div>
+  `;
 }
 
 function getCodePagination(items) {
@@ -2384,6 +2447,14 @@ function renderActionButton({ action, label, iconName = '', variant = 'secondary
   `;
 }
 
+function renderTableIconButton({ action, iconName, label, attrs = '' }) {
+  return `
+    <button class="table-icon-button" type="button" data-action="${escapeHtml(action)}" aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}" ${attrs}>
+      ${icon(iconName)}
+    </button>
+  `;
+}
+
 function updateFieldCounter(input) {
   if (!input || !input.id) {
     return;
@@ -2421,12 +2492,9 @@ function renderField(label, name, value, options = {}) {
 
   return `
     <label class="field" for="${fieldId}">
-      <span class="field-label-row">
-        <span class="field-label">${escapeHtml(label)}</span>
-        ${counter}
-      </span>
+      <span class="field-label">${escapeHtml(label)}</span>
       ${control}
-      ${hint ? `<span class="field-hint">${escapeHtml(hint)}</span>` : ''}
+      ${hint || counter ? `<span class="field-meta">${hint ? `<span class="field-hint">${escapeHtml(hint)}</span>` : '<span></span>'}${counter}</span>` : ''}
     </label>
   `;
 }
@@ -2444,14 +2512,14 @@ function renderSelectField(label, name, value, options, hint = '') {
           )
           .join('')}
       </select>
-      ${hint ? `<span class="field-hint">${escapeHtml(hint)}</span>` : ''}
+      ${hint ? `<span class="field-meta"><span class="field-hint">${escapeHtml(hint)}</span></span>` : ''}
     </label>
   `;
 }
 
-function renderEmptyState(title, body, action = '') {
+function renderEmptyState(title, body, action = '', className = '') {
   return `
-    <div class="empty-state">
+    <div class="empty-state${className ? ` ${escapeHtml(className)}` : ''}">
       <div class="empty-state-icon">${icon('spark', 20)}</div>
       <strong>${escapeHtml(title)}</strong>
       <p>${escapeHtml(body)}</p>
@@ -2519,13 +2587,13 @@ function renderTag(label, tone = 'neutral') {
   return `<span class="tag tag--${tone}">${escapeHtml(label)}</span>`;
 }
 
-function renderTimeline(items) {
+function renderTimeline(items, className = '') {
   if (!items.length) {
     return renderEmptyState('暂无时间线', '系统还没有记录可展示。');
   }
 
   return `
-    <div class="timeline">
+    <div class="timeline${className ? ` ${escapeHtml(className)}` : ''}">
       ${items
         .map(
           (item) => `
@@ -2638,18 +2706,10 @@ function renderTopbarActions() {
     return;
   }
 
-  const actions = [
-    { action: 'refresh-data', label: state.loading ? '刷新中' : '刷新数据', iconName: 'refresh', variant: 'ghost' }
-  ];
+  const actions = state.activeView === 'codes' ? [] : [{ action: 'refresh-data', label: state.loading ? '刷新中' : '刷新数据', iconName: 'refresh', variant: 'ghost' }];
 
   if (state.activeView === 'overview') {
     actions.push({ action: 'export-current', label: '导出报告', iconName: 'download', variant: 'secondary' });
-  } else if (state.activeView === 'wines') {
-    actions.push({ action: 'open-wine-create', label: '新增酒款', iconName: 'plus', variant: 'primary' });
-  } else if (state.activeView === 'codes') {
-    actions.push({ action: 'open-code-batch', label: '生成提取码', iconName: 'code', variant: 'primary' });
-    actions.push({ action: 'open-fixed-code', label: '固定码', iconName: 'spark', variant: 'secondary' });
-    actions.push({ action: 'export-current', label: '导出数据', iconName: 'download', variant: 'secondary' });
   } else if (state.activeView === 'shipping') {
     actions.push({ action: 'export-current', label: '导出订单', iconName: 'download', variant: 'secondary' });
   } else if (state.activeView === 'copy') {
@@ -2710,6 +2770,8 @@ function renderOverviewPage() {
 
   const series = buildOverviewSeries();
   const maxSeries = Math.max(...series.map((day) => Math.max(day.created, day.used)), 1);
+  const created7d = series.reduce((sum, day) => sum + day.created, 0);
+  const used7d = series.reduce((sum, day) => sum + day.used, 0);
   const activeCodes = state.codes.filter((code) => code.status === 'claimed').length;
   const donutTotal = Math.max(summary.total, 1);
   const donutSegments = [
@@ -2731,7 +2793,7 @@ function renderOverviewPage() {
   const recentActions = [...(state.auditLogs || []), ...(state.redeemFailLogs || [])]
     .filter(Boolean)
     .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())
-    .slice(0, 6)
+    .slice(0, 5)
     .map((item) => {
       const actionLabel =
         item.action === 'codes.batch.created'
@@ -2765,18 +2827,28 @@ function renderOverviewPage() {
       const rightTime = new Date(right.updatedAt || right.shippedAt || right.createdAt || 0).getTime();
       return rightTime - leftTime;
     })
-    .slice(0, 4);
+    .slice(0, 6);
 
   page.innerHTML = `
-    <div class="page-stack">
-      <section class="metric-grid metric-grid--four">
+    <div class="page-stack page-stack--overview">
+      <section class="metric-grid metric-grid--four metric-grid--overview">
         ${state.loading ? renderSkeletonCards(4) : cards.map(renderMetricCard).join('')}
       </section>
 
-      <section class="overview-bento">
-        <article class="panel panel--hero">
+      <section class="overview-grid">
+        <article class="panel panel--overview overview-card overview-card--trend">
           ${renderPanelHeader('提取码使用趋势', '近 7 天新增与使用情况')}
           <div class="trend-card">
+            <div class="trend-summary">
+              <div class="trend-summary-item">
+                <span>7日新增</span>
+                <strong>${formatNumber(created7d)}</strong>
+              </div>
+              <div class="trend-summary-item">
+                <span>7日使用</span>
+                <strong>${formatNumber(used7d)}</strong>
+              </div>
+            </div>
             <div class="trend-bars">
               ${series
                 .map(
@@ -2791,15 +2863,16 @@ function renderOverviewPage() {
                 .join('')}
             </div>
             <div class="trend-foot">
-              <span>${renderTag(`已使用 ${formatNumber(activeCodes)}`, 'success')}</span>
+              <span>${renderTag(`累计使用 ${formatNumber(activeCodes)}`, 'success')}</span>
+              <span>${renderTag(`7日使用 ${formatNumber(used7d)}`, 'warning')}</span>
               <span>${renderTag(`当前总数 ${formatNumber(summary.total)}`, 'neutral')}</span>
             </div>
           </div>
         </article>
 
-        <div class="overview-side">
-          <article class="panel">
-            ${renderPanelHeader('状态分布', '当前提取码状态占比')}
+        <article class="panel panel--overview overview-card overview-card--status">
+          ${renderPanelHeader('状态分布', '当前提取码状态占比')}
+          <div class="status-card-body">
             <div class="status-donut" style="--donut:${escapeHtml(`conic-gradient(${donut})`)}">
               <div class="status-donut-core">
                 <strong>${formatNumber(summary.total)}</strong>
@@ -2820,55 +2893,69 @@ function renderOverviewPage() {
                 })
                 .join('')}
             </div>
-          </article>
+          </div>
+        </article>
 
-          <article class="panel">
-            ${renderPanelHeader('最近操作', '提取码、发货和文案更新')}
-            <div class="activity-list">
-              ${recentActions.length
-                ? recentActions
-                    .map(
-                      (item) => `
-                        <article class="activity-item">
-                          <span class="activity-dot activity-dot--${escapeHtml(item.tone)}"></span>
-                          <div class="activity-copy">
-                            <strong>${escapeHtml(item.title)}</strong>
-                            ${item.body ? `<p>${escapeHtml(item.body)}</p>` : ''}
-                          </div>
-                          <time>${escapeHtml(item.time)}</time>
-                        </article>
-                      `
-                    )
-                    .join('')
-                : renderEmptyState('暂无记录', '最近没有可展示的操作记录。')}
+        <article class="panel panel--overview overview-card overview-card--shipping">
+          ${renderPanelHeader('最近发货动态', '最近更新的履约订单')}
+          <div class="shipping-table">
+            <div class="shipping-table-head">
+              <span>订单号</span>
+              <span>商品</span>
+              <span>状态</span>
+              <span>更新时间</span>
             </div>
-          </article>
-
-          <article class="panel">
-            ${renderPanelHeader('最近发货动态', '查看最近更新的履约订单')}
-            <div class="shipping-feed">
+            <div class="shipping-table-body">
               ${recentShipping.length
                 ? recentShipping
                     .map((order) => {
-                      const recipient = order.address ? order.address.contactName || order.address.mobile : (order.user && (order.user.nickname || order.user.displayName || order.user.mobile)) || '—';
+                      const product = (order.items && order.items[0] && (order.items[0].productName || order.items[0].trackTitle || order.items[0].specName)) || '待补充商品';
                       return `
-                        <article class="shipping-feed-item">
-                          <div class="shipping-feed-copy">
+                        <button class="shipping-table-row" type="button" data-action="open-shipping-drawer" data-order-id="${escapeHtml(order.id)}">
+                          <div class="shipping-table-cell">
                             <strong>${escapeHtml(order.orderNo || '—')}</strong>
-                            <p>${escapeHtml(recipient)}</p>
+                            <p>${escapeHtml(order.address ? order.address.contactName || order.address.mobile : (order.user && (order.user.nickname || order.user.displayName || order.user.mobile)) || '—')}</p>
                           </div>
-                          <div class="shipping-feed-side">
+                          <div class="shipping-table-cell">
+                            <strong>${escapeHtml(product)}</strong>
+                            <p>${escapeHtml(order.shippingCompany || '待分配物流')}</p>
+                          </div>
+                          <div class="shipping-table-cell shipping-table-cell--status">
                             ${renderStatusPill(order.deliveryStatus || order.status || 'pending')}
-                            <time>${escapeHtml(formatShortDate(order.updatedAt || order.shippedAt || order.createdAt))}</time>
                           </div>
-                        </article>
+                          <div class="shipping-table-cell shipping-table-cell--time">
+                            <strong>${escapeHtml(formatShortDate(order.updatedAt || order.shippedAt || order.createdAt))}</strong>
+                          </div>
+                        </button>
                       `;
                     })
                     .join('')
                 : renderEmptyState('暂无发货更新', '最近还没有新的发货变动。')}
             </div>
-          </article>
-        </div>
+          </div>
+        </article>
+
+        <article class="panel panel--overview overview-card overview-card--activity">
+          ${renderPanelHeader('最近操作', '提取码、发货和文案更新')}
+          <div class="activity-list activity-list--scroll activity-list--overview">
+            ${recentActions.length
+              ? recentActions
+                  .map(
+                    (item) => `
+                      <article class="activity-item">
+                        <span class="activity-dot activity-dot--${escapeHtml(item.tone)}"></span>
+                        <div class="activity-copy">
+                          <strong>${escapeHtml(item.title)}</strong>
+                          ${item.body ? `<p>${escapeHtml(item.body)}</p>` : ''}
+                        </div>
+                        <time>${escapeHtml(item.time)}</time>
+                      </article>
+                    `
+                  )
+                  .join('')
+              : renderEmptyState('暂无记录', '最近没有可展示的操作记录。')}
+          </div>
+        </article>
       </section>
     </div>
   `;
@@ -2885,47 +2972,47 @@ function renderWinesShell() {
   const archivedCount = wines.filter((wine) => (wine.status || 'active') === 'archived').length;
   const selected = ensureSelectedWine();
   page.innerHTML = `
-    <div class="page-stack">
-      <section class="panel control-console">
-        ${renderPanelHeader('酒款筛选', '搜索酒款并切换状态')}
-        <div class="control-grid">
-          <label class="search-bar">
-            <span class="search-bar-icon">${icon('search')}</span>
-            <input class="input" id="wine-search" type="search" placeholder="搜索酒款、产区、年份或文案" value="${escapeHtml(state.filters.wineSearch)}" data-filter="wine-search" />
-          </label>
-          <div class="segmented-control" id="wine-status-tabs">
-            ${[
-              { value: 'all', label: '全部' },
-              { value: 'active', label: `启用中 ${formatNumber(activeCount)}` },
-              { value: 'archived', label: `已归档 ${formatNumber(archivedCount)}` }
-            ]
-              .map(
-                (item) => `
-                  <button class="segment${state.filters.wineStatus === item.value ? ' is-active' : ''}" type="button" data-wine-status="${escapeHtml(item.value)}">
-                    ${escapeHtml(item.label)}
-                  </button>
-                `
-              )
-              .join('')}
+    <div class="page-stack page-stack--wines">
+      <section class="panel panel--wines-toolbar">
+        <div class="wine-toolbar-tabs">
+          ${[
+            { value: 'all', label: '全部', count: formatNumber(wines.length) },
+            { value: 'active', label: '启用中', count: formatNumber(activeCount) },
+            { value: 'archived', label: '已归档', count: formatNumber(archivedCount) }
+          ]
+            .map(
+              (item) => `
+                <button class="wine-tab ${state.filters.wineStatus === item.value ? 'is-active' : ''}" type="button" data-wine-status="${escapeHtml(item.value)}">
+                  <span>${escapeHtml(item.label)}</span>
+                  <strong>${escapeHtml(item.count)}</strong>
+                </button>
+              `
+            )
+            .join('')}
+        </div>
+        <div class="wines-toolbar-row">
+          <div class="wines-toolbar-filters">
+            <label class="search-bar search-bar--wines">
+              <span class="search-bar-icon">${icon('search')}</span>
+              <input class="input" id="wine-search" type="search" placeholder="搜索酒款、产区、年份或文案" value="${escapeHtml(state.filters.wineSearch)}" data-filter="wine-search" />
+            </label>
           </div>
-          <div class="control-actions">
+          <div class="wines-toolbar-actions">
             ${renderActionButton({ action: 'open-wine-create', label: '新增酒款', iconName: 'plus', variant: 'primary' })}
             ${renderActionButton({ action: 'clear-wine-filters', label: '清空筛选', iconName: 'close', variant: 'ghost' })}
           </div>
         </div>
       </section>
 
-      <div class="wines-layout">
-        <section class="panel">
-          ${renderPanelHeader('酒款列表', `共 ${formatNumber(wines.length)} 款`)}
-          <div id="wine-list" class="wine-list"></div>
-        </section>
-
-        <aside class="wine-rail">
-          <section class="panel" id="wine-summary"></section>
-          <section class="panel" id="wine-spotlight"></section>
-        </aside>
-      </div>
+      <section class="panel panel--wines-list">
+        ${renderPanelHeader('酒款列表', `共 ${formatNumber(wines.length)} 款，支持直接编辑和状态管理`)}
+        <div class="wine-list-table-head" aria-hidden="true">
+          <span>酒款信息</span>
+          <span>关键数据</span>
+          <span>操作</span>
+        </div>
+        <div id="wine-list" class="wine-list"></div>
+      </section>
     </div>
   `;
 
@@ -2936,9 +3023,7 @@ function renderWinesShell() {
 
 function renderWinesContent() {
   const listNode = document.getElementById('wine-list');
-  const summaryNode = document.getElementById('wine-summary');
-  const spotlightNode = document.getElementById('wine-spotlight');
-  if (!listNode || !summaryNode || !spotlightNode) {
+  if (!listNode) {
     return;
   }
 
@@ -2952,7 +3037,8 @@ function renderWinesContent() {
     listNode.innerHTML = renderEmptyState(
       '没有匹配的酒款',
       '试试放宽搜索关键词或切换到启用中 / 已归档。',
-      renderActionButton({ action: 'clear-wine-filters', label: '清空筛选', iconName: 'close', variant: 'ghost' })
+      renderActionButton({ action: 'clear-wine-filters', label: '清空筛选', iconName: 'close', variant: 'ghost' }),
+      'empty-state--wines'
     );
   } else {
     listNode.innerHTML = filtered
@@ -2960,8 +3046,10 @@ function renderWinesContent() {
         const stats = getWineCodeStats(wine);
         const active = wine.id === selected?.id;
         const image = wine.bottleImage || wine.posterImage || wine.giftImage || '';
+        const winery = (state.wineries || []).find((item) => item.id === wine.wineryId) || null;
+        const metaItems = [wine.vintage || '未设置年份', wine.region || '未设置产区', (winery && winery.name) || '未绑定酒庄'];
         return `
-          <button class="wine-card ${active ? 'is-active' : ''}" type="button" data-action="open-wine-drawer" data-wine-id="${escapeHtml(wine.id)}">
+          <article class="wine-card wine-card--row ${active ? 'is-active' : ''}" data-wine-row="${escapeHtml(wine.id)}" tabindex="0" role="button" aria-label="${escapeHtml(`编辑 ${wine.name || '酒款'}`)}">
             <div class="wine-card-media">
               ${renderWineVisual(image, wine.name, wine.name, 'wine-card-placeholder')}
             </div>
@@ -2971,55 +3059,25 @@ function renderWinesContent() {
                   <strong>${escapeHtml(wine.name)}</strong>
                   <span>${escapeHtml(wine.subtitle || '未填写副标题')}</span>
                 </div>
-                ${renderStatusPill(wine.status || 'active')}
               </div>
               <div class="wine-card-meta">
-                <span>${escapeHtml(wine.vintage || '未设置')}</span>
-                <span>${escapeHtml(wine.region || '未设置')}</span>
-              </div>
-              <div class="wine-card-stats">
-                <span><b>${formatNumber(stats.total)}</b><em>提取码</em></span>
-                <span><b>${formatNumber(stats.used)}</b><em>已使用</em></span>
-                <span><b>${escapeHtml(stats.lastUsedAt ? formatShortDate(stats.lastUsedAt) : '—')}</b><em>最近使用</em></span>
+                ${metaItems.map((item) => `<span>${escapeHtml(item)}</span>`).join('')}
               </div>
             </div>
-          </button>
+            <div class="wine-card-stats wine-card-stats--row">
+              <span><b>${formatNumber(stats.total)}</b><em>提取码</em></span>
+              <span><b>${formatNumber(stats.used)}</b><em>已使用</em></span>
+              <span><b>${escapeHtml(stats.lastUsedAt ? formatShortDate(stats.lastUsedAt) : '—')}</b><em>最近使用</em></span>
+            </div>
+            <div class="wine-card-actions">
+              ${renderStatusPill(wine.status || 'active')}
+              ${renderActionButton({ action: 'open-wine-drawer', label: '编辑酒款', iconName: 'edit', variant: 'secondary', title: '编辑酒款' }).replace('<button', `<button data-wine-id="${escapeHtml(wine.id)}"`)}
+            </div>
+          </article>
         `;
       })
       .join('');
   }
-
-  const selectedStats = selected ? getWineCodeStats(selected) : { total: 0, used: 0, ready: 0, lastUsedAt: '' };
-  summaryNode.innerHTML = `
-    ${renderPanelHeader('数据摘要', selected ? selected.name : '从左侧选择一个酒款')}
-    <div class="mini-grid">
-      ${renderMetricCard({ label: '提取码总数', value: formatNumber(selectedStats.total), note: '与提取码数据联动', tone: 'brand' })}
-      ${renderMetricCard({ label: '已使用', value: formatNumber(selectedStats.used), note: '已核销或领取', tone: 'success' })}
-      ${renderMetricCard({ label: '最近使用', value: selectedStats.lastUsedAt ? formatShortDate(selectedStats.lastUsedAt) : '—', note: '最近核销时间', tone: 'wine' })}
-    </div>
-  `;
-
-  if (!selected) {
-    spotlightNode.innerHTML = renderEmptyState('暂无可查看的酒款', '创建或切换到可见状态的酒款后，这里会显示精选封面。');
-    return;
-  }
-
-  const heroImage = selected.bottleImage || selected.posterImage || selected.giftImage || '';
-  spotlightNode.innerHTML = `
-    ${renderPanelHeader('精选视图', '单击卡片即可进入侧边编辑')}
-    <article class="wine-spotlight-card">
-      <div class="wine-spotlight-media">${renderWineVisual(heroImage, selected.name, selected.name, 'wine-spotlight-placeholder')}</div>
-      <div class="wine-spotlight-copy">
-        <span>${escapeHtml(selected.eyebrow || '酒款')}</span>
-        <strong>${escapeHtml(selected.title || selected.name)}</strong>
-        <p>${escapeHtml(selected.quote || selected.overview || '—')}</p>
-        <div class="spotlight-actions">
-          ${renderActionButton({ action: 'open-wine-drawer', label: '编辑酒款', iconName: 'edit', variant: 'primary' })}
-          ${renderActionButton({ action: 'copy-wine-id', label: '复制 ID', iconName: 'copy', variant: 'ghost' })}
-        </div>
-      </div>
-    </article>
-  `;
 }
 
 function renderCodesShell() {
@@ -3028,89 +3086,76 @@ function renderCodesShell() {
     return;
   }
 
-  const wines = getEnrichedWines();
   const selectedStatus = state.filters.codeStatus;
-  const selectedWine = state.filters.codeWine;
+  const selectedBatch = state.filters.codeBatch;
+  const batches = Array.from(new Set((state.codes || []).map((code) => normalizeText(code.batchNo)).filter(Boolean))).sort((left, right) => right.localeCompare(left, 'zh-CN'));
 
   page.innerHTML = `
-    <div class="page-stack">
-      <section class="panel control-console">
-        ${renderPanelHeader('控制台', '搜索、筛选、生成和导出都放在这里')}
-        <div class="control-grid control-grid--wide">
-          <label class="search-bar">
-            <span class="search-bar-icon">${icon('search')}</span>
-            <input class="input" id="code-search" type="search" placeholder="搜索提取码、批次、酒款或用户" value="${escapeHtml(state.filters.codeSearch)}" data-filter="code-search" />
-          </label>
-          <label class="field">
-            <span class="field-label">状态</span>
-            <select class="input select" id="code-status-filter" data-filter="code-status">
-              ${[
-                { value: 'all', label: '全部状态' },
-                { value: 'ready', label: '待使用' },
-                { value: 'claimed', label: '已使用' },
-                { value: 'expired', label: '已过期' },
-                { value: 'disabled', label: '已停用' }
-              ]
-                .map(
-                  (option) =>
-                    `<option value="${escapeHtml(option.value)}" ${selectedStatus === option.value ? 'selected' : ''}>${escapeHtml(option.label)}</option>`
-                )
-                .join('')}
-            </select>
-          </label>
-          <label class="field">
-            <span class="field-label">酒款</span>
-            <select class="input select" id="code-wine-filter" data-filter="code-wine">
-              <option value="all"${selectedWine === 'all' ? ' selected' : ''}>全部酒款</option>
-              ${wines
-                .map(
-                  (wine) =>
-                    `<option value="${escapeHtml(wine.id)}" ${selectedWine === wine.id ? 'selected' : ''}>${escapeHtml(wine.name)}</option>`
-                )
-                .join('')}
-            </select>
-          </label>
-          <div class="control-actions">
-            ${renderActionButton({ action: 'open-code-batch', label: '生成', iconName: 'plus', variant: 'primary' })}
-            ${renderActionButton({ action: 'open-fixed-code', label: '固定码', iconName: 'spark', variant: 'secondary' })}
-            ${renderActionButton({ action: 'open-code-fail-logs', label: '异常码', iconName: 'alert', variant: 'secondary' })}
+    <div class="page-stack page-stack--codes">
+      <section class="panel panel--codes panel--codes-toolbar">
+        <div id="codes-summary" class="code-tabs" role="tablist" aria-label="提取码状态"></div>
+        <div class="codes-toolbar-row">
+          <div class="codes-toolbar-filters">
+            <label class="search-bar search-bar--codes">
+              <span class="search-bar-icon">${icon('search')}</span>
+              <input class="input" id="code-search" type="search" placeholder="搜索提取码、批次、酒款或用户" value="${escapeHtml(state.filters.codeSearch)}" data-filter="code-search" />
+            </label>
+            <label class="field field--compact">
+              <span class="field-label">状态</span>
+              <select class="input select" id="code-status-filter" data-filter="code-status">
+                ${[
+                  { value: 'all', label: '全部状态' },
+                  { value: 'ready', label: '待使用' },
+                  { value: 'claimed', label: '已使用' },
+                  { value: 'expired', label: '已过期' },
+                  { value: 'disabled', label: '已停用' }
+                ]
+                  .map(
+                    (option) =>
+                      `<option value="${escapeHtml(option.value)}" ${selectedStatus === option.value ? 'selected' : ''}>${escapeHtml(option.label)}</option>`
+                  )
+                  .join('')}
+              </select>
+            </label>
+            <label class="field field--compact">
+              <span class="field-label">批次</span>
+              <select class="input select" id="code-batch-filter" data-filter="code-batch">
+                <option value="all"${selectedBatch === 'all' ? ' selected' : ''}>全部批次</option>
+                ${batches.map((batch) => `<option value="${escapeHtml(batch)}" ${selectedBatch === batch ? 'selected' : ''}>${escapeHtml(batch)}</option>`).join('')}
+              </select>
+            </label>
+          </div>
+          <div class="codes-toolbar-actions">
+            ${renderActionButton({ action: 'open-code-batch', label: '生成提取码', iconName: 'plus', variant: 'primary' })}
             ${renderActionButton({ action: 'export-current', label: '导出数据', iconName: 'download', variant: 'secondary' })}
+            ${renderActionButton({ action: 'open-fixed-code', label: '固定码管理', iconName: 'spark', variant: 'secondary' })}
+            ${renderActionButton({ action: 'open-code-fail-logs', label: '异常记录', iconName: 'alert', variant: 'ghost' })}
             ${renderActionButton({ action: 'clear-code-filters', label: '清空筛选', iconName: 'close', variant: 'ghost' })}
           </div>
         </div>
       </section>
 
-      <div class="codes-layout">
-        <section class="codes-main">
-          <div id="codes-summary" class="summary-strip"></div>
-          <section class="panel">
-            ${renderPanelHeader('提取码列表', '状态独立，操作统一放在右侧')}
-            <div class="table-shell">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th class="table-check">
-                      <input type="checkbox" class="checkbox" data-action="toggle-visible-codes" aria-label="全选当前列表" />
-                    </th>
-                    <th>提取码</th>
-                    <th>酒款</th>
-                    <th>状态</th>
-                    <th>批次 / 时间</th>
-                    <th class="table-actions-col">操作</th>
-                  </tr>
-                </thead>
-                <tbody id="codes-table-body"></tbody>
-              </table>
-            </div>
-            <div id="codes-pagination" class="table-footer"></div>
-          </section>
-        </section>
-
-        <aside class="codes-rail">
-          <section class="panel" id="fixed-code-panel"></section>
-          <section class="panel" id="codes-fail-panel"></section>
-        </aside>
-      </div>
+      <section class="panel panel--codes panel--codes-table">
+        ${renderPanelHeader('提取码列表', '主表优先，固定码与异常记录改为弹出层查看')}
+        <div class="table-shell table-shell--codes">
+          <table class="data-table data-table--codes">
+            <thead>
+              <tr>
+                <th class="table-check">
+                  <input type="checkbox" class="checkbox" data-action="toggle-visible-codes" aria-label="全选当前列表" />
+                </th>
+                <th>提取码</th>
+                <th>酒款</th>
+                <th>状态</th>
+                <th>批次 / 时间</th>
+                <th class="table-actions-col">操作</th>
+              </tr>
+            </thead>
+            <tbody id="codes-table-body"></tbody>
+          </table>
+        </div>
+        <div id="codes-pagination" class="table-footer"></div>
+      </section>
 
       <div id="codes-bulk-bar" class="bulk-bar" hidden></div>
     </div>
@@ -3121,15 +3166,13 @@ function renderCodesContent() {
   const summaryNode = document.getElementById('codes-summary');
   const bodyNode = document.getElementById('codes-table-body');
   const paginationNode = document.getElementById('codes-pagination');
-  const fixedNode = document.getElementById('fixed-code-panel');
-  const failNode = document.getElementById('codes-fail-panel');
   const bulkNode = document.getElementById('codes-bulk-bar');
-  if (!summaryNode || !bodyNode || !paginationNode || !fixedNode || !failNode || !bulkNode) {
+  if (!summaryNode || !bodyNode || !paginationNode || !bulkNode) {
     return;
   }
 
   const filtered = getFilteredCodes();
-  const summary = getCodeSummaryCounts(filtered);
+  const summary = getCodeSummaryCounts(getFilteredCodes({ ignoreStatus: true }));
   if (state.selectedCodeId && !filtered.some((code) => code.id === state.selectedCodeId)) {
     state.selectedCodeId = filtered[0] ? filtered[0].id : '';
   }
@@ -3141,17 +3184,17 @@ function renderCodesContent() {
   const allVisibleSelected = pagination.items.length > 0 && pagination.items.every((code) => state.selectedCodeIds.has(code.id));
 
   summaryNode.innerHTML = [
-    { label: '全部', count: summary.total, tone: 'brand', status: 'all' },
-    { label: '待使用', count: summary.ready, tone: 'wine', status: 'ready' },
-    { label: '已使用', count: summary.claimed, tone: 'success', status: 'claimed' },
-    { label: '已过期', count: summary.expired, tone: 'warning', status: 'expired' },
-    { label: '已停用', count: summary.disabled, tone: 'neutral', status: 'disabled' }
+    { label: '全部', count: summary.total, status: 'all' },
+    { label: '待使用', count: summary.ready, status: 'ready' },
+    { label: '已使用', count: summary.claimed, status: 'claimed' },
+    { label: '已过期', count: summary.expired, status: 'expired' },
+    { label: '已停用', count: summary.disabled, status: 'disabled' }
   ]
     .map(
       (item) => `
-        <button class="summary-card ${state.filters.codeStatus === item.status ? 'is-active' : ''}" type="button" data-code-status-tab="${escapeHtml(item.status)}">
-          <span class="summary-card-label"><i class="summary-card-dot summary-card-dot--${escapeHtml(item.tone)}"></i>${escapeHtml(item.label)}</span>
-          <strong class="summary-card-value">${formatNumber(item.count)}</strong>
+        <button class="code-tab ${state.filters.codeStatus === item.status ? 'is-active' : ''}" type="button" role="tab" aria-selected="${state.filters.codeStatus === item.status ? 'true' : 'false'}" data-code-status-tab="${escapeHtml(item.status)}">
+          <span>${escapeHtml(item.label)}</span>
+          <strong>${formatNumber(item.count)}</strong>
         </button>
       `
     )
@@ -3163,33 +3206,44 @@ function renderCodesContent() {
           const selected = state.selectedCodeId === code.id;
           const checked = state.selectedCodeIds.has(code.id);
           const wineName = (code.wine && code.wine.name) || '未绑定酒款';
+          const status = code.status || 'ready';
+          const statusMeta =
+            status === 'claimed'
+              ? `使用于 ${formatShortDate(code.firstUsedAt)}`
+              : status === 'expired'
+                ? `失效于 ${formatShortDate(code.expiresAt)}`
+                : status === 'disabled'
+                  ? '已停用'
+                  : `截止 ${formatShortDate(code.expiresAt)}`;
           return `
             <tr class="${selected ? 'is-selected' : ''}" data-code-row="${escapeHtml(code.id)}">
               <td class="table-check">
                 <input class="checkbox" type="checkbox" data-code-select="${escapeHtml(code.id)}" ${checked ? 'checked' : ''} aria-label="选择 ${escapeHtml(code.redeemCode || '')}" />
               </td>
-              <td>
-                <div class="table-primary">${escapeHtml(code.redeemCode || code.token || '')}</div>
-                <div class="table-secondary">${escapeHtml(code.label || code.batchNo || '未命名')}</div>
+              <td class="table-col-code">
+                <div class="table-primary table-primary--code table-mono">${escapeHtml(code.redeemCode || code.token || '')}</div>
+                <div class="table-secondary">${escapeHtml(code.label || '未命名')}</div>
               </td>
-              <td>
+              <td class="table-col-wine">
                 <button class="table-link table-link--wine" type="button" data-action="open-wine-drawer" data-wine-id="${escapeHtml(code.wineId || '')}">
                   ${escapeHtml(wineName)}
                 </button>
-                <div class="table-secondary">${escapeHtml(code.track && (code.track.cnTitle || code.track.title) || '—')}</div>
+                <div class="table-secondary truncate">${escapeHtml(code.track && (code.track.cnTitle || code.track.title) || '—')}</div>
               </td>
-              <td>
-                ${renderStatusPill(code.status || 'ready')}
-                <div class="table-secondary">${escapeHtml(code.firstUsedAt ? formatShortDate(code.firstUsedAt) : formatShortDate(code.expiresAt))}</div>
+              <td class="table-col-status">
+                <div class="table-stack table-stack--status">
+                  ${renderStatusPill(status)}
+                  <div class="table-secondary">${escapeHtml(statusMeta)}</div>
+                </div>
               </td>
-              <td>
-                <div class="table-secondary">${escapeHtml(code.batchNo || '—')}</div>
-                <div class="table-secondary">${escapeHtml(formatShortDate(code.createdAt))}</div>
+              <td class="table-col-batch">
+                <div class="table-primary table-primary--subtle table-mono">${escapeHtml(code.batchNo || '—')}</div>
+                <div class="table-secondary">创建于 ${escapeHtml(formatShortDate(code.createdAt))}</div>
               </td>
               <td class="table-actions-col">
-                <div class="table-actions">
-                  ${renderActionButton({ action: 'open-code-drawer', label: '查看', iconName: 'eye', variant: 'ghost' })}
-                  ${renderActionButton({ action: 'copy-code', label: '复制', iconName: 'copy', variant: 'ghost' })}
+                <div class="table-actions table-actions--codes">
+                  ${renderTableIconButton({ action: 'open-code-drawer', iconName: 'eye', label: '查看详情', attrs: `data-code-id="${escapeHtml(code.id)}"` })}
+                  ${renderTableIconButton({ action: 'copy-code', iconName: 'copy', label: '复制提取码', attrs: `data-code-id="${escapeHtml(code.id)}"` })}
                 </div>
               </td>
             </tr>
@@ -3200,30 +3254,29 @@ function renderCodesContent() {
 
   const tokens = getPaginationTokens(pagination.page, pagination.totalPages);
   paginationNode.innerHTML = `
-    <div class="table-footer-copy">共 ${formatNumber(pagination.totalItems)} 条记录</div>
-    <div class="pagination-group">
-      <button class="pagination-button pagination-button--prev" type="button" data-code-page="${pagination.page - 1}" ${pagination.page <= 1 ? 'disabled' : ''}>‹</button>
-      ${tokens
-        .map((token) =>
-          token === 'ellipsis'
-            ? '<span class="pagination-ellipsis">…</span>'
-            : `<button class="pagination-button ${token === pagination.page ? 'is-active' : ''}" type="button" data-code-page="${token}">${token}</button>`
-        )
-        .join('')}
-      <button class="pagination-button pagination-button--next" type="button" data-code-page="${pagination.page + 1}" ${pagination.page >= pagination.totalPages ? 'disabled' : ''}>›</button>
-    </div>
-    <label class="footer-select">
-      <span>每页</span>
-      <select class="input select" data-code-page-size>
-        ${[10, 20, 50, 100]
-          .map((size) => `<option value="${size}" ${pagination.pageSize === size ? 'selected' : ''}>${size} 条</option>`)
+    <div class="table-footer-copy">共 ${formatNumber(pagination.totalItems)} 条记录 · 第 ${formatNumber(pagination.page)} / ${formatNumber(pagination.totalPages)} 页</div>
+    <div class="table-footer-actions">
+      <div class="pagination-group">
+        <button class="pagination-button pagination-button--prev" type="button" data-code-page="${pagination.page - 1}" ${pagination.page <= 1 ? 'disabled' : ''}>‹</button>
+        ${tokens
+          .map((token) =>
+            token === 'ellipsis'
+              ? '<span class="pagination-ellipsis">…</span>'
+              : `<button class="pagination-button ${token === pagination.page ? 'is-active' : ''}" type="button" data-code-page="${token}">${token}</button>`
+          )
           .join('')}
-      </select>
-    </label>
+        <button class="pagination-button pagination-button--next" type="button" data-code-page="${pagination.page + 1}" ${pagination.page >= pagination.totalPages ? 'disabled' : ''}>›</button>
+      </div>
+      <label class="footer-select">
+        <span>每页</span>
+        <select class="input select" data-code-page-size>
+          ${[10, 20, 50, 100]
+            .map((size) => `<option value="${size}" ${pagination.pageSize === size ? 'selected' : ''}>${size} 条</option>`)
+            .join('')}
+        </select>
+      </label>
+    </div>
   `;
-
-  fixedNode.innerHTML = renderFixedCodeCard();
-  failNode.innerHTML = renderFailLogCard();
 
   if (state.selectedCodeIds.size > 0) {
     bulkNode.hidden = false;
@@ -3285,6 +3338,29 @@ function renderFailLogCard() {
   const items = (state.redeemFailLogs || []).slice(0, 6);
   return `
     ${renderPanelHeader('异常码', '最近失败记录')}
+    <div class="fail-list">
+      ${items.length
+        ? items
+            .map(
+              (item) => `
+                <article class="fail-item">
+                  <div>
+                    <strong>${escapeHtml(getShortCode(item.code))}</strong>
+                    <p>${escapeHtml(REASON_COPY[item.reason] || item.reason || '未知原因')}</p>
+                  </div>
+                  <time>${escapeHtml(formatShortDate(item.createdAt))}</time>
+                </article>
+              `
+            )
+            .join('')
+        : renderEmptyState('没有异常记录', '当前没有失败提取码记录。')}
+    </div>
+  `;
+}
+
+function renderFailLogList(limit = 20) {
+  const items = (state.redeemFailLogs || []).slice(0, limit);
+  return `
     <div class="fail-list">
       ${items.length
         ? items
@@ -3603,12 +3679,13 @@ function getFilteredOrders() {
     .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime());
 }
 
-function getFilteredCodes() {
+function getFilteredCodes(options = {}) {
+  const { ignoreStatus = false } = options;
   const query = normalizeText(state.filters.codeSearch).toLowerCase();
   return [...(state.codes || [])]
     .filter((code) => {
-      const matchesStatus = state.filters.codeStatus === 'all' || (code.status || 'ready') === state.filters.codeStatus;
-      const matchesWine = state.filters.codeWine === 'all' || code.wineId === state.filters.codeWine;
+      const matchesStatus = ignoreStatus || state.filters.codeStatus === 'all' || (code.status || 'ready') === state.filters.codeStatus;
+      const matchesBatch = state.filters.codeBatch === 'all' || normalizeText(code.batchNo) === state.filters.codeBatch;
       const searchHaystack = [
         code.redeemCode,
         code.label,
@@ -3622,7 +3699,7 @@ function getFilteredCodes() {
         .join(' ')
         .toLowerCase();
       const matchesQuery = !query || searchHaystack.includes(query);
-      return matchesStatus && matchesWine && matchesQuery;
+      return matchesStatus && matchesBatch && matchesQuery;
     })
     .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime());
 }
@@ -3929,15 +4006,7 @@ function renderCopyPage() {
 }
 
 function openCodeFailPanel() {
-  if (state.activeView !== 'codes') {
-    setView('codes');
-  }
-  window.requestAnimationFrame(() => {
-    const node = document.getElementById('codes-fail-panel');
-    if (node) {
-      node.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  });
+  openModal('code-fails');
 }
 
 function exportCurrentView() {
@@ -4052,6 +4121,7 @@ function clearCodeFilters() {
   state.filters.codeSearch = '';
   state.filters.codeStatus = 'all';
   state.filters.codeWine = 'all';
+  state.filters.codeBatch = 'all';
   state.codePage = 1;
   state.selectedCodeIds.clear();
   renderCodesShell();
@@ -4512,47 +4582,46 @@ function renderDrawer() {
       { id: 'wine-section-related', label: '关联', note: '音乐与扩展内容' }
     ];
     els.drawerPanel.innerHTML = `
-      <header class="drawer-head">
-        <div>
+      <header class="drawer-head drawer-head--wine">
+        <div class="drawer-head-copy">
           <span class="drawer-eyebrow">酒款编辑</span>
-          <h3>${escapeHtml(wine.name)}</h3>
-          <p>${escapeHtml(wine.subtitle || '未填写副标题')}</p>
+          <h3>编辑酒款</h3>
+          <p>左侧固定导航，右侧滚动编辑详情和视觉内容。</p>
         </div>
         <button class="icon-button" type="button" data-close-drawer aria-label="关闭">${icon('close')}</button>
       </header>
 
-      <div class="drawer-workspace drawer-workspace--wine">
+      <div class="drawer-body drawer-body--wine">
         <aside class="drawer-rail">
           <div class="drawer-rail-card">
             <span class="drawer-rail-label">编辑分区</span>
             ${renderSectionNav(wineSections, 'wine')}
           </div>
-          <div class="drawer-rail-card drawer-rail-card--soft">
-            <span class="drawer-rail-label">酒款识别</span>
-            <strong>${escapeHtml(wine.vintage || wine.name)}</strong>
-            <p>${escapeHtml(wine.id)}</p>
-            <div class="drawer-rail-actions">
-              ${renderActionButton({ action: 'copy-wine-id', label: '复制 ID', iconName: 'copy', variant: 'secondary' })}
-            </div>
-          </div>
         </aside>
 
-        <div class="drawer-main">
-          <div class="drawer-hero">
-            <div class="drawer-hero-media">${renderWineVisual(wine.bottleImage || wine.posterImage || wine.giftImage || '', wine.name, wine.name, 'drawer-hero-placeholder')}</div>
-            <div class="drawer-hero-copy">
-              <div class="drawer-hero-row">
-                ${renderStatusPill(wine.status || 'active')}
-                ${renderTag(winery.name || '未绑定酒庄', 'neutral')}
-              </div>
-              <div class="drawer-hero-stats">
-                <div><strong>${formatNumber(stats.total)}</strong><span>提取码</span></div>
-                <div><strong>${formatNumber(stats.used)}</strong><span>已使用</span></div>
-                <div><strong>${escapeHtml(stats.lastUsedAt ? formatShortDate(stats.lastUsedAt) : '—')}</strong><span>最近使用</span></div>
+        <div class="drawer-main drawer-main--wine">
+          <div class="drawer-content-scroll">
+            <div class="drawer-hero drawer-hero--wine">
+              <div class="drawer-hero-media">${renderWineVisual(wine.bottleImage || wine.posterImage || wine.giftImage || '', wine.name, wine.name, 'drawer-hero-placeholder')}</div>
+              <div class="drawer-hero-copy">
+                <div class="drawer-hero-top">
+                  <div class="drawer-hero-copy-block">
+                    <strong>${escapeHtml(wine.name)}</strong>
+                    <p>${escapeHtml(wine.subtitle || '未填写副标题')}</p>
+                  </div>
+                  <div class="drawer-hero-row">
+                    ${renderStatusPill(wine.status || 'active')}
+                    ${renderTag(winery.name || '未绑定酒庄', 'neutral')}
+                  </div>
+                </div>
+                <div class="drawer-hero-stats">
+                  <div><strong>${formatNumber(stats.total)}</strong><span>提取码</span></div>
+                  <div><strong>${formatNumber(stats.used)}</strong><span>已使用</span></div>
+                  <div><strong>${escapeHtml(stats.lastUsedAt ? formatShortDate(stats.lastUsedAt) : '—')}</strong><span>最近使用</span></div>
+                </div>
               </div>
             </div>
-          </div>
-          <form id="wine-form" class="drawer-form" data-wine-id="${escapeHtml(wine.id)}">
+            <form id="wine-form" class="drawer-form" data-wine-id="${escapeHtml(wine.id)}">
             <section class="drawer-section drawer-section--anchored" id="wine-section-basics" data-drawer-section>
               ${renderPanelHeader('基础信息', '优先整理主名称、年份、产区和启用状态。')}
               <div class="form-grid">
@@ -4614,13 +4683,17 @@ function renderDrawer() {
                   : renderEmptyState('暂无关联曲目', '这款酒还没有绑定音乐内容。')}
               </div>
             </section>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
 
-      <footer class="drawer-foot">
+      <footer class="drawer-foot drawer-foot--wine">
         ${renderActionButton({ action: 'archive-wine', label: '归档 / 删除', iconName: 'trash', variant: 'danger', tone: 'danger' })}
-        ${renderActionButton({ action: 'save-wine', label: '保存酒款', iconName: 'save', variant: 'primary' })}
+        <div class="drawer-foot-actions">
+          ${renderActionButton({ action: 'close-drawer', label: '取消', iconName: 'close', variant: 'ghost' })}
+          ${renderActionButton({ action: 'save-wine', label: '保存酒款', iconName: 'save', variant: 'primary' })}
+        </div>
       </footer>
     `;
     els.drawerPanel.scrollTop = 0;
@@ -4636,7 +4709,10 @@ function renderDrawer() {
     }
     const userOrder = (state.orders || []).find((order) => order.user && order.user.id === code.firstUserId) || null;
     const user = userOrder ? userOrder.user : null;
-    const codeGuide = getCodeStatusGuide(code.status || 'ready');
+    const wineName = (code.wine && code.wine.name) || '未绑定酒款';
+    const trackTitle = (code.track && (code.track.cnTitle || code.track.title)) || '未关联曲目';
+    const userLabel = user ? user.nickname || user.displayName || user.mobile : code.firstUserId || '未核销';
+    const orderStatusLabel = userOrder ? STATUS_COPY[userOrder.deliveryStatus || userOrder.status || 'pending'] || '处理中' : '未关联订单';
     const codeSections = [
       { id: 'code-section-user', label: '使用与用户', note: '核销人与会话信息' },
       { id: 'code-section-fulfillment', label: '履约信息', note: '关联订单与物流状态' },
@@ -4667,9 +4743,31 @@ function renderDrawer() {
                 ${renderStatusPill(code.status || 'ready')}
                 ${renderTag(code.batchNo || '未分配批次', 'neutral')}
               </div>
-              <strong>${escapeHtml((code.wine && code.wine.name) || '未绑定酒款')}</strong>
+              <strong>${escapeHtml(wineName)}</strong>
               <p>${escapeHtml(code.label || '当前提取码尚未添加补充标识。')}</p>
             </div>
+          </div>
+          <div class="summary-inline-grid summary-inline-grid--code">
+            <article class="summary-inline-card">
+              <span>提取码</span>
+              <strong class="table-mono">${escapeHtml(code.redeemCode || code.token || '—')}</strong>
+              <small>${escapeHtml(code.batchNo || '未分配批次')}</small>
+            </article>
+            <article class="summary-inline-card">
+              <span>首次使用用户</span>
+              <strong>${escapeHtml(userLabel)}</strong>
+              <small>${escapeHtml(code.firstUserId || '未记录用户标识')}</small>
+            </article>
+            <article class="summary-inline-card">
+              <span>关联曲目</span>
+              <strong>${escapeHtml(trackTitle)}</strong>
+              <small>${escapeHtml(code.sessionId || '未生成会话')}</small>
+            </article>
+            <article class="summary-inline-card">
+              <span>履约状态</span>
+              <strong>${escapeHtml(orderStatusLabel)}</strong>
+              <small>${escapeHtml(userOrder ? userOrder.orderNo || '已生成订单' : '尚未关联订单')}</small>
+            </article>
           </div>
           <div class="detail-grid">
             <article class="detail-card">
@@ -4693,9 +4791,9 @@ function renderDrawer() {
 
         <aside class="action-well action-well--${escapeHtml(getStatusTone(code.status || 'ready'))}">
           <div class="action-well-head">
-            <span class="drawer-eyebrow">状态操作</span>
-            <h4>更新核销状态</h4>
-            <p>状态变更会影响扫码结果和运营视图，请在确认后提交。</p>
+            <span class="drawer-eyebrow">状态调整</span>
+            <h4>更新提取码状态</h4>
+            <p>提交后会同步影响扫码结果、用户侧反馈和提取码统计。</p>
           </div>
           <form id="code-status-form" class="action-form" data-code-id="${escapeHtml(code.id)}">
             ${renderSelectField('状态', 'status', code.status || 'ready', [
@@ -4709,8 +4807,7 @@ function renderDrawer() {
             </div>
           </form>
           <div class="action-well-note" data-code-status-note>
-            <strong>${escapeHtml(codeGuide.title)}</strong>
-            <p>${escapeHtml(codeGuide.body)}</p>
+            ${renderCodeStatusNote(code.status || 'ready')}
           </div>
         </aside>
       </div>
@@ -4718,7 +4815,7 @@ function renderDrawer() {
       <div class="drawer-split">
         <section class="drawer-section drawer-section--anchored" id="code-section-user" data-drawer-section>
           ${renderPanelHeader('使用与用户', '核销结果、用户标识与会话轨迹。')}
-          <div class="detail-list">
+          <div class="detail-list detail-list--code">
             <div class="detail-row"><span>首次使用用户</span><strong>${escapeHtml(user ? user.nickname || user.displayName || user.mobile : code.firstUserId || '—')}</strong></div>
             <div class="detail-row"><span>用户标识</span><strong>${escapeHtml(code.firstUserId || '—')}</strong></div>
             <div class="detail-row"><span>手机号</span><strong>${escapeHtml(user ? user.mobile || '—' : '—')}</strong></div>
@@ -4732,7 +4829,7 @@ function renderDrawer() {
           ${
             userOrder
               ? `
-                <div class="detail-list">
+                <div class="detail-list detail-list--code">
                   <div class="detail-row"><span>订单号</span><strong>${escapeHtml(userOrder.orderNo || '—')}</strong></div>
                   <div class="detail-row"><span>发货状态</span><strong>${escapeHtml(STATUS_COPY[userOrder.deliveryStatus || userOrder.status || 'pending'] || '处理中')}</strong></div>
                   <div class="detail-row"><span>物流公司</span><strong>${escapeHtml(userOrder.shippingCompany || '—')}</strong></div>
@@ -4747,7 +4844,7 @@ function renderDrawer() {
 
       <div class="drawer-section drawer-section--anchored" id="code-section-timeline" data-drawer-section>
         ${renderPanelHeader('操作时间线', '展示创建、核销、到期和后台处理记录。')}
-        ${renderTimeline(getCodeTimeline(code))}
+        ${renderTimeline(getCodeTimeline(code), 'timeline--code')}
       </div>
 
       <footer class="drawer-foot">
@@ -5097,6 +5194,44 @@ function renderModal() {
     return;
   }
 
+  if (type === 'code-fails') {
+    const items = state.redeemFailLogs || [];
+    const latest = items[0] || null;
+    els.modalPanel.innerHTML = `
+      <header class="modal-head">
+        <div>
+          <span class="drawer-eyebrow">异常记录</span>
+          <h3>提取码异常记录</h3>
+          <p>查看最近失败核销记录，定位格式错误、失效码和停用码。</p>
+        </div>
+        <button class="icon-button" type="button" data-close-modal aria-label="关闭">${icon('close')}</button>
+      </header>
+      <div class="modal-summary">
+        <article class="modal-summary-card">
+          <span>异常总数</span>
+          <strong>${formatNumber(items.length)}</strong>
+        </article>
+        <article class="modal-summary-card">
+          <span>最近原因</span>
+          <strong>${escapeHtml(latest ? REASON_COPY[latest.reason] || latest.reason || '未知原因' : '暂无记录')}</strong>
+        </article>
+        <article class="modal-summary-card">
+          <span>最近时间</span>
+          <strong>${escapeHtml(latest ? formatShortDate(latest.createdAt) : '—')}</strong>
+        </article>
+      </div>
+      <div class="modal-body">
+        ${renderFailLogList(20)}
+      </div>
+      <footer class="modal-foot">
+        ${renderActionButton({ action: 'cancel-modal', label: '关闭', iconName: 'close', variant: 'ghost' })}
+      </footer>
+    `;
+    els.modalPanel.scrollTop = 0;
+    openLayer(els.modalLayer);
+    return;
+  }
+
   closeModal();
 }
 
@@ -5194,16 +5329,6 @@ function handleAdminActionButtonClick(button) {
     return;
   }
 
-  if (action === 'copy-wine-id') {
-    const wine = getActiveSelectedWine();
-    if (wine) {
-      copyText(wine.id)
-        .then(() => showToast('酒款 ID 已复制。', 'success'))
-        .catch(() => showToast('复制失败。', 'error'));
-    }
-    return;
-  }
-
   if (action === 'clear-wine-filters') {
     clearWineFilters();
     return;
@@ -5291,16 +5416,7 @@ function updateCodeStatusNote(status) {
   if (!note) {
     return;
   }
-
-  const guide = getCodeStatusGuide(status);
-  const title = note.querySelector('strong');
-  const body = note.querySelector('p');
-  if (title) {
-    title.textContent = guide.title;
-  }
-  if (body) {
-    body.textContent = guide.body;
-  }
+  note.innerHTML = renderCodeStatusNote(status);
 }
 
 function handleDrawerSectionNav(button) {
@@ -5385,6 +5501,12 @@ function handleAdminDocumentClick(event) {
     return;
   }
 
+  const wineRow = event.target.closest('[data-wine-row]');
+  if (wineRow && !event.target.closest('button, input, select, label')) {
+    openWineDrawerById(wineRow.dataset.wineRow);
+    return;
+  }
+
   if (event.target.closest('[data-close-drawer]')) {
     closeDrawer();
     return;
@@ -5445,8 +5567,8 @@ function handleAdminDocumentChange(event) {
     return;
   }
 
-  if (input.matches('[data-filter="code-wine"]')) {
-    state.filters.codeWine = input.value;
+  if (input.matches('[data-filter="code-batch"]')) {
+    state.filters.codeBatch = input.value;
     state.codePage = 1;
     renderCodesContent();
     return;
@@ -5524,6 +5646,12 @@ function wireAdminRuntime() {
   document.addEventListener('change', handleAdminDocumentChange);
   document.addEventListener('submit', handleAdminDocumentSubmit);
   document.addEventListener('keydown', (event) => {
+    const wineRow = event.target.closest && event.target.closest('[data-wine-row]');
+    if (wineRow && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault();
+      openWineDrawerById(wineRow.dataset.wineRow);
+      return;
+    }
     if (event.key !== 'Escape') {
       return;
     }
@@ -5539,6 +5667,7 @@ function wireAdminRuntime() {
 
 async function bootstrapAdminRuntime() {
   wireAdminRuntime();
+  startSessionClock();
   updateSessionPill();
   updatePermissionUi();
   renderPageShells();
