@@ -3389,42 +3389,46 @@ function renderShippingShell() {
 
   const shippingCounts = getShippingSummary();
   page.innerHTML = `
-    <div class="page-stack">
-      <section class="panel control-console">
-        ${renderPanelHeader('发货控制台', '搜索订单、筛选状态与导出数据')}
-        <div class="control-grid control-grid--wide">
-          <label class="search-bar">
+    <div class="page-stack page-stack--shipping">
+      <section class="panel panel--shipping-toolbar">
+        <div class="shipping-toolbar-tabs">
+          ${[
+            { value: 'all', label: '全部', count: formatNumber((state.orders || []).length) },
+            { value: 'pending', label: '待发货', count: formatNumber(shippingCounts.pending) },
+            { value: 'shipped', label: '已发货', count: formatNumber(shippingCounts.shipped) },
+            { value: 'abnormal', label: '异常', count: formatNumber(shippingCounts.abnormal) },
+            { value: 'closed', label: '已取消', count: formatNumber((state.orders || []).filter((order) => order.status === 'closed').length) }
+          ]
+            .map(
+              (item) => `
+                <button class="shipping-tab ${state.filters.shippingStatus === item.value ? 'is-active' : ''}" type="button" data-shipping-status="${escapeHtml(item.value)}">
+                  <span>${escapeHtml(item.label)}</span>
+                  <strong>${escapeHtml(item.count)}</strong>
+                </button>
+              `
+            )
+            .join('')}
+        </div>
+        <div class="shipping-toolbar-row">
+          <div class="shipping-toolbar-filters">
+            <label class="search-bar search-bar--shipping">
             <span class="search-bar-icon">${icon('search')}</span>
             <input class="input" id="shipping-search" type="search" placeholder="搜索订单号、手机号、收货人或物流信息" value="${escapeHtml(state.filters.shippingSearch)}" data-filter="shipping-search" />
           </label>
-          <div class="segmented-control" id="shipping-status-tabs">
-            ${[
-              { value: 'all', label: '全部' },
-              { value: 'pending', label: `待发货 ${formatNumber(shippingCounts.pending)}` },
-              { value: 'shipped', label: `已发货 ${formatNumber(shippingCounts.shipped)}` },
-              { value: 'abnormal', label: `异常 ${formatNumber(shippingCounts.abnormal)}` },
-              { value: 'closed', label: `已取消 ${formatNumber((state.orders || []).filter((order) => order.status === 'closed').length)}` }
-            ]
-              .map(
-                (item) => `
-                  <button class="segment${state.filters.shippingStatus === item.value ? ' is-active' : ''}" type="button" data-shipping-status="${escapeHtml(item.value)}">${escapeHtml(item.label)}</button>
-                `
-              )
-              .join('')}
           </div>
-          <div class="control-actions">
+          <div class="shipping-toolbar-actions">
             ${renderActionButton({ action: 'export-current', label: '导出订单', iconName: 'download', variant: 'secondary' })}
             ${renderActionButton({ action: 'clear-shipping-filters', label: '清空筛选', iconName: 'close', variant: 'ghost' })}
           </div>
         </div>
       </section>
 
-      <section class="metric-grid metric-grid--four" id="shipping-stats"></section>
+      <section class="metric-grid metric-grid--four metric-grid--shipping" id="shipping-stats"></section>
 
-      <section class="panel">
+      <section class="panel panel--shipping-list">
         ${renderPanelHeader('订单列表', '点击行打开右侧详情')}
         <div class="table-shell">
-          <table class="data-table">
+          <table class="data-table data-table--shipping">
             <thead>
               <tr>
                 <th>订单号</th>
@@ -3471,44 +3475,46 @@ function renderShippingContent() {
           const shippingName = order.shippingCompany || '—';
           const shippingNo = order.trackingNo || '—';
           const statusTone = isOrderAbnormal(order) ? 'danger' : isOrderPending(order) ? 'warning' : isOrderShipped(order) ? 'success' : 'neutral';
-          const actionButton = isOrderPhysical(order)
-            ? renderActionButton({ action: 'open-shipping-modal', label: '发货', iconName: 'truck', variant: 'primary' })
-            : renderActionButton({ action: 'open-shipping-drawer', label: '查看', iconName: 'eye', variant: 'ghost' });
+          const itemSummary = items.map((item) => item.productName || item.trackTitle || order.orderNo).filter(Boolean).join('、') || '—';
+          const addressSummary = order.address ? [order.address.contactName, order.address.mobile].filter(Boolean).join(' · ') : order.addressSummary || '—';
+          const addressDetail = order.address ? [order.address.provinceCity, order.address.detail].filter(Boolean).join(' · ') : order.addressSummary || '—';
 
           return `
             <tr data-order-row="${escapeHtml(order.id)}">
-              <td>
+              <td class="table-col-order">
                 <div class="table-primary">${escapeHtml(order.orderNo || '—')}</div>
                 <div class="table-secondary">${escapeHtml(formatShortDate(order.createdAt))}</div>
               </td>
-              <td>
+              <td class="table-col-user">
                 <div class="table-primary">${escapeHtml(user.nickname || user.displayName || '—')}</div>
                 <div class="table-secondary">${escapeHtml(user.mobile || '—')}</div>
               </td>
-              <td>
-                <div class="table-primary">${escapeHtml(items.map((item) => item.productName || item.trackTitle || order.orderNo).filter(Boolean).join('、') || '—')}</div>
+              <td class="table-col-product">
+                <div class="table-primary truncate-2">${escapeHtml(itemSummary)}</div>
                 <div class="table-secondary">${escapeHtml(order.orderType === 'physical' ? '实物订单' : '数字权益')}</div>
               </td>
-              <td>
-                <div class="table-primary">${escapeHtml(order.address ? [order.address.contactName, order.address.mobile].filter(Boolean).join(' · ') : order.addressSummary || '—')}</div>
-                <div class="table-secondary">${renderTruncatedText(order.address ? [order.address.provinceCity, order.address.detail].filter(Boolean).join(' · ') : order.addressSummary || '—')}</div>
+              <td class="table-col-address">
+                <div class="table-primary">${escapeHtml(addressSummary)}</div>
+                <div class="table-secondary truncate-2">${escapeHtml(addressDetail)}</div>
               </td>
-              <td>
+              <td class="table-col-logistics">
                 <div class="table-primary">${escapeHtml(shippingName)}</div>
                 <div class="table-secondary">${escapeHtml(shippingNo)}</div>
               </td>
-              <td>
-                <span class="status-pill status-pill--${statusTone}"><span class="status-pill-dot"></span><span>${escapeHtml(STATUS_COPY[order.deliveryStatus || order.status || 'pending'] || order.deliveryStatus || order.status || '待发货')}</span></span>
-                <div class="table-secondary">${escapeHtml(order.wechatShippingSyncStatus || '—')}</div>
+              <td class="table-col-order-status">
+                <div class="table-stack">
+                  <span class="status-pill status-pill--${statusTone}"><span class="status-pill-dot"></span><span>${escapeHtml(STATUS_COPY[order.deliveryStatus || order.status || 'pending'] || order.deliveryStatus || order.status || '待发货')}</span></span>
+                  <div class="table-secondary">${escapeHtml(order.wechatShippingSyncStatus || '—')}</div>
+                </div>
               </td>
-              <td>
+              <td class="table-col-order-updated">
                 <div class="table-primary">${escapeHtml(formatShortDate(order.updatedAt || order.shippedAt || order.completedAt || order.paidAt || order.createdAt))}</div>
                 <div class="table-secondary">${escapeHtml(order.shippedAt ? `已发货 ${formatShortDate(order.shippedAt)}` : '—')}</div>
               </td>
               <td class="table-actions-col">
-                <div class="table-actions">
-                  ${renderActionButton({ action: 'open-shipping-drawer', label: '查看', iconName: 'eye', variant: 'ghost' })}
-                  ${isOrderPhysical(order) ? renderActionButton({ action: 'open-shipping-modal', label: '发货', iconName: 'truck', variant: 'primary' }) : ''}
+                <div class="table-actions table-actions--shipping">
+                  ${renderTableIconButton({ action: 'open-shipping-drawer', iconName: 'eye', label: '查看详情', attrs: `data-order-id="${escapeHtml(order.id)}"` })}
+                  ${isOrderPhysical(order) ? renderTableIconButton({ action: 'open-shipping-modal', iconName: 'truck', label: '发货', attrs: `data-order-id="${escapeHtml(order.id)}"` }) : ''}
                 </div>
               </td>
             </tr>
@@ -3526,12 +3532,13 @@ function renderCopyShell() {
 
   ensureCopyDraft();
   page.innerHTML = `
-    <div class="copy-layout">
+    <div class="page-stack page-stack--copy">
+      <div class="copy-layout">
       <aside class="panel copy-nav-panel">
         <header class="panel-header">
           <div>
             <h3 class="panel-title">文案分类</h3>
-            <p class="panel-note">选择左侧分类，右侧实时预览。</p>
+            <p class="panel-note">选择左侧分类，中间编辑，右侧实时预览。</p>
           </div>
           <span class="copy-status-pill ${state.copyDirty ? 'is-dirty' : 'is-saved'}" id="copy-dirty-pill">${state.copyDirty ? '未保存' : '已保存'}</span>
         </header>
@@ -3541,8 +3548,15 @@ function renderCopyShell() {
         <div id="copy-editor"></div>
       </section>
       <aside class="panel copy-preview-panel">
+        <header class="panel-header">
+          <div>
+            <h3 class="panel-title">实时预览</h3>
+            <p class="panel-note">模拟小程序页面布局和按钮文案。</p>
+          </div>
+        </header>
         <div id="copy-preview" class="copy-preview"></div>
       </aside>
+      </div>
     </div>
   `;
 }
@@ -4865,6 +4879,8 @@ function renderDrawer() {
     }
     const user = order.user || {};
     const timeline = getOrderTimeline(order);
+    const receiverLabel = order.address ? [order.address.contactName, order.address.mobile].filter(Boolean).join(' · ') : user.mobile || '—';
+    const productLabel = (order.items || []).map((item) => item.productName || item.trackTitle || '订单项').filter(Boolean).join('、') || '—';
     const shippingSections = [
       { id: 'shipping-section-receiver', label: '收货信息', note: '地址、联系人与备注' },
       { id: 'shipping-section-items', label: '商品明细', note: '订单项与金额' },
@@ -4899,6 +4915,28 @@ function renderDrawer() {
               <p>${escapeHtml(order.addressSummary || '当前订单尚未补充完整的收货摘要。')}</p>
             </div>
           </div>
+          <div class="summary-inline-grid summary-inline-grid--shipping">
+            <article class="summary-inline-card">
+              <span>收货联系人</span>
+              <strong>${escapeHtml(receiverLabel)}</strong>
+              <small>${escapeHtml(order.address ? order.address.provinceCity || '未补充省市' : '未填写地址')}</small>
+            </article>
+            <article class="summary-inline-card">
+              <span>商品内容</span>
+              <strong>${escapeHtml(productLabel)}</strong>
+              <small>${escapeHtml(order.orderType === 'physical' ? '实物订单' : '数字权益')}</small>
+            </article>
+            <article class="summary-inline-card">
+              <span>物流信息</span>
+              <strong>${escapeHtml(order.shippingCompany || '待分配物流')}</strong>
+              <small>${escapeHtml(order.trackingNo || '未填写单号')}</small>
+            </article>
+            <article class="summary-inline-card">
+              <span>同步状态</span>
+              <strong>${escapeHtml(order.wechatShippingSyncStatus || '待同步')}</strong>
+              <small>${escapeHtml(formatShortDate(order.updatedAt || order.shippedAt || order.createdAt))}</small>
+            </article>
+          </div>
           <div class="detail-grid">
             <article class="detail-card">
               <span>物流公司</span>
@@ -4928,6 +4966,20 @@ function renderDrawer() {
           <div class="action-well-note">
             <strong>${escapeHtml(order.orderNo || '—')}</strong>
             <p>${escapeHtml(order.address ? [order.address.contactName, order.address.mobile].filter(Boolean).join(' · ') : user.mobile || '—')}</p>
+            <div class="action-well-list">
+              <div class="action-well-list-row">
+                <span>订单类型</span>
+                <strong>${escapeHtml(order.orderType === 'physical' ? '实物订单' : '数字权益')}</strong>
+              </div>
+              <div class="action-well-list-row">
+                <span>物流同步</span>
+                <strong>${escapeHtml(order.wechatShippingSyncStatus || '待同步')}</strong>
+              </div>
+              <div class="action-well-list-row">
+                <span>当前操作</span>
+                <strong>${escapeHtml(isOrderShipped(order) ? '查看物流进度' : '提交发货信息')}</strong>
+              </div>
+            </div>
           </div>
         </aside>
       </div>
@@ -4965,10 +5017,11 @@ function renderDrawer() {
 
       <div class="drawer-section drawer-section--anchored" id="shipping-section-timeline" data-drawer-section>
         ${renderPanelHeader('时间线', '展示订单创建、支付、发货、签收和异常同步记录。')}
-        ${renderTimeline(timeline)}
+        ${renderTimeline(timeline, 'timeline--shipping')}
       </div>
 
       <footer class="drawer-foot">
+        ${isOrderPhysical(order) && !isOrderShipped(order) ? renderActionButton({ action: 'open-shipping-modal', label: '发货', iconName: 'truck', variant: 'primary' }) : ''}
         ${renderActionButton({ action: 'close-drawer', label: '关闭', iconName: 'close', variant: 'ghost' })}
       </footer>
     `;
