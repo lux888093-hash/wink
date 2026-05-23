@@ -2430,6 +2430,9 @@ textarea:focus,
   inset: 0;
   z-index: 40;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--transition);
@@ -2461,17 +2464,27 @@ textarea:focus,
 }
 
 .drawer-panel {
-  width: min(720px, 100vw);
-  height: 100dvh;
-  margin-left: auto;
+  width: min(1040px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
   overflow-y: auto;
-  padding: 28px;
-  transform: translateX(36px);
+  padding: 28px 32px 24px;
+  border-radius: 30px;
+  overscroll-behavior: contain;
+  transform: translateY(18px) scale(0.985);
   transition: transform var(--transition);
 }
 
 .drawer-layer.is-open .drawer-panel {
-  transform: translateX(0);
+  transform: translateY(0) scale(1);
+}
+
+.drawer-panel--wine {
+  width: min(1180px, calc(100vw - 32px));
+}
+
+.drawer-panel--code,
+.drawer-panel--shipping {
+  width: min(940px, calc(100vw - 32px));
 }
 
 .modal-panel {
@@ -2485,6 +2498,20 @@ textarea:focus,
   transition: transform var(--transition);
 }
 
+.modal-panel--confirm {
+  width: min(560px, calc(100vw - 32px));
+}
+
+.modal-panel--wine-create,
+.modal-panel--code-batch,
+.modal-panel--shipping {
+  width: min(860px, calc(100vw - 32px));
+}
+
+.modal-panel--fixed-code {
+  width: min(780px, calc(100vw - 32px));
+}
+
 .modal-layer.is-open .modal-panel {
   transform: translateY(0) scale(1);
 }
@@ -2496,6 +2523,8 @@ textarea:focus,
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(110, 36, 50, 0.08);
 }
 
 .drawer-eyebrow {
@@ -2523,6 +2552,80 @@ textarea:focus,
   color: var(--muted);
   font-size: 14px;
   line-height: 1.6;
+}
+
+.modal-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.modal-summary-card,
+.modal-callout {
+  padding: 16px 18px;
+  border: 1px solid rgba(110, 36, 50, 0.08);
+  border-radius: 18px;
+  background: rgba(247, 243, 236, 0.72);
+}
+
+.modal-summary-card {
+  display: grid;
+  gap: 6px;
+}
+
+.modal-summary-card span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.modal-summary-card strong {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.modal-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.modal-callout-icon {
+  width: 36px;
+  height: 36px;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.modal-callout strong {
+  display: block;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.modal-callout p {
+  margin-top: 6px;
+}
+
+.modal-callout--danger {
+  border-color: rgba(185, 71, 71, 0.16);
+  background: rgba(248, 231, 231, 0.7);
+}
+
+.modal-callout--danger .modal-callout-icon {
+  color: var(--danger);
+}
+
+.modal-callout--primary .modal-callout-icon,
+.modal-callout--success .modal-callout-icon {
+  color: var(--wine-red);
 }
 
 .drawer-hero {
@@ -2593,6 +2696,225 @@ textarea:focus,
   gap: 22px;
 }
 
+.drawer-workspace {
+  display: grid;
+  gap: 22px;
+}
+
+.drawer-workspace--wine {
+  grid-template-columns: 232px minmax(0, 1fr);
+  align-items: start;
+}
+
+.drawer-rail {
+  position: sticky;
+  top: 0;
+  display: grid;
+  gap: 14px;
+  align-self: start;
+}
+
+.drawer-rail-card,
+.drawer-toolbar,
+.summary-shell,
+.action-well {
+  padding: 18px;
+  border: 1px solid rgba(110, 36, 50, 0.08);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.drawer-rail-card--soft,
+.summary-shell,
+.action-well {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 243, 236, 0.82)),
+    rgba(255, 255, 255, 0.72);
+}
+
+.drawer-rail-label {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.drawer-rail-card strong,
+.summary-shell-copy strong,
+.action-well-note strong {
+  display: block;
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+.drawer-rail-card p,
+.summary-shell-copy p,
+.action-well-head p,
+.action-well-note p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.drawer-rail-actions,
+.drawer-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.drawer-main {
+  min-width: 0;
+  display: grid;
+  gap: 22px;
+}
+
+.drawer-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.drawer-overview,
+.drawer-split {
+  display: grid;
+  gap: 18px;
+}
+
+.drawer-overview--code,
+.drawer-overview--shipping {
+  grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.9fr);
+  align-items: start;
+}
+
+.drawer-split {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.summary-shell {
+  display: grid;
+  gap: 18px;
+}
+
+.summary-shell-top,
+.summary-shell-copy {
+  display: grid;
+  gap: 10px;
+}
+
+.action-well {
+  display: grid;
+  gap: 16px;
+}
+
+.action-well-head h4 {
+  margin: 10px 0 0;
+  color: var(--ink);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.action-form {
+  display: grid;
+  gap: 14px;
+}
+
+.action-well-note {
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(110, 36, 50, 0.1);
+  background: rgba(255, 253, 249, 0.82);
+}
+
+.action-well--warning .action-well-note {
+  background: rgba(248, 239, 225, 0.76);
+  border-color: rgba(185, 134, 59, 0.16);
+}
+
+.action-well--danger .action-well-note {
+  background: rgba(248, 231, 231, 0.76);
+  border-color: rgba(185, 71, 71, 0.16);
+}
+
+.section-nav {
+  display: grid;
+  gap: 8px;
+}
+
+.drawer-toolbar .section-nav {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.drawer-toolbar .section-nav-button {
+  flex: 1 1 180px;
+}
+
+.section-nav-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  background: rgba(247, 243, 236, 0.62);
+  color: var(--ink);
+  text-align: left;
+  transition:
+    transform var(--transition),
+    border-color var(--transition),
+    background var(--transition),
+    box-shadow var(--transition);
+}
+
+.section-nav-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(110, 36, 50, 0.12);
+  background: rgba(255, 253, 249, 0.88);
+}
+
+.section-nav-button.is-active {
+  border-color: rgba(110, 36, 50, 0.18);
+  background: rgba(255, 247, 244, 0.92);
+  box-shadow:
+    inset 0 0 0 1px rgba(110, 36, 50, 0.05),
+    0 10px 24px -18px rgba(110, 36, 50, 0.3);
+}
+
+.section-nav-copy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.section-nav-copy strong {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.section-nav-copy small,
+.section-nav-index {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
 .drawer-section {
   display: grid;
   gap: 16px;
@@ -2600,9 +2922,31 @@ textarea:focus,
   border-top: 1px solid rgba(110, 36, 50, 0.08);
 }
 
+.drawer-section--anchored {
+  scroll-margin-top: 24px;
+}
+
+.drawer-panel--wine .drawer-form {
+  gap: 26px;
+}
+
+.drawer-panel--wine .drawer-section .panel-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding-bottom: 14px;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 249, 0.98) 0%, rgba(255, 253, 249, 0.98) 70%, rgba(255, 253, 249, 0));
+}
+
 .detail-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   margin-bottom: 8px;
+}
+
+.drawer-panel--code .detail-grid,
+.drawer-panel--shipping .detail-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .detail-card {
@@ -2619,6 +2963,7 @@ textarea:focus,
 .detail-list strong {
   max-width: 60%;
   text-align: right;
+  word-break: break-word;
 }
 
 .inline-form {
@@ -2658,6 +3003,35 @@ textarea:focus,
   margin-top: 24px;
   padding-top: 22px;
   border-top: 1px solid rgba(110, 36, 50, 0.08);
+}
+
+.modal-panel--wine-create .modal-foot,
+.modal-panel--code-batch .modal-foot,
+.modal-panel--shipping .modal-foot,
+.modal-panel--fixed-code .modal-foot {
+  position: sticky;
+  bottom: -28px;
+  margin-inline: -28px;
+  padding: 18px 28px 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 249, 0), rgba(255, 253, 249, 0.86) 18%, rgba(255, 253, 249, 0.98)),
+    rgba(255, 253, 249, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.drawer-panel--wine .drawer-foot,
+.drawer-panel--code .drawer-foot,
+.drawer-panel--shipping .drawer-foot {
+  position: sticky;
+  bottom: -24px;
+  margin-inline: -32px;
+  padding: 18px 32px 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 249, 0), rgba(255, 253, 249, 0.86) 18%, rgba(255, 253, 249, 0.98)),
+    rgba(255, 253, 249, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 .fixed-code-modal {
@@ -2986,6 +3360,10 @@ textarea:focus,
   .form-grid,
   .copy-form-grid,
   .detail-grid,
+  .drawer-workspace--wine,
+  .drawer-overview--code,
+  .drawer-overview--shipping,
+  .drawer-split,
   .drawer-hero,
   .fixed-code-modal,
   .image-field-body {
@@ -2996,8 +3374,26 @@ textarea:focus,
     grid-template-columns: 1fr;
   }
 
+  .modal-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .drawer-panel--code .detail-grid,
+  .drawer-panel--shipping .detail-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .drawer-rail {
+    position: static;
+  }
+
   .inline-form {
     grid-template-columns: 1fr;
+  }
+
+  .drawer-toolbar {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
 
@@ -3010,6 +3406,7 @@ textarea:focus,
   .topbar-actions,
   .topbar-action-group,
   .panel-header,
+  .drawer-toolbar,
   .table-footer,
   .detail-row,
   .drawer-foot,
@@ -3033,6 +3430,12 @@ textarea:focus,
   .summary-strip,
   .miniapp-actions {
     grid-template-columns: 1fr;
+  }
+
+  .drawer-toolbar .section-nav,
+  .drawer-toolbar .section-nav-button {
+    width: 100%;
+    flex: 1 1 100%;
   }
 
   .data-table {
@@ -3109,7 +3512,9 @@ textarea:focus,
   }
 
   .drawer-panel {
-    width: 100vw;
+    width: calc(100vw - 12px);
+    max-height: calc(100dvh - 12px);
+    border-radius: 24px;
   }
 
   .modal-panel {
@@ -3117,5 +3522,22 @@ textarea:focus,
     max-height: calc(100dvh - 16px);
     margin: auto 8px 8px;
     border-radius: 22px;
+  }
+
+  .modal-panel--wine-create .modal-foot,
+  .modal-panel--code-batch .modal-foot,
+  .modal-panel--shipping .modal-foot,
+  .modal-panel--fixed-code .modal-foot {
+    bottom: -20px;
+    margin-inline: -20px;
+    padding-inline: 20px;
+  }
+
+  .drawer-panel--wine .drawer-foot,
+  .drawer-panel--code .drawer-foot,
+  .drawer-panel--shipping .drawer-foot {
+    bottom: -20px;
+    margin-inline: -20px;
+    padding-inline: 20px;
   }
 }

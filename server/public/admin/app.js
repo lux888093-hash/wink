@@ -629,6 +629,28 @@ function renderCodeStatusOptions(currentStatus) {
     .join('');
 }
 
+function getCodeStatusGuide(status) {
+  const guides = {
+    ready: {
+      title: '待使用',
+      body: '该提取码可正常核销，适合新发放或恢复可用状态。'
+    },
+    claimed: {
+      title: '已使用',
+      body: '适合补录人工核销结果。更新后会作为已完成使用记录展示。'
+    },
+    expired: {
+      title: '已过期',
+      body: '过期状态会阻止后续核销，建议仅在确认失效后更新。'
+    },
+    disabled: {
+      title: '已停用',
+      body: '停用会立即阻止扫码使用，适合异常码、作废码或风控处理。'
+    }
+  };
+  return guides[status] || guides.ready;
+}
+
 function getCodePagination(items) {
   const pageSize = Number(state.codePageSize) || 20;
   const totalItems = items.length;
@@ -2465,6 +2487,31 @@ function renderPanelHeader(title, note = '', actions = '') {
       </div>
       ${actions ? `<div class="panel-actions">${actions}</div>` : ''}
     </header>
+  `;
+}
+
+function renderSectionNav(items, group = 'drawer') {
+  return `
+    <nav class="section-nav" aria-label="分区导航">
+      ${items
+        .map(
+          (item, index) => `
+            <button
+              class="section-nav-button ${index === 0 ? 'is-active' : ''}"
+              type="button"
+              data-drawer-section-group="${escapeHtml(group)}"
+              data-drawer-section-target="${escapeHtml(item.id)}"
+            >
+              <span class="section-nav-copy">
+                <strong>${escapeHtml(item.label)}</strong>
+                ${item.note ? `<small>${escapeHtml(item.note)}</small>` : ''}
+              </span>
+              <span class="section-nav-index">${String(index + 1).padStart(2, '0')}</span>
+            </button>
+          `
+        )
+        .join('')}
+    </nav>
   `;
 }
 
@@ -4443,6 +4490,7 @@ function renderDrawer() {
   }
 
   const { type, data } = state.drawer;
+  els.drawerPanel.className = type ? `drawer-panel drawer-panel--${type}` : 'drawer-panel';
   if (!type) {
     closeLayer(els.drawerLayer);
     return;
@@ -4457,6 +4505,12 @@ function renderDrawer() {
     const winery = (state.wineries || []).find((item) => item.id === wine.wineryId) || {};
     const stats = getWineCodeStats(wine);
     const tracks = (state.tracks || []).filter((track) => track.wineId === wine.id);
+    const wineSections = [
+      { id: 'wine-section-basics', label: '基础信息', note: '名称、产区与状态' },
+      { id: 'wine-section-copy', label: '文案', note: '故事、摘要与品牌口径' },
+      { id: 'wine-section-visual', label: '视觉', note: '封面、瓶身与礼盒图片' },
+      { id: 'wine-section-related', label: '关联', note: '音乐与扩展内容' }
+    ];
     els.drawerPanel.innerHTML = `
       <header class="drawer-head">
         <div>
@@ -4467,90 +4521,109 @@ function renderDrawer() {
         <button class="icon-button" type="button" data-close-drawer aria-label="关闭">${icon('close')}</button>
       </header>
 
-      <div class="drawer-hero">
-        <div class="drawer-hero-media">${renderWineVisual(wine.bottleImage || wine.posterImage || wine.giftImage || '', wine.name, wine.name, 'drawer-hero-placeholder')}</div>
-        <div class="drawer-hero-copy">
-          <div class="drawer-hero-row">
-            ${renderStatusPill(wine.status || 'active')}
-            ${renderTag(winery.name || '未绑定酒庄', 'neutral')}
+      <div class="drawer-workspace drawer-workspace--wine">
+        <aside class="drawer-rail">
+          <div class="drawer-rail-card">
+            <span class="drawer-rail-label">编辑分区</span>
+            ${renderSectionNav(wineSections, 'wine')}
           </div>
-          <div class="drawer-hero-stats">
-            <div><strong>${formatNumber(stats.total)}</strong><span>提取码</span></div>
-            <div><strong>${formatNumber(stats.used)}</strong><span>已使用</span></div>
-            <div><strong>${escapeHtml(stats.lastUsedAt ? formatShortDate(stats.lastUsedAt) : '—')}</strong><span>最近使用</span></div>
+          <div class="drawer-rail-card drawer-rail-card--soft">
+            <span class="drawer-rail-label">酒款识别</span>
+            <strong>${escapeHtml(wine.vintage || wine.name)}</strong>
+            <p>${escapeHtml(wine.id)}</p>
+            <div class="drawer-rail-actions">
+              ${renderActionButton({ action: 'copy-wine-id', label: '复制 ID', iconName: 'copy', variant: 'secondary' })}
+            </div>
           </div>
+        </aside>
+
+        <div class="drawer-main">
+          <div class="drawer-hero">
+            <div class="drawer-hero-media">${renderWineVisual(wine.bottleImage || wine.posterImage || wine.giftImage || '', wine.name, wine.name, 'drawer-hero-placeholder')}</div>
+            <div class="drawer-hero-copy">
+              <div class="drawer-hero-row">
+                ${renderStatusPill(wine.status || 'active')}
+                ${renderTag(winery.name || '未绑定酒庄', 'neutral')}
+              </div>
+              <div class="drawer-hero-stats">
+                <div><strong>${formatNumber(stats.total)}</strong><span>提取码</span></div>
+                <div><strong>${formatNumber(stats.used)}</strong><span>已使用</span></div>
+                <div><strong>${escapeHtml(stats.lastUsedAt ? formatShortDate(stats.lastUsedAt) : '—')}</strong><span>最近使用</span></div>
+              </div>
+            </div>
+          </div>
+          <form id="wine-form" class="drawer-form" data-wine-id="${escapeHtml(wine.id)}">
+            <section class="drawer-section drawer-section--anchored" id="wine-section-basics" data-drawer-section>
+              ${renderPanelHeader('基础信息', '优先整理主名称、年份、产区和启用状态。')}
+              <div class="form-grid">
+                ${renderSelectField('酒庄', 'wineryId', wine.wineryId, (state.wineries || []).map((item) => ({ value: item.id, label: item.name })), '切换酒庄关联')}
+                ${renderField('酒款名称', 'name', wine.name, { hint: '对外显示的主名称。', maxlength: 80 })}
+                ${renderField('英文标题', 'title', wine.title, { hint: '用于列表和详情页。', maxlength: 100 })}
+                ${renderField('副标题', 'subtitle', wine.subtitle, { hint: '建议 8 - 20 个字。', maxlength: 120 })}
+                ${renderField('年份 / 版次', 'vintage', wine.vintage, { hint: '例如 2022 Reserve。', maxlength: 80 })}
+                ${renderField('产区', 'region', wine.region, { hint: '用于列表展示。', maxlength: 80 })}
+                ${renderSelectField('状态', 'status', wine.status || 'active', [
+                  { value: 'active', label: '启用中' },
+                  { value: 'archived', label: '已归档' }
+                ])}
+              </div>
+            </section>
+
+            <section class="drawer-section drawer-section--anchored" id="wine-section-copy" data-drawer-section>
+              ${renderPanelHeader('文案', '保持品牌感，同时控制语气克制、信息清晰。')}
+              <div class="form-grid">
+                ${renderField('引言', 'quote', wine.quote, { type: 'textarea', hint: '一句话概括风味。', maxlength: 160 })}
+                ${renderField('概述', 'overview', wine.overview, { type: 'textarea', hint: '列表页摘要。', maxlength: 800 })}
+                ${renderField('故事标题', 'storyTitle', wine.storyTitle, { hint: '详情页章节标题。', maxlength: 80 })}
+                ${renderField('故事正文', 'story', wine.story, { type: 'textarea', hint: '完整故事段落。', maxlength: 3000 })}
+                ${renderField('场景描述', 'moodLine', wine.moodLine, { hint: '页面氛围文案。', maxlength: 160 })}
+                ${renderField('酒庄名称', 'estateName', wine.estateName, { hint: '庄园名称。', maxlength: 120 })}
+                ${renderField('酒庄标语', 'estateTagline', wine.estateTagline, { hint: '品牌一句话。', maxlength: 160 })}
+                ${renderField('酒庄简介', 'estateIntro', wine.estateIntro, { type: 'textarea', hint: '品牌简介。', maxlength: 1000 })}
+              </div>
+            </section>
+
+            <section class="drawer-section drawer-section--anchored" id="wine-section-visual" data-drawer-section>
+              ${renderPanelHeader('视觉', '统一管理封面、瓶身、礼盒与酒庄图片。')}
+              <div class="form-grid">
+                ${renderImageField({ label: '酒庄主视觉', name: 'estateHeroImage', value: wine.estateHeroImage || '', folder: 'wineries', placeholder: '/assets/images/winery-vineyard-moon.jpg' })}
+                ${renderImageField({ label: '人物 / 场景', name: 'estatePortraitImage', value: wine.estatePortraitImage || '', folder: 'wineries', placeholder: '/assets/images/village-ancient-vine-cellar.jpg' })}
+                ${renderImageField({ label: '封面图', name: 'posterImage', value: wine.posterImage || '', folder: 'wines', placeholder: '/assets/images/wine-bottle-poster.jpg' })}
+                ${renderImageField({ label: '瓶身图', name: 'bottleImage', value: wine.bottleImage || '', folder: 'wines', placeholder: '/assets/images/wine-bottle-estate.jpg' })}
+                ${renderImageField({ label: '礼盒图', name: 'giftImage', value: wine.giftImage || '', folder: 'wines', placeholder: '/assets/images/wine-gift-set.jpg' })}
+              </div>
+            </section>
+
+            <section class="drawer-section drawer-section--anchored" id="wine-section-related" data-drawer-section>
+              ${renderPanelHeader('关联', '预留给音乐、活动和后续扩展内容。')}
+              <div class="related-list">
+                ${tracks.length
+                  ? tracks
+                      .map(
+                        (track) => `
+                          <article class="related-item">
+                            <div>
+                              <strong>${escapeHtml(track.cnTitle || track.title)}</strong>
+                              <p>${escapeHtml(track.description || '—')}</p>
+                            </div>
+                            <span>${escapeHtml(track.durationLabel || '—')}</span>
+                          </article>
+                        `
+                      )
+                      .join('')
+                  : renderEmptyState('暂无关联曲目', '这款酒还没有绑定音乐内容。')}
+              </div>
+            </section>
+          </form>
         </div>
       </div>
-
-      <form id="wine-form" class="drawer-form" data-wine-id="${escapeHtml(wine.id)}">
-        <div class="drawer-section">
-          ${renderPanelHeader('基础信息')}
-          <div class="form-grid">
-            ${renderSelectField('酒庄', 'wineryId', wine.wineryId, (state.wineries || []).map((item) => ({ value: item.id, label: item.name })), '切换酒庄关联')}
-            ${renderField('酒款名称', 'name', wine.name, { hint: '对外显示的主名称。', maxlength: 80 })}
-            ${renderField('英文标题', 'title', wine.title, { hint: '用于列表和详情页。', maxlength: 100 })}
-            ${renderField('副标题', 'subtitle', wine.subtitle, { hint: '建议 8 - 20 个字。', maxlength: 120 })}
-            ${renderField('年份 / 版次', 'vintage', wine.vintage, { hint: '例如 2022 Reserve。', maxlength: 80 })}
-            ${renderField('产区', 'region', wine.region, { hint: '用于列表展示。', maxlength: 80 })}
-            ${renderSelectField('状态', 'status', wine.status || 'active', [
-              { value: 'active', label: '启用中' },
-              { value: 'archived', label: '已归档' }
-            ])}
-          </div>
-        </div>
-
-        <div class="drawer-section">
-          ${renderPanelHeader('文案')}
-          <div class="form-grid">
-            ${renderField('引言', 'quote', wine.quote, { type: 'textarea', hint: '一句话概括风味。', maxlength: 160 })}
-            ${renderField('概述', 'overview', wine.overview, { type: 'textarea', hint: '列表页摘要。', maxlength: 800 })}
-            ${renderField('故事标题', 'storyTitle', wine.storyTitle, { hint: '详情页章节标题。', maxlength: 80 })}
-            ${renderField('故事正文', 'story', wine.story, { type: 'textarea', hint: '完整故事段落。', maxlength: 3000 })}
-            ${renderField('场景描述', 'moodLine', wine.moodLine, { hint: '页面氛围文案。', maxlength: 160 })}
-            ${renderField('酒庄名称', 'estateName', wine.estateName, { hint: '庄园名称。', maxlength: 120 })}
-            ${renderField('酒庄标语', 'estateTagline', wine.estateTagline, { hint: '品牌一句话。', maxlength: 160 })}
-            ${renderField('酒庄简介', 'estateIntro', wine.estateIntro, { type: 'textarea', hint: '品牌简介。', maxlength: 1000 })}
-          </div>
-        </div>
-
-        <div class="drawer-section">
-          ${renderPanelHeader('视觉')}
-          <div class="form-grid">
-            ${renderImageField({ label: '酒庄主视觉', name: 'estateHeroImage', value: wine.estateHeroImage || '', folder: 'wineries', placeholder: '/assets/images/winery-vineyard-moon.jpg' })}
-            ${renderImageField({ label: '人物 / 场景', name: 'estatePortraitImage', value: wine.estatePortraitImage || '', folder: 'wineries', placeholder: '/assets/images/village-ancient-vine-cellar.jpg' })}
-            ${renderImageField({ label: '封面图', name: 'posterImage', value: wine.posterImage || '', folder: 'wines', placeholder: '/assets/images/wine-bottle-poster.jpg' })}
-            ${renderImageField({ label: '瓶身图', name: 'bottleImage', value: wine.bottleImage || '', folder: 'wines', placeholder: '/assets/images/wine-bottle-estate.jpg' })}
-            ${renderImageField({ label: '礼盒图', name: 'giftImage', value: wine.giftImage || '', folder: 'wines', placeholder: '/assets/images/wine-gift-set.jpg' })}
-          </div>
-        </div>
-
-        <div class="drawer-section">
-          ${renderPanelHeader('关联')}
-          <div class="related-list">
-            ${tracks.length
-              ? tracks
-                  .map(
-                    (track) => `
-                      <article class="related-item">
-                        <div>
-                          <strong>${escapeHtml(track.cnTitle || track.title)}</strong>
-                          <p>${escapeHtml(track.description || '—')}</p>
-                        </div>
-                        <span>${escapeHtml(track.durationLabel || '—')}</span>
-                      </article>
-                    `
-                  )
-                  .join('')
-              : renderEmptyState('暂无关联曲目', '这款酒还没有绑定音乐内容。')}
-          </div>
-        </div>
-      </form>
 
       <footer class="drawer-foot">
         ${renderActionButton({ action: 'archive-wine', label: '归档 / 删除', iconName: 'trash', variant: 'danger', tone: 'danger' })}
         ${renderActionButton({ action: 'save-wine', label: '保存酒款', iconName: 'save', variant: 'primary' })}
       </footer>
     `;
+    els.drawerPanel.scrollTop = 0;
     openLayer(els.drawerLayer);
     return;
   }
@@ -4563,6 +4636,12 @@ function renderDrawer() {
     }
     const userOrder = (state.orders || []).find((order) => order.user && order.user.id === code.firstUserId) || null;
     const user = userOrder ? userOrder.user : null;
+    const codeGuide = getCodeStatusGuide(code.status || 'ready');
+    const codeSections = [
+      { id: 'code-section-user', label: '使用与用户', note: '核销人与会话信息' },
+      { id: 'code-section-fulfillment', label: '履约信息', note: '关联订单与物流状态' },
+      { id: 'code-section-timeline', label: '操作记录', note: '创建、更新与异常记录' }
+    ];
     els.drawerPanel.innerHTML = `
       <header class="drawer-head">
         <div>
@@ -4573,62 +4652,110 @@ function renderDrawer() {
         <button class="icon-button" type="button" data-close-drawer aria-label="关闭">${icon('close')}</button>
       </header>
 
-      <div class="detail-grid">
-        <article class="detail-card">
-          <span>状态</span>
-          ${renderStatusPill(code.status || 'ready')}
-        </article>
-        <article class="detail-card">
-          <span>酒款</span>
-          <strong>${escapeHtml((code.wine && code.wine.name) || '未绑定酒款')}</strong>
-        </article>
-        <article class="detail-card">
-          <span>批次</span>
-          <strong>${escapeHtml(code.batchNo || '—')}</strong>
-        </article>
-        <article class="detail-card">
-          <span>使用时间</span>
-          <strong>${escapeHtml(code.firstUsedAt ? formatShortDate(code.firstUsedAt) : '—')}</strong>
-        </article>
-      </div>
-
-      <div class="drawer-section">
-        ${renderPanelHeader('使用与用户')}
-        <div class="detail-list">
-          <div class="detail-row"><span>创建时间</span><strong>${escapeHtml(formatShortDate(code.createdAt))}</strong></div>
-          <div class="detail-row"><span>过期时间</span><strong>${escapeHtml(formatShortDate(code.expiresAt))}</strong></div>
-          <div class="detail-row"><span>首次使用用户</span><strong>${escapeHtml(user ? user.nickname || user.displayName || user.mobile : code.firstUserId || '—')}</strong></div>
-          <div class="detail-row"><span>用户标识</span><strong>${escapeHtml(code.firstUserId || '—')}</strong></div>
-          <div class="detail-row"><span>会话</span><strong>${escapeHtml(code.sessionId || '—')}</strong></div>
-          <div class="detail-row"><span>关联曲目</span><strong>${escapeHtml((code.track && (code.track.cnTitle || code.track.title)) || '—')}</strong></div>
+      <div class="drawer-toolbar">
+        ${renderSectionNav(codeSections, 'code')}
+        <div class="drawer-toolbar-actions">
+          ${renderActionButton({ action: 'copy-code', label: '复制提取码', iconName: 'copy', variant: 'secondary' })}
         </div>
       </div>
 
-      <div class="drawer-section">
-        ${renderPanelHeader('状态更新')}
-        <form id="code-status-form" class="inline-form" data-code-id="${escapeHtml(code.id)}">
-          ${renderSelectField('状态', 'status', code.status || 'ready', [
-            { value: 'ready', label: '待使用' },
-            { value: 'claimed', label: '已使用' },
-            { value: 'expired', label: '已过期' },
-            { value: 'disabled', label: '已停用' }
-          ])}
-          <div class="drawer-inline-actions">
-            ${renderActionButton({ action: 'save-code-status', label: '更新状态', iconName: 'save', variant: 'primary' })}
+      <div class="drawer-overview drawer-overview--code">
+        <article class="summary-shell">
+          <div class="summary-shell-top">
+            <div class="summary-shell-copy">
+              <div class="drawer-hero-row">
+                ${renderStatusPill(code.status || 'ready')}
+                ${renderTag(code.batchNo || '未分配批次', 'neutral')}
+              </div>
+              <strong>${escapeHtml((code.wine && code.wine.name) || '未绑定酒款')}</strong>
+              <p>${escapeHtml(code.label || '当前提取码尚未添加补充标识。')}</p>
+            </div>
           </div>
-        </form>
+          <div class="detail-grid">
+            <article class="detail-card">
+              <span>创建时间</span>
+              <strong>${escapeHtml(formatShortDate(code.createdAt))}</strong>
+            </article>
+            <article class="detail-card">
+              <span>过期时间</span>
+              <strong>${escapeHtml(formatShortDate(code.expiresAt))}</strong>
+            </article>
+            <article class="detail-card">
+              <span>首次使用</span>
+              <strong>${escapeHtml(code.firstUsedAt ? formatShortDate(code.firstUsedAt) : '—')}</strong>
+            </article>
+            <article class="detail-card">
+              <span>物流状态</span>
+              <strong>${escapeHtml(userOrder ? STATUS_COPY[userOrder.deliveryStatus || userOrder.status || 'pending'] || '处理中' : '未关联订单')}</strong>
+            </article>
+          </div>
+        </article>
+
+        <aside class="action-well action-well--${escapeHtml(getStatusTone(code.status || 'ready'))}">
+          <div class="action-well-head">
+            <span class="drawer-eyebrow">状态操作</span>
+            <h4>更新核销状态</h4>
+            <p>状态变更会影响扫码结果和运营视图，请在确认后提交。</p>
+          </div>
+          <form id="code-status-form" class="action-form" data-code-id="${escapeHtml(code.id)}">
+            ${renderSelectField('状态', 'status', code.status || 'ready', [
+              { value: 'ready', label: '待使用' },
+              { value: 'claimed', label: '已使用' },
+              { value: 'expired', label: '已过期' },
+              { value: 'disabled', label: '已停用' }
+            ])}
+            <div class="drawer-inline-actions">
+              ${renderActionButton({ action: 'save-code-status', label: '更新状态', iconName: 'save', variant: 'primary' })}
+            </div>
+          </form>
+          <div class="action-well-note" data-code-status-note>
+            <strong>${escapeHtml(codeGuide.title)}</strong>
+            <p>${escapeHtml(codeGuide.body)}</p>
+          </div>
+        </aside>
       </div>
 
-      <div class="drawer-section">
-        ${renderPanelHeader('操作时间线')}
+      <div class="drawer-split">
+        <section class="drawer-section drawer-section--anchored" id="code-section-user" data-drawer-section>
+          ${renderPanelHeader('使用与用户', '核销结果、用户标识与会话轨迹。')}
+          <div class="detail-list">
+            <div class="detail-row"><span>首次使用用户</span><strong>${escapeHtml(user ? user.nickname || user.displayName || user.mobile : code.firstUserId || '—')}</strong></div>
+            <div class="detail-row"><span>用户标识</span><strong>${escapeHtml(code.firstUserId || '—')}</strong></div>
+            <div class="detail-row"><span>手机号</span><strong>${escapeHtml(user ? user.mobile || '—' : '—')}</strong></div>
+            <div class="detail-row"><span>会话</span><strong>${escapeHtml(code.sessionId || '—')}</strong></div>
+            <div class="detail-row"><span>关联曲目</span><strong>${escapeHtml((code.track && (code.track.cnTitle || code.track.title)) || '—')}</strong></div>
+          </div>
+        </section>
+
+        <section class="drawer-section drawer-section--anchored" id="code-section-fulfillment" data-drawer-section>
+          ${renderPanelHeader('履约信息', '订单、收货和物流状态在这里集中查看。')}
+          ${
+            userOrder
+              ? `
+                <div class="detail-list">
+                  <div class="detail-row"><span>订单号</span><strong>${escapeHtml(userOrder.orderNo || '—')}</strong></div>
+                  <div class="detail-row"><span>发货状态</span><strong>${escapeHtml(STATUS_COPY[userOrder.deliveryStatus || userOrder.status || 'pending'] || '处理中')}</strong></div>
+                  <div class="detail-row"><span>物流公司</span><strong>${escapeHtml(userOrder.shippingCompany || '—')}</strong></div>
+                  <div class="detail-row"><span>物流单号</span><strong>${escapeHtml(userOrder.trackingNo || '—')}</strong></div>
+                  <div class="detail-row"><span>收货信息</span><strong>${escapeHtml(userOrder.address ? [userOrder.address.contactName, userOrder.address.mobile].filter(Boolean).join(' · ') : userOrder.addressSummary || '—')}</strong></div>
+                </div>
+              `
+              : renderEmptyState('暂无履约信息', '当前提取码还没有关联到订单或物流记录。')
+          }
+        </section>
+      </div>
+
+      <div class="drawer-section drawer-section--anchored" id="code-section-timeline" data-drawer-section>
+        ${renderPanelHeader('操作时间线', '展示创建、核销、到期和后台处理记录。')}
         ${renderTimeline(getCodeTimeline(code))}
       </div>
 
       <footer class="drawer-foot">
-        ${renderActionButton({ action: 'copy-code', label: '复制提取码', iconName: 'copy', variant: 'secondary' })}
+        ${isOrderPhysical(userOrder) && !isOrderShipped(userOrder) ? renderActionButton({ action: 'open-shipping-modal', label: '发货', iconName: 'truck', variant: 'primary' }) : ''}
         ${renderActionButton({ action: 'close-drawer', label: '关闭', iconName: 'close', variant: 'ghost' })}
       </footer>
     `;
+    els.drawerPanel.scrollTop = 0;
     openLayer(els.drawerLayer);
     return;
   }
@@ -4641,6 +4768,11 @@ function renderDrawer() {
     }
     const user = order.user || {};
     const timeline = getOrderTimeline(order);
+    const shippingSections = [
+      { id: 'shipping-section-receiver', label: '收货信息', note: '地址、联系人与备注' },
+      { id: 'shipping-section-items', label: '商品明细', note: '订单项与金额' },
+      { id: 'shipping-section-timeline', label: '物流时间线', note: '发货、签收与异常' }
+    ];
     els.drawerPanel.innerHTML = `
       <header class="drawer-head">
         <div>
@@ -4651,64 +4783,99 @@ function renderDrawer() {
         <button class="icon-button" type="button" data-close-drawer aria-label="关闭">${icon('close')}</button>
       </header>
 
-      <div class="detail-grid">
-        <article class="detail-card">
-          <span>发货状态</span>
-          ${renderStatusPill(order.deliveryStatus || order.status || 'pending')}
-        </article>
-        <article class="detail-card">
-          <span>物流公司</span>
-          <strong>${escapeHtml(order.shippingCompany || '—')}</strong>
-        </article>
-        <article class="detail-card">
-          <span>物流单号</span>
-          <strong>${escapeHtml(order.trackingNo || '—')}</strong>
-        </article>
-        <article class="detail-card">
-          <span>支付状态</span>
-          <strong>${escapeHtml(STATUS_COPY[order.status || 'pending_payment'] || order.status || '—')}</strong>
-        </article>
-      </div>
-
-      <div class="drawer-section">
-        ${renderPanelHeader('收货信息')}
-        <div class="detail-list">
-          <div class="detail-row"><span>收货人</span><strong>${escapeHtml(order.address ? order.address.contactName : user.nickname || '—')}</strong></div>
-          <div class="detail-row"><span>手机号</span><strong>${escapeHtml(order.address ? order.address.mobile : user.mobile || '—')}</strong></div>
-          <div class="detail-row"><span>地址</span><strong>${escapeHtml(order.address ? [order.address.provinceCity, order.address.detail].filter(Boolean).join(' · ') : order.addressSummary || '—')}</strong></div>
-          <div class="detail-row"><span>备注</span><strong>${escapeHtml(order.address ? order.address.deliveryNote || '—' : '—')}</strong></div>
+      <div class="drawer-toolbar">
+        ${renderSectionNav(shippingSections, 'shipping')}
+        <div class="drawer-toolbar-actions">
+          ${isOrderPhysical(order) && !isOrderShipped(order) ? renderActionButton({ action: 'open-shipping-modal', label: '发货', iconName: 'truck', variant: 'primary' }) : ''}
         </div>
       </div>
 
-      <div class="drawer-section">
-        ${renderPanelHeader('商品明细')}
-        <div class="product-list">
-          ${(order.items || [])
-            .map(
-              (item) => `
-                <article class="product-item">
-                  <div>
-                    <strong>${escapeHtml(item.productName || item.trackTitle || '订单项')}</strong>
-                    <p>${escapeHtml(item.specName || item.trackTitle || '—')}</p>
-                  </div>
-                  <span>¥${escapeHtml(formatNumber(item.price || 0))}</span>
-                </article>
-              `
-            )
-            .join('')}
-        </div>
+      <div class="drawer-overview drawer-overview--shipping">
+        <article class="summary-shell">
+          <div class="summary-shell-top">
+            <div class="summary-shell-copy">
+              <div class="drawer-hero-row">
+                ${renderStatusPill(order.deliveryStatus || order.status || 'pending')}
+                ${renderTag(STATUS_COPY[order.status || 'pending_payment'] || order.status || '—', 'neutral')}
+              </div>
+              <strong>${escapeHtml(user.nickname || user.displayName || user.mobile || '未绑定用户')}</strong>
+              <p>${escapeHtml(order.addressSummary || '当前订单尚未补充完整的收货摘要。')}</p>
+            </div>
+          </div>
+          <div class="detail-grid">
+            <article class="detail-card">
+              <span>物流公司</span>
+              <strong>${escapeHtml(order.shippingCompany || '—')}</strong>
+            </article>
+            <article class="detail-card">
+              <span>物流单号</span>
+              <strong>${escapeHtml(order.trackingNo || '—')}</strong>
+            </article>
+            <article class="detail-card">
+              <span>支付状态</span>
+              <strong>${escapeHtml(STATUS_COPY[order.status || 'pending_payment'] || order.status || '—')}</strong>
+            </article>
+            <article class="detail-card">
+              <span>最近更新</span>
+              <strong>${escapeHtml(formatShortDate(order.updatedAt || order.shippedAt || order.createdAt))}</strong>
+            </article>
+          </div>
+        </article>
+
+        <aside class="action-well action-well--${escapeHtml(getStatusTone(order.deliveryStatus || order.status || 'pending'))}">
+          <div class="action-well-head">
+            <span class="drawer-eyebrow">履约摘要</span>
+            <h4>当前物流状态</h4>
+            <p>${escapeHtml(isOrderShipped(order) ? '当前订单已进入配送流程，可在时间线中查看同步记录。' : '当前订单仍待发货，可在这里直接发起物流同步。')}</p>
+          </div>
+          <div class="action-well-note">
+            <strong>${escapeHtml(order.orderNo || '—')}</strong>
+            <p>${escapeHtml(order.address ? [order.address.contactName, order.address.mobile].filter(Boolean).join(' · ') : user.mobile || '—')}</p>
+          </div>
+        </aside>
       </div>
 
-      <div class="drawer-section">
-        ${renderPanelHeader('时间线')}
+      <div class="drawer-split">
+        <section class="drawer-section drawer-section--anchored" id="shipping-section-receiver" data-drawer-section>
+          ${renderPanelHeader('收货信息', '地址信息较长时优先保留联系人、手机号和详细地址。')}
+          <div class="detail-list">
+            <div class="detail-row"><span>收货人</span><strong>${escapeHtml(order.address ? order.address.contactName : user.nickname || '—')}</strong></div>
+            <div class="detail-row"><span>手机号</span><strong>${escapeHtml(order.address ? order.address.mobile : user.mobile || '—')}</strong></div>
+            <div class="detail-row"><span>地址</span><strong>${escapeHtml(order.address ? [order.address.provinceCity, order.address.detail].filter(Boolean).join(' · ') : order.addressSummary || '—')}</strong></div>
+            <div class="detail-row"><span>备注</span><strong>${escapeHtml(order.address ? order.address.deliveryNote || '—' : '—')}</strong></div>
+          </div>
+        </section>
+
+        <section class="drawer-section drawer-section--anchored" id="shipping-section-items" data-drawer-section>
+          ${renderPanelHeader('商品明细', '保留商品名、规格和价格，便于客服与履约核对。')}
+          <div class="product-list">
+            ${(order.items || [])
+              .map(
+                (item) => `
+                  <article class="product-item">
+                    <div>
+                      <strong>${escapeHtml(item.productName || item.trackTitle || '订单项')}</strong>
+                      <p>${escapeHtml(item.specName || item.trackTitle || '—')}</p>
+                    </div>
+                    <span>¥${escapeHtml(formatNumber(item.price || 0))}</span>
+                  </article>
+                `
+              )
+              .join('')}
+          </div>
+        </section>
+      </div>
+
+      <div class="drawer-section drawer-section--anchored" id="shipping-section-timeline" data-drawer-section>
+        ${renderPanelHeader('时间线', '展示订单创建、支付、发货、签收和异常同步记录。')}
         ${renderTimeline(timeline)}
       </div>
 
       <footer class="drawer-foot">
-        ${isOrderPhysical(order) && !isOrderShipped(order) ? renderActionButton({ action: 'open-shipping-modal', label: '发货', iconName: 'truck', variant: 'primary' }) : ''}
         ${renderActionButton({ action: 'close-drawer', label: '关闭', iconName: 'close', variant: 'ghost' })}
       </footer>
     `;
+    els.drawerPanel.scrollTop = 0;
     openLayer(els.drawerLayer);
     return;
   }
@@ -4722,6 +4889,7 @@ function renderModal() {
   }
 
   const { type, data } = state.modal;
+  els.modalPanel.className = type ? `modal-panel modal-panel--${type}` : 'modal-panel';
   if (!type) {
     closeLayer(els.modalLayer);
     return;
@@ -4733,17 +4901,25 @@ function renderModal() {
         <div>
           <span class="drawer-eyebrow">${escapeHtml(data.eyebrow || '确认操作')}</span>
           <h3>${escapeHtml(data.title || '请确认')}</h3>
+          ${data.body ? `<p>${escapeHtml(data.body || '')}</p>` : ''}
         </div>
         <button class="icon-button" type="button" data-close-modal aria-label="关闭">${icon('close')}</button>
       </header>
       <div class="modal-body">
-        <p>${escapeHtml(data.body || '')}</p>
+        <div class="modal-callout modal-callout--${escapeHtml(data.tone || 'primary')}">
+          <span class="modal-callout-icon">${icon(data.tone === 'danger' ? 'alert' : 'check')}</span>
+          <div>
+            <strong>${escapeHtml(data.confirmLabel || '确认继续')}</strong>
+            <p>提交后会立即生效。</p>
+          </div>
+        </div>
       </div>
       <footer class="modal-foot">
         ${renderActionButton({ action: 'cancel-modal', label: '取消', iconName: 'close', variant: 'ghost' })}
         ${renderActionButton({ action: 'confirm-modal', label: data.confirmLabel || '确认', iconName: 'check', variant: 'primary', tone: data.tone || 'primary' })}
       </footer>
     `;
+    els.modalPanel.scrollTop = 0;
     openLayer(els.modalLayer);
     return;
   }
@@ -4755,9 +4931,20 @@ function renderModal() {
         <div>
           <span class="drawer-eyebrow">新增酒款</span>
           <h3>创建一款新的酒</h3>
+          <p>先建立基础档案，详情页与视觉素材可在创建后继续完善。</p>
         </div>
         <button class="icon-button" type="button" data-close-modal aria-label="关闭">${icon('close')}</button>
       </header>
+      <div class="modal-summary">
+        <article class="modal-summary-card">
+          <span>默认酒庄</span>
+          <strong>${escapeHtml(defaultWinery.name || '未设置')}</strong>
+        </article>
+        <article class="modal-summary-card">
+          <span>创建后动作</span>
+          <strong>进入酒款详情</strong>
+        </article>
+      </div>
       <form id="wine-create-form" class="modal-form">
         <div class="form-grid">
           ${renderSelectField('酒庄', 'wineryId', defaultWinery.id || '', (state.wineries || []).map((item) => ({ value: item.id, label: item.name })), '默认使用第一个酒庄')}
@@ -4776,6 +4963,7 @@ function renderModal() {
         ${renderActionButton({ action: 'cancel-modal', label: '取消', iconName: 'close', variant: 'ghost' })}
       </footer>
     `;
+    els.modalPanel.scrollTop = 0;
     openLayer(els.modalLayer);
     return;
   }
@@ -4784,14 +4972,30 @@ function renderModal() {
     const wines = getEnrichedWines();
     const defaultWine = wines[0] || {};
     const defaultBatchNo = `HJ${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+    const defaultWineStats = defaultWine.id ? getWineCodeStats(defaultWine) : { total: 0, ready: 0 };
     els.modalPanel.innerHTML = `
       <header class="modal-head">
         <div>
           <span class="drawer-eyebrow">生成提取码</span>
           <h3>批量生成一组提取码</h3>
+          <p>适用于门店发放、活动兑换或礼盒附码，生成后可继续批量导出。</p>
         </div>
         <button class="icon-button" type="button" data-close-modal aria-label="关闭">${icon('close')}</button>
       </header>
+      <div class="modal-summary">
+        <article class="modal-summary-card">
+          <span>默认酒款</span>
+          <strong>${escapeHtml(defaultWine.name || '未设置')}</strong>
+        </article>
+        <article class="modal-summary-card">
+          <span>当前提取码</span>
+          <strong>${formatNumber(defaultWineStats.total)}</strong>
+        </article>
+        <article class="modal-summary-card">
+          <span>待使用</span>
+          <strong>${formatNumber(defaultWineStats.ready)}</strong>
+        </article>
+      </div>
       <form id="code-batch-form" class="modal-form">
         <div class="form-grid">
           ${renderSelectField('酒款', 'wineId', defaultWine.id || '', wines.map((wine) => ({ value: wine.id, label: wine.name })), '选择要绑定的酒款')}
@@ -4805,6 +5009,7 @@ function renderModal() {
         ${renderActionButton({ action: 'cancel-modal', label: '取消', iconName: 'close', variant: 'ghost' })}
       </footer>
     `;
+    els.modalPanel.scrollTop = 0;
     openLayer(els.modalLayer);
     return;
   }
@@ -4825,6 +5030,20 @@ function renderModal() {
         </div>
         <button class="icon-button" type="button" data-close-modal aria-label="关闭">${icon('close')}</button>
       </header>
+      <div class="modal-summary">
+        <article class="modal-summary-card">
+          <span>收货人</span>
+          <strong>${escapeHtml(order.address ? order.address.contactName || order.address.mobile : '—')}</strong>
+        </article>
+        <article class="modal-summary-card">
+          <span>当前状态</span>
+          <strong>${escapeHtml(STATUS_COPY[order.deliveryStatus || order.status || 'pending'] || '待发货')}</strong>
+        </article>
+        <article class="modal-summary-card">
+          <span>地址</span>
+          <strong>${escapeHtml(order.address ? order.address.provinceCity || '—' : '—')}</strong>
+        </article>
+      </div>
       <form id="shipping-form" class="modal-form" data-order-id="${escapeHtml(order.id)}">
         <div class="form-grid">
           ${renderField('物流公司', 'shippingCompany', data.shippingCompany || order.shippingCompany || '', { hint: '例如 顺丰速运。', maxlength: 80 })}
@@ -4842,6 +5061,7 @@ function renderModal() {
         ${renderActionButton({ action: 'cancel-modal', label: '取消', iconName: 'close', variant: 'ghost' })}
       </footer>
     `;
+    els.modalPanel.scrollTop = 0;
     openLayer(els.modalLayer);
     return;
   }
@@ -4853,6 +5073,7 @@ function renderModal() {
         <div>
           <span class="drawer-eyebrow">固定码管理</span>
           <h3>长期入口二维码</h3>
+          <p>用于长期入口或门店海报，生成后可复制链接或重新生成。</p>
         </div>
         <button class="icon-button" type="button" data-close-modal aria-label="关闭">${icon('close')}</button>
       </header>
@@ -4871,6 +5092,7 @@ function renderModal() {
         ${renderActionButton({ action: 'cancel-modal', label: '关闭', iconName: 'close', variant: 'ghost' })}
       </footer>
     `;
+    els.modalPanel.scrollTop = 0;
     openLayer(els.modalLayer);
     return;
   }
@@ -5064,6 +5286,41 @@ function handleAdminActionButtonClick(button) {
   }
 }
 
+function updateCodeStatusNote(status) {
+  const note = document.querySelector('[data-code-status-note]');
+  if (!note) {
+    return;
+  }
+
+  const guide = getCodeStatusGuide(status);
+  const title = note.querySelector('strong');
+  const body = note.querySelector('p');
+  if (title) {
+    title.textContent = guide.title;
+  }
+  if (body) {
+    body.textContent = guide.body;
+  }
+}
+
+function handleDrawerSectionNav(button) {
+  const group = button.dataset.drawerSectionGroup;
+  const targetId = button.dataset.drawerSectionTarget;
+  const panel = button.closest('.drawer-panel');
+  if (!group || !targetId || !panel) {
+    return;
+  }
+
+  panel.querySelectorAll(`[data-drawer-section-group="${escapeSelector(group)}"]`).forEach((item) => {
+    item.classList.toggle('is-active', item === button);
+  });
+
+  const target = panel.querySelector(`#${escapeSelector(targetId)}`);
+  if (target && typeof target.scrollIntoView === 'function') {
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
 function handleAdminDocumentClick(event) {
   const navItem = event.target.closest('.nav-item[data-view]');
   if (navItem && !navItem.disabled) {
@@ -5101,6 +5358,12 @@ function handleAdminDocumentClick(event) {
     state.filters.shippingStatus = shippingStatus.dataset.shippingStatus;
     renderShippingShell();
     renderShippingContent();
+    return;
+  }
+
+  const sectionButton = event.target.closest('[data-drawer-section-target]');
+  if (sectionButton) {
+    handleDrawerSectionNav(sectionButton);
     return;
   }
 
@@ -5192,6 +5455,11 @@ function handleAdminDocumentChange(event) {
   if (input.matches('[data-filter="shipping-status"]')) {
     state.filters.shippingStatus = input.value;
     renderShippingContent();
+    return;
+  }
+
+  if (input.matches('#code-status-form select[name="status"]')) {
+    updateCodeStatusNote(input.value);
     return;
   }
 
