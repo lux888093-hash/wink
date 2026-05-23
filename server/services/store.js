@@ -465,6 +465,144 @@ function getResolvedHomeContent(store) {
   };
 }
 
+function buildDefaultMiniappCopy(store) {
+  const hero = getResolvedHomeHero(store);
+  const content = getResolvedHomeContent(store);
+  const wine = store.wines[0] || {};
+  const product = store.products[0] || {};
+  const wineName = getOptionalText(wine.name, '古藤西拉');
+  const productName = getOptionalText(product.name, '礼盒');
+
+  return {
+    activePage: 'home',
+    pages: {
+      home: {
+        badge: getOptionalText(hero.eyebrow, '首页'),
+        title: getOptionalText(hero.title, '古藤村落酒庄'),
+        subtitle: getOptionalText(hero.subtitle, '首页负责建立品牌第一印象。'),
+        body: getOptionalText(
+          content.intro,
+          '把酒庄、提取码和会员内容放在同一条清晰路径里，让访问者先看见品牌，再看见行动入口。'
+        ),
+        primaryAction: '查看酒款',
+        secondaryAction: '进入提取码',
+        note: getOptionalText(hero.ambienceNote, DEFAULT_HOME_AGE_NOTE)
+      },
+      activity: {
+        badge: '活动页',
+        title: '庄园活动',
+        subtitle: '发布品鉴会、上新提醒和会员日。',
+        body: '把时间、名额、场地和报名按钮放在同一屏，避免用户在首屏之外反复寻找。',
+        primaryAction: '预约活动',
+        secondaryAction: '查看日历',
+        note: '只保留一个主动作，其他动作做弱化处理。'
+      },
+      detail: {
+        badge: '酒款详情',
+        title: wineName,
+        subtitle: getOptionalText(wine.subtitle, '酒款详情页'),
+        body: `${productName} 的详情页需要先讲年份、产区和风味，再讲礼赠、扫码和故事。`,
+        primaryAction: '立即下单',
+        secondaryAction: '查看提取码',
+        note: '详情页不要把说明写得太长。'
+      },
+      buttons: {
+        badge: '按钮文案',
+        title: '按钮文案',
+        subtitle: '按钮要短，动作要明确。',
+        body: '主按钮统一用保存、发布、确认、生成这类动词；次按钮统一用取消、返回、稍后处理。',
+        primaryAction: '保存草稿',
+        secondaryAction: '发布到小程序',
+        note: '按钮文案最好控制在 6 个字以内。'
+      },
+      modal: {
+        badge: '弹窗文案',
+        title: '弹窗文案',
+        subtitle: '提示要直接，不要绕。',
+        body: '弹窗只保留结果、风险和下一步。删除、停用和发布都需要二次确认。',
+        primaryAction: '确认',
+        secondaryAction: '取消',
+        note: '危险动作保持柔和，不要用生硬红色。'
+      },
+      share: {
+        badge: '分享文案',
+        title: '分享文案',
+        subtitle: '分享卡片要短，保留品牌名和核心信息。',
+        body: `${wineName} 与 ${productName} 的分享标题不宜太满，建议只保留品牌名、酒款名和一个关键词。`,
+        primaryAction: '复制文案',
+        secondaryAction: '预览卡片',
+        note: '控制在两行之内。'
+      }
+    }
+  };
+}
+
+function normalizeMiniappCopyPage(page, fallbackPage) {
+  const source = ensurePlainObject(page);
+  const fallback = ensurePlainObject(fallbackPage);
+
+  return {
+    badge: ensureText(source.badge, {
+      field: 'badge',
+      min: 0,
+      max: 40,
+      defaultValue: getOptionalText(fallback.badge)
+    }),
+    title: ensureText(source.title, {
+      field: 'title',
+      min: 0,
+      max: 80,
+      defaultValue: getOptionalText(fallback.title)
+    }),
+    subtitle: ensureText(source.subtitle, {
+      field: 'subtitle',
+      min: 0,
+      max: 120,
+      defaultValue: getOptionalText(fallback.subtitle)
+    }),
+    body: ensureText(source.body, {
+      field: 'body',
+      min: 0,
+      max: 420,
+      defaultValue: getOptionalText(fallback.body)
+    }),
+    primaryAction: ensureText(source.primaryAction, {
+      field: 'primaryAction',
+      min: 0,
+      max: 32,
+      defaultValue: getOptionalText(fallback.primaryAction)
+    }),
+    secondaryAction: ensureText(source.secondaryAction, {
+      field: 'secondaryAction',
+      min: 0,
+      max: 32,
+      defaultValue: getOptionalText(fallback.secondaryAction)
+    }),
+    note: ensureText(source.note, {
+      field: 'note',
+      min: 0,
+      max: 120,
+      defaultValue: getOptionalText(fallback.note)
+    })
+  };
+}
+
+function getResolvedMiniappCopy(store) {
+  const defaults = buildDefaultMiniappCopy(store);
+  const content = ensurePlainObject(store.settings && store.settings.miniappCopy);
+  const pageKeys = Object.keys(defaults.pages);
+  const pages = {};
+
+  pageKeys.forEach((key) => {
+    pages[key] = normalizeMiniappCopyPage(content.pages && content.pages[key], defaults.pages[key]);
+  });
+
+  return {
+    activePage: pageKeys.includes(content.activePage) ? content.activePage : defaults.activePage,
+    pages
+  };
+}
+
 function ensureAdminToken(token) {
   const normalized = String(token || '').trim();
 
@@ -3365,7 +3503,8 @@ function adminGetSiteContent() {
 
   return {
     hero: getResolvedHomeHero(store),
-    homeContent: getResolvedHomeContent(store)
+    homeContent: getResolvedHomeContent(store),
+    miniappCopy: getResolvedMiniappCopy(store)
   };
 }
 
@@ -3373,6 +3512,7 @@ function adminSaveSiteContent(payload = {}) {
   const store = readStore();
   const currentHero = getResolvedHomeHero(store);
   const currentContent = getResolvedHomeContent(store);
+  const currentMiniappCopy = getResolvedMiniappCopy(store);
 
   store.settings = ensurePlainObject(store.settings);
   store.settings.homeHero = {
@@ -3437,7 +3577,41 @@ function adminSaveSiteContent(payload = {}) {
     chapters: parsePipeObjectList(payload.chaptersText, ['eyebrow', 'title', 'body', 'image'], { maxItems: 8 })
   };
 
-  writeAudit(store, 'site.updated', 'settings.home', DEFAULT_ADMIN_USERNAME);
+  let nextMiniappCopy = currentMiniappCopy;
+  if (payload.miniappCopyJson !== undefined || payload.miniappCopy !== undefined) {
+    let parsedMiniappCopy = payload.miniappCopy;
+
+    if (payload.miniappCopyJson !== undefined) {
+      try {
+        parsedMiniappCopy = JSON.parse(String(payload.miniappCopyJson || ''));
+      } catch (error) {
+        throw createValidationError('miniappCopyJson', 'invalid_json');
+      }
+    }
+
+    nextMiniappCopy = {
+      activePage: ensureEnum(
+        ensurePlainObject(parsedMiniappCopy).activePage,
+        Object.keys(currentMiniappCopy.pages),
+        {
+          field: 'activePage',
+          defaultValue: currentMiniappCopy.activePage
+        }
+      ),
+      pages: {}
+    };
+
+    Object.keys(currentMiniappCopy.pages).forEach((pageKey) => {
+      nextMiniappCopy.pages[pageKey] = normalizeMiniappCopyPage(
+        ensurePlainObject(parsedMiniappCopy).pages && ensurePlainObject(parsedMiniappCopy).pages[pageKey],
+        currentMiniappCopy.pages[pageKey]
+      );
+    });
+  }
+
+  store.settings.miniappCopy = nextMiniappCopy;
+
+  writeAudit(store, 'site.updated', 'settings.site-content', DEFAULT_ADMIN_USERNAME);
   writeStore(store);
 
   return adminGetSiteContent();

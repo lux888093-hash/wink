@@ -3,300 +3,176 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>鸿玖酒庄运营台</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <title>鸿玖酒庄运营中台</title>
+    <meta
+      name="description"
+      content="高端红酒品牌运营中台，聚合酒款、提取码、发货与小程序文案管理。"
+    />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css?v=20260523-05" />
   </head>
   <body>
-    <div class="admin-shell">
-      <aside class="nav-rail">
-        <div class="brand-lockup">
+    <a class="skip-link" href="#app-main">跳到内容</a>
+
+    <div class="app-shell" id="app-shell">
+      <aside class="sidebar">
+        <div class="brand-card">
           <div class="brand-mark" aria-hidden="true">
-            <div class="brand-mark-ring">
-              <span class="brand-mark-letter">H</span>
-            </div>
+            <img src="./favicon.svg" alt="" />
           </div>
-          <h1 class="brand-title">鸿玖酒庄</h1>
+          <div class="brand-copy">
+            <div class="brand-name">鸿玖酒庄</div>
+            <div class="brand-subtitle">高端红酒运营中台</div>
+          </div>
+          <div class="brand-note">酒款、提取码、发货与文案管理</div>
         </div>
 
-        <nav class="nav-stack" aria-label="主导航">
-          <button class="nav-item is-active" data-view="overview">概览</button>
-          <button class="nav-item" data-view="wines">酒款管理</button>
-          <button class="nav-item" data-view="codes">提取码管理</button>
+        <nav class="nav-groups" aria-label="主导航">
+          <div class="nav-group">
+            <div class="nav-group-label">运营</div>
+            <div class="nav-stack">
+              <button class="nav-item is-active" type="button" data-view="overview">
+                <span class="nav-item-dot"></span>
+                <span>运营概览</span>
+              </button>
+              <button class="nav-item" type="button" data-view="wines">
+                <span class="nav-item-dot"></span>
+                <span>酒款管理</span>
+              </button>
+              <button class="nav-item" type="button" data-view="codes">
+                <span class="nav-item-dot"></span>
+                <span>提取码管理</span>
+              </button>
+              <button class="nav-item" type="button" data-view="shipping">
+                <span class="nav-item-dot"></span>
+                <span>发货管理</span>
+              </button>
+              <button class="nav-item" type="button" data-view="copy">
+                <span class="nav-item-dot"></span>
+                <span>小程序文案</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="nav-group nav-group-muted">
+            <div class="nav-group-label">扩展模块</div>
+            <div class="nav-stack">
+              <button class="nav-item is-disabled" type="button" disabled>
+                <span class="nav-item-dot"></span>
+                <span>商品与库存</span>
+              </button>
+              <button class="nav-item is-disabled" type="button" disabled>
+                <span class="nav-item-dot"></span>
+                <span>会员用户</span>
+              </button>
+              <button class="nav-item is-disabled" type="button" disabled>
+                <span class="nav-item-dot"></span>
+                <span>活动运营</span>
+              </button>
+              <button class="nav-item is-disabled" type="button" disabled>
+                <span class="nav-item-dot"></span>
+                <span>审计记录</span>
+              </button>
+            </div>
+          </div>
         </nav>
 
-        <div class="rail-profile">
-          <div class="rail-avatar">A</div>
-          <div class="rail-user-meta">
-            <strong class="rail-user-name">Admin</strong>
+        <div class="sidebar-footer">
+          <div class="admin-card">
+            <div class="admin-card-top">
+              <div class="admin-avatar" id="sidebar-avatar">A</div>
+              <div class="admin-meta">
+                <div class="admin-name" id="sidebar-user">Admin</div>
+                <div class="admin-role" id="sidebar-role">运营管理员</div>
+              </div>
+            </div>
+            <div class="admin-card-bottom">
+              <span id="sidebar-session">未登录</span>
+              <span id="sidebar-health">离线</span>
+            </div>
           </div>
         </div>
       </aside>
 
-      <main class="workspace">
+      <div class="content-shell">
         <header class="topbar">
           <div class="topbar-copy">
-            <h2 class="topbar-title" id="view-title">运营概览</h2>
-            <p class="topbar-description" id="view-description" hidden></p>
+            <div class="topbar-kicker" id="topbar-kicker">鸿玖酒庄 · 运营中台</div>
+            <h1 class="topbar-title" id="view-title">运营概览</h1>
+            <p class="topbar-description" id="view-description">
+              查看酒款、提取码、发货与小程序内容状态。
+            </p>
           </div>
-
           <div class="topbar-actions">
             <div class="session-pill" id="session-pill" hidden>未登录</div>
-            <button class="outline-button" id="refresh-button" type="button">刷新数据</button>
-            <button class="outline-button" id="logout-button" type="button">退出登录</button>
+            <div class="topbar-action-group" id="topbar-actions"></div>
           </div>
         </header>
 
         <div class="status-banner" id="status-banner" aria-live="polite"></div>
 
-        <section class="view is-active" id="view-overview">
-          <div class="overview-canvas" id="overview-canvas"></div>
-        </section>
-
-        <section class="view" id="view-wines">
-          <div class="workspace-grid wines-grid wines-grid-compact">
-            <section class="surface list-surface list-surface-wide">
-              <div class="surface-head surface-head-actions-only">
-                <button class="primary-button" id="open-create-wine" type="button">新增</button>
-              </div>
-
-              <div class="toolbar wine-toolbar">
-                <label class="search-field search-field-with-icon">
-                  <span class="visually-hidden">搜索酒款</span>
-                  <input id="wine-search" type="search" placeholder="搜索酒名、年份、产区、文案" />
-                </label>
-              </div>
-
-              <div class="wine-status-row">
-                <div class="segmented-control" id="wine-status-tabs">
-                  <button class="segment is-active" type="button" data-wine-status="all">全部</button>
-                  <button class="segment" type="button" data-wine-status="active">启用中</button>
-                  <button class="segment" type="button" data-wine-status="archived">已归档</button>
-                </div>
-              </div>
-
-              <div class="selection-list" id="wines-collection"></div>
-            </section>
-          </div>
-        </section>
-
-        <section class="view" id="view-codes">
-          <div class="workspace-grid codes-grid codes-grid-compact">
-            <section class="surface table-surface table-surface-wide">
-              <div class="surface-head surface-head-actions-only code-head-actions">
-                <button class="outline-button" id="open-batch-dialog" type="button">生成</button>
-                <button class="outline-button" id="open-fixed-dialog" type="button">固定码</button>
-                <button class="outline-button" id="open-fail-dialog" type="button">异常</button>
-                <button class="outline-button" id="export-codes-button" type="button">导出</button>
-              </div>
-
-              <div class="codes-workspace-head">
-                <div class="codes-filter-block">
-                  <label class="search-field search-field-with-icon">
-                    <span class="visually-hidden">搜索提取码</span>
-                    <input id="code-search" type="search" placeholder="搜索提取码" />
-                  </label>
-                  <div class="codes-filter-row">
-                    <label class="select-field">
-                      <span>状态</span>
-                      <select id="code-status-filter">
-                        <option value="all">全部</option>
-                        <option value="ready">待使用</option>
-                        <option value="claimed">已使用</option>
-                        <option value="expired">已过期</option>
-                        <option value="disabled">已停用</option>
-                      </select>
-                    </label>
-                    <label class="select-field">
-                      <span>酒款</span>
-                      <select id="code-wine-filter"></select>
-                    </label>
-                  </div>
-                </div>
-                <div class="summary-cards" id="codes-summary"></div>
-              </div>
-
-              <div class="table-shell">
-                <table class="data-table" id="codes-table"></table>
-              </div>
-
-              <div class="table-footer" id="codes-footer"></div>
-            </section>
-          </div>
-        </section>
-      </main>
+        <main class="workspace" id="app-main">
+          <section class="page is-active" id="page-overview" aria-label="运营概览"></section>
+          <section class="page" id="page-wines" aria-label="酒款管理"></section>
+          <section class="page" id="page-codes" aria-label="提取码管理"></section>
+          <section class="page" id="page-shipping" aria-label="发货管理"></section>
+          <section class="page" id="page-copy" aria-label="小程序文案"></section>
+        </main>
+      </div>
     </div>
 
-    <dialog class="sheet-dialog overview-dialog" id="overview-detail-dialog">
-      <div class="sheet-form overview-detail-sheet">
-        <div class="sheet-head">
-          <div>
-            <h3 class="surface-title" id="overview-detail-title">详情</h3>
-          </div>
-          <button class="ghost-icon-button" type="button" data-action="close-overview-detail" aria-label="关闭">×</button>
-        </div>
-        <div class="overview-detail-body" id="overview-detail-body"></div>
-      </div>
-    </dialog>
+    <div class="drawer-layer" id="drawer-layer" hidden>
+      <div class="drawer-backdrop" data-close-drawer></div>
+      <aside class="drawer-panel" id="drawer-panel" role="dialog" aria-modal="true" aria-label="详情"></aside>
+    </div>
 
-    <dialog class="sheet-dialog side-sheet-dialog" id="wine-editor-dialog">
-      <div class="sheet-form side-sheet-form">
-        <div class="sheet-head">
-          <div>
-            <h3 class="surface-title">酒款</h3>
-          </div>
-          <button class="ghost-icon-button" type="button" data-action="close-wine-editor" aria-label="关闭">×</button>
-        </div>
-        <div class="side-sheet-body" id="wine-editor"></div>
-      </div>
-    </dialog>
+    <div class="modal-layer" id="modal-layer" hidden>
+      <div class="modal-backdrop" data-close-modal></div>
+      <section class="modal-panel" id="modal-panel" role="dialog" aria-modal="true" aria-label="编辑"></section>
+    </div>
 
-    <dialog class="sheet-dialog side-sheet-dialog" id="create-wine-dialog">
-      <form class="sheet-form side-sheet-form" id="create-wine-form" method="dialog">
-        <div class="sheet-head sheet-head-actions-only">
-          <button class="ghost-icon-button" type="button" data-action="close-create-wine" aria-label="关闭">×</button>
-        </div>
-
-        <div class="sheet-grid">
-          <label>
-            <span>酒款名称</span>
-            <input name="name" type="text" placeholder="例如：静夜序曲 2026" required />
-          </label>
-          <label>
-            <span>英文标题</span>
-            <input name="title" type="text" placeholder="例如：Soundless A Quiet World" />
-          </label>
-          <label>
-            <span>副标题</span>
-            <input name="subtitle" type="text" placeholder="例如：庄园限定干红" />
-          </label>
-          <label>
-            <span>年份 / 版次</span>
-            <input name="vintage" type="text" placeholder="例如：2026 Estate Edition" />
-          </label>
-          <label>
-            <span>产区</span>
-            <input name="region" type="text" placeholder="例如：宁夏贺兰山东麓" />
-          </label>
-          <label>
-            <span>状态标签</span>
-            <input name="eyebrow" type="text" placeholder="例如：扫码限定" />
-          </label>
-          <label class="sheet-span-full">
-            <span>酒款介绍</span>
-            <textarea name="overview" rows="5" placeholder="先写这瓶酒最关键的介绍，后续可继续在编辑区补充故事、引言和图片。"></textarea>
-          </label>
-        </div>
-
-        <div class="sheet-actions">
-          <button class="outline-button" type="button" data-action="close-create-wine">取消</button>
-          <button class="primary-button" type="submit">创建酒款</button>
-        </div>
-      </form>
-    </dialog>
-
-    <dialog class="sheet-dialog side-sheet-dialog" id="batch-dialog">
-      <form class="sheet-form side-sheet-form" id="batch-form" method="dialog">
-        <div class="sheet-head">
-          <div>
-            <h3 class="surface-title">生成提取码</h3>
-          </div>
-          <button class="ghost-icon-button" type="button" data-action="close-batch-dialog" aria-label="关闭">×</button>
-        </div>
-
-        <div class="stack-form">
-          <label class="form-row">
-            <span class="form-row-label">酒款</span>
-            <div class="form-row-control">
-              <select id="batch-wine"></select>
-            </div>
-          </label>
-          <label class="form-row">
-            <span class="form-row-label">数量</span>
-            <div class="form-row-control">
-              <input id="batch-quantity" type="number" min="1" max="500" value="24" />
-            </div>
-          </label>
-          <label class="form-row">
-            <span class="form-row-label">批次号</span>
-            <div class="form-row-control">
-              <input id="batch-batch-no" type="text" placeholder="留空自动生成" />
-            </div>
-          </label>
-          <label class="form-row">
-            <span class="form-row-label">有效期</span>
-            <div class="form-row-control">
-              <input id="batch-expire-at" type="datetime-local" />
-            </div>
-          </label>
-        </div>
-
-        <div class="sheet-actions">
-          <button class="outline-button" type="button" data-action="close-batch-dialog">取消</button>
-          <button class="primary-button" type="submit">生成</button>
-        </div>
-      </form>
-    </dialog>
-
-    <dialog class="sheet-dialog side-sheet-dialog" id="fixed-dialog">
-      <div class="sheet-form side-sheet-form">
-        <div class="sheet-head">
-          <div>
-            <h3 class="surface-title">固定码</h3>
-          </div>
-          <button class="ghost-icon-button" type="button" data-action="close-fixed-dialog" aria-label="关闭">×</button>
-        </div>
-
-        <div class="fixed-code-block fixed-code-block-dialog">
-          <div class="fixed-code-layout">
-            <div class="fixed-qrcode-preview" id="fixed-qrcode-preview">
-              <div class="fixed-qrcode-placeholder">待生成</div>
-            </div>
-            <div class="fixed-code-actions">
-              <button class="outline-button" id="fixed-qrcode-button" type="button">生成</button>
-              <a class="outline-button" id="fixed-qrcode-download" href="#" download hidden>下载</a>
-              <button class="text-button" id="fixed-qrcode-copy" type="button" hidden>复制</button>
-            </div>
-          </div>
-          <p class="inline-feedback" id="fixed-qrcode-result"></p>
-        </div>
-      </div>
-    </dialog>
-
-    <dialog class="sheet-dialog side-sheet-dialog" id="fail-logs-dialog">
-      <div class="sheet-form side-sheet-form">
-        <div class="sheet-head">
-          <div>
-            <h3 class="surface-title">验证异常</h3>
-          </div>
-          <button class="ghost-icon-button" type="button" data-action="close-fail-dialog" aria-label="关闭">×</button>
-        </div>
-        <div class="fail-log-block fail-log-block-dialog" id="codes-fail-block">
-          <div id="codes-fail-logs"></div>
-        </div>
-      </div>
-    </dialog>
+    <div class="toast-host" id="toast-host" aria-live="polite" aria-atomic="true"></div>
 
     <div class="login-overlay" id="login-overlay">
       <div class="login-card">
         <div class="login-visual">
-          <h2 class="login-title">鸿玖酒庄运营台</h2>
+          <div class="login-visual-copy">
+            <div class="login-eyebrow">Hongjiu Estate</div>
+            <h2 class="login-title">鸿玖酒庄运营中台</h2>
+            <p class="login-copy">面向酒款、提取码、发货与小程序文案的品牌化工作台。</p>
+          </div>
         </div>
 
         <form id="login-form" class="login-form">
-          <label>
-            <span>账号</span>
-            <input id="login-username" type="text" value="curator" />
-          </label>
-          <label>
-            <span>密码</span>
-            <input id="login-password" type="password" value="Curator!2026" />
-          </label>
-          <button class="primary-button" type="submit">登录</button>
+          <div class="form-block">
+            <label>
+              <span>账号</span>
+              <input id="login-username" type="text" value="curator" autocomplete="username" />
+            </label>
+            <label>
+              <span>密码</span>
+              <input
+                id="login-password"
+                type="password"
+                value="Curator!2026"
+                autocomplete="current-password"
+              />
+            </label>
+          </div>
+          <button class="button button-primary" type="submit">
+            <span class="button-icon" aria-hidden="true">
+              <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="5" y="10" width="14" height="10" rx="2" />
+                <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+              </svg>
+            </span>
+            <span>登录</span>
+          </button>
           <p class="login-error" id="login-error"></p>
         </form>
       </div>
     </div>
 
-    <script src="./app.js"></script>
+    <script src="./app.js?v=20260523-05"></script>
   </body>
 </html>
