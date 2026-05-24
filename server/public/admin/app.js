@@ -4881,6 +4881,11 @@ function renderDrawer() {
     const timeline = getOrderTimeline(order);
     const receiverLabel = order.address ? [order.address.contactName, order.address.mobile].filter(Boolean).join(' · ') : user.mobile || '—';
     const productLabel = (order.items || []).map((item) => item.productName || item.trackTitle || '订单项').filter(Boolean).join('、') || '—';
+    const addressLine = order.address ? [order.address.provinceCity, order.address.detail].filter(Boolean).join(' · ') : order.addressSummary || '—';
+    const shippingStatusLabel = STATUS_COPY[order.deliveryStatus || order.status || 'pending'] || order.deliveryStatus || order.status || '待发货';
+    const timelineLead = isOrderShipped(order)
+      ? `已发货 ${formatShortDate(order.shippedAt || order.updatedAt || order.createdAt)}`
+      : `最近更新 ${formatShortDate(order.updatedAt || order.createdAt)}`;
     const shippingSections = [
       { id: 'shipping-section-receiver', label: '收货信息', note: '地址、联系人与备注' },
       { id: 'shipping-section-items', label: '商品明细', note: '订单项与金额' },
@@ -4911,8 +4916,8 @@ function renderDrawer() {
                 ${renderStatusPill(order.deliveryStatus || order.status || 'pending')}
                 ${renderTag(STATUS_COPY[order.status || 'pending_payment'] || order.status || '—', 'neutral')}
               </div>
-              <strong>${escapeHtml(user.nickname || user.displayName || user.mobile || '未绑定用户')}</strong>
-              <p>${escapeHtml(order.addressSummary || '当前订单尚未补充完整的收货摘要。')}</p>
+              <strong>${escapeHtml(receiverLabel || user.nickname || user.displayName || '未绑定用户')}</strong>
+              <p>${escapeHtml(addressLine || '当前订单尚未补充完整的收货摘要。')}</p>
             </div>
           </div>
           <div class="summary-inline-grid summary-inline-grid--shipping">
@@ -4922,37 +4927,14 @@ function renderDrawer() {
               <small>${escapeHtml(order.address ? order.address.provinceCity || '未补充省市' : '未填写地址')}</small>
             </article>
             <article class="summary-inline-card">
-              <span>商品内容</span>
-              <strong>${escapeHtml(productLabel)}</strong>
-              <small>${escapeHtml(order.orderType === 'physical' ? '实物订单' : '数字权益')}</small>
-            </article>
-            <article class="summary-inline-card">
               <span>物流信息</span>
-              <strong>${escapeHtml(order.shippingCompany || '待分配物流')}</strong>
-              <small>${escapeHtml(order.trackingNo || '未填写单号')}</small>
+              <strong>${escapeHtml(order.trackingNo || '待录入单号')}</strong>
+              <small>${escapeHtml(order.shippingCompany || '待分配物流')}</small>
             </article>
             <article class="summary-inline-card">
-              <span>同步状态</span>
-              <strong>${escapeHtml(order.wechatShippingSyncStatus || '待同步')}</strong>
-              <small>${escapeHtml(formatShortDate(order.updatedAt || order.shippedAt || order.createdAt))}</small>
-            </article>
-          </div>
-          <div class="detail-grid">
-            <article class="detail-card">
-              <span>物流公司</span>
-              <strong>${escapeHtml(order.shippingCompany || '—')}</strong>
-            </article>
-            <article class="detail-card">
-              <span>物流单号</span>
-              <strong>${escapeHtml(order.trackingNo || '—')}</strong>
-            </article>
-            <article class="detail-card">
-              <span>支付状态</span>
-              <strong>${escapeHtml(STATUS_COPY[order.status || 'pending_payment'] || order.status || '—')}</strong>
-            </article>
-            <article class="detail-card">
-              <span>最近更新</span>
-              <strong>${escapeHtml(formatShortDate(order.updatedAt || order.shippedAt || order.createdAt))}</strong>
+              <span>履约进度</span>
+              <strong>${escapeHtml(shippingStatusLabel)}</strong>
+              <small>${escapeHtml(timelineLead)}</small>
             </article>
           </div>
         </article>
@@ -4968,16 +4950,16 @@ function renderDrawer() {
             <p>${escapeHtml(order.address ? [order.address.contactName, order.address.mobile].filter(Boolean).join(' · ') : user.mobile || '—')}</p>
             <div class="action-well-list">
               <div class="action-well-list-row">
-                <span>订单类型</span>
-                <strong>${escapeHtml(order.orderType === 'physical' ? '实物订单' : '数字权益')}</strong>
-              </div>
-              <div class="action-well-list-row">
                 <span>物流同步</span>
                 <strong>${escapeHtml(order.wechatShippingSyncStatus || '待同步')}</strong>
               </div>
               <div class="action-well-list-row">
                 <span>当前操作</span>
                 <strong>${escapeHtml(isOrderShipped(order) ? '查看物流进度' : '提交发货信息')}</strong>
+              </div>
+              <div class="action-well-list-row">
+                <span>商品数量</span>
+                <strong>${escapeHtml(`${(order.items || []).length} 项`)}</strong>
               </div>
             </div>
           </div>
@@ -4988,9 +4970,8 @@ function renderDrawer() {
         <section class="drawer-section drawer-section--anchored" id="shipping-section-receiver" data-drawer-section>
           ${renderPanelHeader('收货信息', '地址信息较长时优先保留联系人、手机号和详细地址。')}
           <div class="detail-list">
-            <div class="detail-row"><span>收货人</span><strong>${escapeHtml(order.address ? order.address.contactName : user.nickname || '—')}</strong></div>
-            <div class="detail-row"><span>手机号</span><strong>${escapeHtml(order.address ? order.address.mobile : user.mobile || '—')}</strong></div>
-            <div class="detail-row"><span>地址</span><strong>${escapeHtml(order.address ? [order.address.provinceCity, order.address.detail].filter(Boolean).join(' · ') : order.addressSummary || '—')}</strong></div>
+            <div class="detail-row"><span>收货信息</span><strong>${escapeHtml(receiverLabel)}</strong></div>
+            <div class="detail-row"><span>详细地址</span><strong>${escapeHtml(addressLine)}</strong></div>
             <div class="detail-row"><span>备注</span><strong>${escapeHtml(order.address ? order.address.deliveryNote || '—' : '—')}</strong></div>
           </div>
         </section>

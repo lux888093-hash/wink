@@ -4103,7 +4103,7 @@ textarea:focus,
 }
 
 .summary-inline-grid--shipping {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .summary-inline-card {
@@ -4379,6 +4379,14 @@ textarea:focus,
 
 .drawer-panel--shipping .summary-inline-card {
   background: #fdfdfd;
+}
+
+.drawer-panel--shipping .summary-shell {
+  gap: 16px;
+}
+
+.drawer-panel--shipping .summary-inline-card strong {
+  font-size: 13px;
 }
 
 .drawer-panel--shipping .timeline--shipping {
