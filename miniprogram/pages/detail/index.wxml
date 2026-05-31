@@ -44,24 +44,92 @@
       </view>
     </view>
 
-    <view class="detail-tasting">
-      <text class="detail-section-kicker">品鉴结构</text>
-      <view class="detail-note" wx:for="{{wine.tasting}}" wx:key="key">
-        <view class="detail-note-head">
-          <text class="detail-note-title">{{item.key}}</text>
+    <view class="detail-tasting detail-luxury-section">
+      <view class="detail-section-shell detail-section-shell-tasting">
+        <view class="detail-section-heading">
+          <text class="detail-section-kicker">品鉴结构</text>
+          <text class="detail-section-note">Aroma · Structure · Finish</text>
         </view>
-        <text class="detail-note-copy line-clamp-2">{{item.text}}</text>
-        <view wx:if="{{item.meter}}" class="detail-note-meter">
-          <view class="detail-note-meter-fill" style="width: {{item.meter}}%;"></view>
+
+        <view class="detail-tasting-grid">
+          <view class="detail-tasting-column" wx:for="{{tastingColumns}}" wx:key="slot">
+            <view class="detail-tasting-top">
+              <view class="detail-tasting-emblem">
+                <view wx:if="{{item.iconType === 'aroma'}}" class="detail-emblem-aroma">
+                  <view class="detail-emblem-node detail-emblem-node-center"></view>
+                  <view class="detail-emblem-node detail-emblem-node-top"></view>
+                  <view class="detail-emblem-node detail-emblem-node-right"></view>
+                  <view class="detail-emblem-branch detail-emblem-branch-top"></view>
+                  <view class="detail-emblem-branch detail-emblem-branch-right"></view>
+                </view>
+                <view wx:elif="{{item.iconType === 'structure'}}" class="detail-emblem-structure">
+                  <view class="detail-emblem-weave detail-emblem-weave-a"></view>
+                  <view class="detail-emblem-weave detail-emblem-weave-b"></view>
+                  <view class="detail-emblem-core"></view>
+                </view>
+                <view wx:else class="detail-emblem-finish">
+                  <view class="detail-emblem-wave detail-emblem-wave-a"></view>
+                  <view class="detail-emblem-wave detail-emblem-wave-b"></view>
+                </view>
+              </view>
+              <view class="detail-tasting-heading">
+                <text class="detail-tasting-eyebrow">{{item.eyebrow}}</text>
+                <text class="detail-tasting-title">{{item.displayKey}}</text>
+              </view>
+            </view>
+            <text class="detail-tasting-copy">{{item.text}}</text>
+          </view>
         </view>
       </view>
     </view>
 
-    <view class="detail-service">
-      <text class="detail-section-kicker">饮用建议</text>
-      <view class="detail-service-row" wx:for="{{wine.technical}}" wx:key="label">
-        <text class="detail-service-label">{{item.label}}</text>
-        <text class="detail-service-value">{{item.value}}</text>
+    <view class="detail-service detail-luxury-section">
+      <view class="detail-section-shell detail-section-shell-service">
+        <view class="detail-section-heading">
+          <text class="detail-section-kicker">饮用建议</text>
+          <text class="detail-section-note">Serving · Pairing · Cellaring · Value</text>
+        </view>
+
+        <view class="detail-service-list">
+          <view class="detail-service-row" wx:for="{{technicalRows}}" wx:key="slot">
+            <text class="detail-service-label">{{item.label}}</text>
+            <view class="detail-service-icon">
+              <view wx:if="{{item.iconType === 'temperature'}}" class="detail-service-glyph detail-service-glyph-temperature">
+                <view class="detail-glyph-bottle"></view>
+                <view class="detail-glyph-thermo">
+                  <view class="detail-glyph-thermo-bulb"></view>
+                </view>
+              </view>
+              <view wx:elif="{{item.iconType === 'pairing'}}" class="detail-service-glyph detail-service-glyph-pairing">
+                <view class="detail-glyph-fork">
+                  <view class="detail-glyph-fork-head">
+                    <view class="detail-glyph-fork-prong detail-glyph-fork-prong-left"></view>
+                    <view class="detail-glyph-fork-prong detail-glyph-fork-prong-center"></view>
+                    <view class="detail-glyph-fork-prong detail-glyph-fork-prong-right"></view>
+                  </view>
+                  <view class="detail-glyph-fork-handle"></view>
+                </view>
+                <view class="detail-glyph-spoon">
+                  <view class="detail-glyph-spoon-handle"></view>
+                </view>
+              </view>
+              <view wx:elif="{{item.iconType === 'aging'}}" class="detail-service-glyph detail-service-glyph-aging">
+                <view class="detail-glyph-barrel">
+                  <view class="detail-glyph-barrel-ring detail-glyph-barrel-ring-top"></view>
+                  <view class="detail-glyph-barrel-ring detail-glyph-barrel-ring-bottom"></view>
+                </view>
+                <view class="detail-glyph-clock">
+                  <view class="detail-glyph-clock-hand detail-glyph-clock-hand-hour"></view>
+                  <view class="detail-glyph-clock-hand detail-glyph-clock-hand-minute"></view>
+                </view>
+              </view>
+              <view wx:else class="detail-service-glyph detail-service-glyph-value">
+                <view class="detail-glyph-diamond"></view>
+              </view>
+            </view>
+            <text class="detail-service-value">{{item.value}}</text>
+          </view>
+        </view>
       </view>
     </view>
 
