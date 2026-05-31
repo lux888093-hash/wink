@@ -60,27 +60,27 @@ const state = {
 
 const viewMeta = {
   overview: {
-    kicker: '鸿玖酒庄 · 运营中台',
+    kicker: '南澳古藤酒业 · 运营中台',
     title: '运营概览',
     description: '查看酒款、提取码、发货与小程序文案状态。'
   },
   wines: {
-    kicker: '鸿玖酒庄 · 酒款管理',
+    kicker: '南澳古藤酒业 · 酒款管理',
     title: '酒款管理',
     description: '卡片式列表、右侧编辑与图片管理放在同一屏。'
   },
   codes: {
-    kicker: '鸿玖酒庄 · 提取码管理',
+    kicker: '南澳古藤酒业 · 提取码管理',
     title: '提取码管理',
     description: '控制生成、状态更新、导出与异常码处理。'
   },
   shipping: {
-    kicker: '鸿玖酒庄 · 发货履约',
+    kicker: '南澳古藤酒业 · 发货履约',
     title: '发货管理',
     description: '查看订单、同步物流、处理异常与发货记录。'
   },
   copy: {
-    kicker: '鸿玖酒庄 · 小程序文案',
+    kicker: '南澳古藤酒业 · 小程序文案',
     title: '小程序文案',
     description: '编辑页面文案、预览手机效果并发布到小程序。'
   }
@@ -424,9 +424,9 @@ function setView(view) {
 
   state.activeView = view;
   const meta = viewMeta[view];
-  document.title = `${meta.title} · 鸿玖酒庄运营台`;
+  document.title = `${meta.title} · 南澳古藤酒业运营台`;
   if (els.topbarKicker) {
-    els.topbarKicker.textContent = meta.kicker || '鸿玖酒庄 · 运营中台';
+    els.topbarKicker.textContent = meta.kicker || '南澳古藤酒业 · 运营中台';
   }
   els.viewTitle.textContent = meta.title;
   els.viewDescription.textContent = meta.description;
@@ -2316,7 +2316,7 @@ function ensureCopyDraftSource() {
     pages: {
       home: {
         badge: '首页',
-        title: '鸿玖酒庄',
+        title: '南澳古藤酒业',
         subtitle: '高端红酒品牌运营中台',
         body: '把酒款、提取码、发货和小程序文案放在一条清晰路径里。',
         primaryAction: '查看酒款',

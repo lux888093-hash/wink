@@ -898,7 +898,7 @@ app.post('/api/payments/orders/:orderId/jsapi', async (req, res) => {
     }
 
     const wxPayment = await createJsapiTransaction({
-      description: `鸿玖酒庄订单 ${prepared.order.orderNo}`,
+      description: `南澳古藤酒业订单 ${prepared.order.orderNo}`,
       outTradeNo: prepared.order.orderNo,
       totalFen: Math.round(Number(prepared.order.payAmount || 0) * 100),
       openid: prepared.user.openid,
@@ -1555,5 +1555,5 @@ app.get('/', (_req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Hongjiu curator backend listening on http://127.0.0.1:${port}`);
+  console.log(`南澳古藤酒业 curator backend listening on http://127.0.0.1:${port}`);
 });

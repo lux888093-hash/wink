@@ -363,19 +363,19 @@ function buildDefaultHomeContent(store) {
 
   return {
     intro:
-      winery.intro || '鸿玖酒庄以月光、葡萄藤、木屋与夜色为主线，讲述一处安静、克制、带有收藏感的东方庄园。',
-    statementKicker: '庄园手册',
-    statementTitle: '月色、藤影与木屋',
-    statementBody: '月光、木质与暗红光线构成庄园第一印象。',
+      winery.intro || '南澳古藤酒业以南澳红土、百年老藤、石屋与桶陈酒窖为主线，讲述一处安静、克制、带有时间感的古藤庄园。',
+    statementKicker: '酒庄档案',
+    statementTitle: '老藤、时间与共振',
+    statementBody: '这里不靠喧闹渠道抬高身价，也不为销量牺牲体面。',
     ageNote: DEFAULT_HOME_AGE_NOTE,
     facts: [
       {
         label: '主线',
-        value: '月光、葡萄藤与木屋'
+        value: '南澳红土、百年老藤与桶陈酒窖'
       },
       {
         label: '气质',
-        value: winery.tagline || 'Moonlit Vineyard Residency'
+        value: winery.tagline || '在安静中听见灵魂'
       },
       {
         label: '秩序',
@@ -385,20 +385,20 @@ function buildDefaultHomeContent(store) {
     chapters: [
       {
         eyebrow: '01 / PLACE',
-        title: '夜色里的葡萄园',
-        body: '鸿玖把庄园的第一印象留给夜色、藤影和远处的微光。这里的画面不急着解释，只让葡萄园先成为记忆。',
+        title: '红土里的古藤',
+        body: '南澳古藤酒业把风土的第一印象留给红土、老藤与远处酒窖的微光。这里的画面不急着解释，只让葡萄园先成为记忆。',
         image: winery.harvestImage || '/assets/images/harvest-under-moon.jpg'
       },
       {
         eyebrow: '02 / HOUSE',
-        title: '一盏留亮的窗',
-        body: '庄园的故事从一盏窗开始：木屋、藤影、夜风和被留住的微光，让酒有了可以被记住的住所。',
+        title: '石屋与酒窖',
+        body: '石屋、桶陈和被时间收束的木质气息，让这片古藤产区有了可以被记住的内部秩序。',
         image: winery.portraitImage || '/assets/images/winery-cottage-night.jpg'
       },
       {
         eyebrow: '03 / RITUAL',
-        title: '留白中的秩序',
-        body: '深色、木质与一抹金色只作为背景，让庄园本身成为主角。信息被压缩到必要的几句，余下交给画面。',
+        title: '密钥与私享乐章',
+        body: '深色、木质与一组专属密钥把开瓶、听歌和独饮连成同一条路径，让酒庄本身成为主角。',
         image: winery.heroImage || '/assets/images/winery-vineyard-moon.jpg'
       }
     ],
@@ -442,9 +442,9 @@ function getResolvedHomeHero(store) {
   const hero = ensurePlainObject(store.settings && store.settings.homeHero);
 
   return {
-    eyebrow: getOptionalText(hero.eyebrow, 'Hongjiu Estate'),
-    title: getOptionalText(hero.title, '鸿玖酒庄'),
-    subtitle: getOptionalText(hero.subtitle, '月色葡萄园、木屋灯光与庄园礼盒。'),
+    eyebrow: getOptionalText(hero.eyebrow, '南澳古藤酒业'),
+    title: getOptionalText(hero.title, '南澳古藤酒业'),
+    subtitle: getOptionalText(hero.subtitle, '南澳古藤西拉、石屋酒窖与私享乐章。'),
     ambienceNote: getOptionalText(hero.ambienceNote, DEFAULT_HOME_AGE_NOTE)
   };
 }
@@ -478,7 +478,7 @@ function buildDefaultMiniappCopy(store) {
     pages: {
       home: {
         badge: getOptionalText(hero.eyebrow, '首页'),
-        title: getOptionalText(hero.title, '古藤村落酒庄'),
+        title: getOptionalText(hero.title, '南澳古藤酒业'),
         subtitle: getOptionalText(hero.subtitle, '首页负责建立品牌第一印象。'),
         body: getOptionalText(
           content.intro,
@@ -4064,7 +4064,7 @@ function adminCreateWine(payload = {}) {
   const wine = {
     id,
     wineryId: winery.id,
-    brand: payload.brand || 'Hongjiu Estate',
+    brand: payload.brand || '南澳古藤酒业',
     eyebrow: ensureText(payload.eyebrow, {
       field: 'eyebrow',
       min: 1,

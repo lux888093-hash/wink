@@ -15,7 +15,7 @@ function buildScenes(wine, collection) {
     {
       id: 'estate-hero',
       vintage: '酒庄',
-      title: wine.estateTagline || wine.estateName || '鸿玖酒庄',
+      title: wine.estateTagline || wine.estateName || '南澳古藤酒业',
       note: wine.estateIntro || '',
       image: wine.estateHeroImage || wine.posterImage || wine.bottleImage
     },

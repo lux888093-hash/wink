@@ -61,8 +61,8 @@
     </view>
 
     <view class="legal-footer">
-      <text class="micro-copy">鸿玖酒庄</text>
-      <text class="micro-copy">© 2026 Hongjiu Estate. All rights reserved.</text>
+      <text class="micro-copy">南澳古藤酒业</text>
+      <text class="micro-copy">© 2026 南澳古藤酒业. All rights reserved.</text>
     </view>
   </scroll-view>
 </view>

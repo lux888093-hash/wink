@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-红酒扫码小程序 (Hongjiu Estate Wine QR-code Mini Program) — a WeChat mini program for a winery that delivers exclusive per-bottle content via QR codes, plus a public storefront and membership system. The server is Express + native WeChat mini program frontend.
+红酒扫码小程序 (南澳古藤酒业 Wine QR-code Mini Program) — a WeChat mini program for a winery that delivers exclusive per-bottle content via QR codes, plus a public storefront and membership system. The server is Express + native WeChat mini program frontend.
 
 ## Commands
 

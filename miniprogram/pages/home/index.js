@@ -94,7 +94,7 @@ Page({
       return title;
     }
 
-    return '月色、藤影与木屋';
+    return '老藤、时间与共振';
   },
 
   buildEstateFacts(winery, homeContent) {
@@ -108,11 +108,11 @@ Page({
     return [
       {
         label: '主线',
-        value: '月光、葡萄藤与木屋'
+        value: '南澳红土、百年老藤与桶陈酒窖'
       },
       {
         label: '气质',
-        value: winery.tagline || 'Moonlit Vineyard Residency'
+        value: winery.tagline || '在安静中听见灵魂'
       },
       {
         label: '秩序',
@@ -138,23 +138,23 @@ Page({
     return [
       {
         eyebrow: '静界',
-        title: '夜色里的葡萄园',
+        title: '红土里的古藤',
         body:
-          '鸿玖把庄园的第一印象留给夜色、藤影和远处的微光。这里的画面不急着解释，只让葡萄园先成为记忆。',
+          '南澳古藤酒业把风土的第一印象留给红土、老藤与远处酒窖的微光。这里的画面不急着解释，只让葡萄园先成为记忆。',
         image: winery.harvestImage || '/assets/images/harvest-under-moon.jpg'
       },
       {
-        eyebrow: '木屋',
-        title: '一盏留亮的窗',
+        eyebrow: '石屋',
+        title: '石屋与酒窖',
         body:
-          '庄园的故事从一盏窗开始：木屋、藤影、夜风和被留住的微光，让酒有了可以被记住的住所。',
+          '石屋、桶陈和被时间收束的木质气息，让这片古藤产区有了可以被记住的内部秩序。',
         image: winery.portraitImage || '/assets/images/winery-cottage-night.jpg'
       },
       {
         eyebrow: '秩序',
-        title: '留白中的秩序',
+        title: '密钥与私享乐章',
         body:
-          '深色、木质与一抹金色只作为背景，让庄园本身成为主角。信息被压缩到必要的几句，余下交给画面。',
+          '深色、木质与一组专属密钥把开瓶、听歌和独饮连成同一条路径，让酒庄本身成为主角。',
         image: winery.heroImage || '/assets/images/winery-vineyard-moon.jpg'
       }
     ];

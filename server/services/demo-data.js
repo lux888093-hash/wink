@@ -28,13 +28,13 @@ function createSeedStore() {
   return {
     meta: {
       version: 2,
-      brandName: '古藤村落酒庄 Village Ancient Vine',
+      brandName: '南澳古藤酒业',
       initializedAt: new Date().toISOString()
     },
     settings: {
       homeHero: {
         eyebrow: '酒庄',
-        title: '古藤村落酒庄',
+        title: '南澳古藤酒业',
         subtitle: '南澳古藤西拉、19首私享乐章与 567 价值坐标。',
         ambienceNote: '理性饮酒，未成年人请勿饮酒。'
       },
@@ -44,7 +44,7 @@ function createSeedStore() {
       },
       homeContent: {
         intro:
-          '古藤村落酒庄把南澳红土、百年老藤、18个月橡木桶熟成与黑胶意象放进同一条叙事：一瓶酒，一组密钥，一段只属于独饮时刻的安静体验。',
+          '南澳古藤酒业把南澳红土、百年老藤、18个月橡木桶熟成与黑胶意象放进同一条叙事：一瓶酒，一组密钥，一段只属于独饮时刻的安静体验。',
         statementKicker: '酒庄档案',
         statementTitle: '老藤、时间与共振',
         statementBody:
@@ -84,7 +84,7 @@ function createSeedStore() {
           {
             eyebrow: '老藤',
             title: '红土里的百年根系',
-            body: '古藤村落酒庄把南澳红土、石屋、老藤与桶陈酒窖放在同一个场景里。百年老藤穿过硬土与岩层，把更深的果味骨架、矿物感和稳定张力留进杯中。'
+            body: '南澳古藤酒业把南澳红土、石屋、老藤与桶陈酒窖放在同一个场景里。百年老藤穿过硬土与岩层，把更深的果味骨架、矿物感和稳定张力留进杯中。'
           },
           {
             eyebrow: '时间',
@@ -112,11 +112,11 @@ function createSeedStore() {
     wineries: [
       {
         id: wineryId,
-        name: '古藤村落酒庄',
-        englishName: 'Village Ancient Vine',
+        name: '南澳古藤酒业',
+        englishName: '南澳古藤酒业',
         tagline: '在安静中听见灵魂',
         intro:
-          '古藤村落酒庄位于南澳巴罗萨谷古藤产区，以红土、老藤、石屋和橡木桶酒窖构成核心场景。',
+          '南澳古藤酒业位于南澳巴罗萨谷古藤产区，以红土、老藤、石屋和橡木桶酒窖构成核心场景。',
         story:
           '它不追求喧闹传播，而是把酒、音乐和独处时刻做成一条完整体验线：开瓶、输入密钥、进入只属于这一瓶酒的安静空间。',
         heroImage: '/assets/images/village-ancient-vine-sign.jpg',
@@ -129,7 +129,7 @@ function createSeedStore() {
       {
         id: 'soundless-a-quiet-world-2022',
         wineryId,
-        brand: 'Village Ancient Vine',
+        brand: '南澳古藤酒业',
         eyebrow: '扫码限定',
         title: 'A Quiet World · Voice of the Soul',
         name: '567 黑胶颂·古藤西拉',
@@ -148,7 +148,7 @@ function createSeedStore() {
         story:
           '这支酒把开瓶、听歌和独饮连成同一条路径。酒标上的微光小屋不是装饰，而是提醒你暂时离开外界噪声。',
         moodLine: '把灯光压低，再开始倒酒。',
-        estateName: '古藤村落酒庄',
+        estateName: '南澳古藤酒业',
         estateTagline: '老藤、时间与一段私享乐章',
         estateIntro:
           '酒庄位于南澳巴罗萨谷古藤产区。红土、石屋、老藤与橡木桶酒窖，共同定义它的第一印象。',
@@ -238,8 +238,8 @@ function createSeedStore() {
           {
             id: 'moon-arch',
             vintage: '酒庄',
-            title: '古藤村落入口',
-            note: '南澳古藤葡萄园的第一眼，是红土、石屋与写着古藤村落酒庄的木牌。',
+            title: '南澳古藤入口',
+            note: '南澳古藤葡萄园的第一眼，是红土、石屋与写着南澳古藤酒业的木牌。',
             image: '/assets/images/village-ancient-vine-sign.jpg'
           },
           {
@@ -276,7 +276,7 @@ function createSeedStore() {
       {
         id: 'amber-nocturne-reserve-2021',
         wineryId,
-        brand: 'Hongjiu Estate',
+        brand: '南澳古藤酒业',
         eyebrow: '商城精选',
         title: 'Amber Nocturne Reserve',
         name: '琥珀夜曲珍藏',
@@ -295,10 +295,10 @@ function createSeedStore() {
         story:
           '它更像会员橱窗里的主展示品，强调视觉深度、收藏感与更正式的礼盒结构。',
         moodLine: '适合在正式宴请前开场。',
-        estateName: '鸿玖珍藏酒窖',
+        estateName: '南澳古藤珍藏酒窖',
         estateTagline: '更深的木质气息与更正式的礼序',
         estateIntro:
-          '鸿玖珍藏酒窖以木桶、石墙和低照度陈列为核心，空间更深、更安静。',
+          '南澳古藤珍藏酒窖以木桶、石墙和低照度陈列为核心，空间更深、更安静。',
         estatePhilosophy: '酒窖不强调喧闹陈列，而是用材质、温度和暗光呈现更正式的收藏秩序。',
         estateHeroImage: '/assets/images/wine-bottle-poster.jpg',
         estatePortraitImage: '/assets/images/wine-bottle-estate.jpg',
@@ -348,7 +348,7 @@ function createSeedStore() {
       {
         id: 'dawn-rose-2023',
         wineryId,
-        brand: 'Hongjiu Estate',
+        brand: '南澳古藤酒业',
         eyebrow: '新客友好',
         title: 'Copper Dawn Rose',
         name: '铜曦桃红',
@@ -366,9 +366,9 @@ function createSeedStore() {
         storyTitle: '白昼款的必要性',
         story: '这支桃红的重点在于明亮果香、轻盈酒体和更清爽的饮用节奏。',
         moodLine: '午后露台、轻食和更明亮的果香。',
-        estateName: '鸿玖晨曦园',
+        estateName: '南澳古藤晨曦园',
         estateTagline: '更明亮的果香与轻礼社交',
-        estateIntro: '鸿玖晨曦园更靠近日间葡萄园，保留清晨光线、石径与花果香气。',
+        estateIntro: '南澳古藤晨曦园更靠近日间葡萄园，保留清晨光线、石径与花果香气。',
         estatePhilosophy: '晨曦园的表达更轻盈，但仍以酒庄的秩序感、自然光和克制留白为核心。',
         estateHeroImage: '/assets/images/harvest-under-moon.jpg',
         estatePortraitImage: '/assets/images/wine-gift-set.jpg',
@@ -758,7 +758,7 @@ function createSeedStore() {
         contactName: '月光访客',
         mobile: '13800000000',
         provinceCity: '上海市静安区',
-        detail: '鸿玖会所演示地址',
+        detail: '南澳古藤会所演示地址',
         deliveryNote: '工作日 18:00 后配送',
         isDefault: true,
         createdAt: shiftDays(-1),
